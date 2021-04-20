@@ -1,6 +1,7 @@
 compiler:
   path: gcc
-  source_path:     '../Src/'
+  src_dirs:
+      - '../Src/'
   unit_tests_path: &unit_tests_path 'test/'
   build_path:      &build_path 'build/'
   options:
@@ -37,6 +38,7 @@ linker:
 :cmock:
   :plugins: []
   #  :includes:
-  :mock_path: ./build/mocks
+  :mock_path: ./test/mocks
+  :mock_prefix: Mock_
 
 colour: true

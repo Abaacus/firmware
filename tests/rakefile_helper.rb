@@ -9,19 +9,25 @@ module RakefileHelpers
 
   C_EXTENSION = '.c'.freeze
 
-  def load_configuration(config_file)
-    $cfg_file = config_file
-    $cfg = YAML.load(File.read($cfg_file))
+  def load_configuration(common_file, board_file)
+    $common_cfg_file = common_file
+    $board_cfg_file = board_file
+    $cfg = YAML.load(File.read($common_cfg_file))
+    $cfg = YAML.load(File.read($board_cfg_file)).merge($cfg)
+    
+    $main_src_dirs = $cfg['board_cfg']['src_dirs'] + $cfg['compiler']['src_dirs']
+    
+
     $colour_output = false unless $cfg['colour']
+
   end
 
   def configure_clean
     CLEAN.include($cfg['compiler']['build_path'] + '*.*') unless $cfg['compiler']['build_path'].nil?
   end
 
-  def configure_toolchain(config_file = DEFAULT_CONFIG_FILE)
-    config_file += '.yml' unless config_file =~ /\.yml$/
-    load_configuration(config_file)
+  def configure_toolchain(common_config, board_config)
+    load_configuration(common_config, board_config)
     configure_clean
   end
 
@@ -33,6 +39,9 @@ module RakefileHelpers
 
   def local_include_dirs
     include_dirs = $cfg['compiler']['includes']['items'].dup
+    $cfg['board_cfg']['include_dirs'].each { |include_dir|
+      include_dirs.append('../../tests/' + include_dir)
+    }
     include_dirs.delete_if { |dir| dir.is_a?(Array) }
     include_dirs
   end
@@ -86,7 +95,16 @@ module RakefileHelpers
                 squash($cfg['compiler']['defines']['prefix'], $cfg['compiler']['defines']['items'])
               end
     options = squash('', $cfg['compiler']['options'])
-    includes = squash($cfg['compiler']['includes']['prefix'], $cfg['compiler']['includes']['items'])
+
+    include_dirs = local_include_dirs
+
+    board_compiler_flags = $cfg['board_cfg']['compiler_flags']
+
+    board_compiler_flags.each { |key, fields|
+      options += squash(fields['prefix'], fields['items'])
+    }
+
+    includes = squash($cfg['compiler']['includes']['prefix'], include_dirs)
     includes = includes.gsub(/\\ /, ' ').gsub(/\\\"/, '"').gsub(/\\$/, '') # Remove trailing slashes (for IAR)
     { :command => command, :defines => defines, :options => options, :includes => includes }
   end
@@ -173,7 +191,7 @@ module RakefileHelpers
     report 'Running system tests...'
 
     # Tack on TEST define for compiling unit tests
-    load_configuration($cfg_file)
+    load_configuration($common_cfg_file, $board_cfg_file)
     test_defines = ['TEST']
     $cfg['compiler']['defines']['items'] = [] if $cfg['compiler']['defines']['items'].nil?
     $cfg['compiler']['defines']['items'] << 'TEST'
@@ -192,7 +210,13 @@ module RakefileHelpers
 
         require '../../lib/cmock.rb'
         @cmock ||= CMock.new($cfg_file)
-        @cmock.setup_mocks([$cfg['compiler']['source_path'] + header.gsub('Mock', '')])
+
+        unmocked_srcs = []
+        $main_src_dirs.each { |src_dir|
+          unmocked_srcs += src_dir.gsub('Mock', '')
+        }
+
+        @cmock.setup_mocks(unmocked_srcs)
       end
 
       # compile all mocks
@@ -242,13 +266,14 @@ module RakefileHelpers
     end
   end
 
+=begin
   def build_application(main)
     report 'Building application...'
 
     obj_list = []
     load_configuration($cfg_file)
-    main_path = $cfg['compiler']['source_path'] + main + C_EXTENSION
-
+    common_path = $cfg['compiler']['source_path'] + main + C_EXTENSION
+    
     # Detect dependencies and build required required modules
     include_dirs = local_include_dirs
     extract_headers(main_path).each do |header|
@@ -265,4 +290,5 @@ module RakefileHelpers
     # Create the executable
     link_it(main_base, obj_list)
   end
+=end
 end

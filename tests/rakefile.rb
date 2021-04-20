@@ -13,8 +13,11 @@ REQUIRED_DIRS.each do |v|
 end
 
 # Load default configuration, for now
-DEFAULT_CONFIG_FILE = 'gcc.yml'.freeze
-configure_toolchain(DEFAULT_CONFIG_FILE)
+COMMON_CONFIG_FILE = 'common.yml'.freeze
+BOARD_CONFIG_FILE = '../../tests/test.yml'
+configure_toolchain(COMMON_CONFIG_FILE, BOARD_CONFIG_FILE)
+
+
 
 task :unit do
   run_tests(unit_test_files)
@@ -31,10 +34,6 @@ task :default => REQUIRED_DIRS + %i[clobber all]
 task :ci => [:default]
 task :cruise => [:default]
 
-desc 'Load configuration'
-task :config, :config_file do |_t, args|
-  configure_toolchain(args[:config_file])
-end
 
 desc 'Return error on Failures'
 task :strict do

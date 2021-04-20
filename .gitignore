@@ -1,1 +1,5 @@
 Scripts/templates/outputs/
+*__pycache__*
+*.pyc
+*_Runner.c
+*.o
