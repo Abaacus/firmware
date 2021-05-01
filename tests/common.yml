@@ -1,19 +1,23 @@
+# gcc compiler instead of arm-none-eabi-gcc
+# Can't run ARM code on x86
 compiler:
-  path: gcc
+  path: gcc 
   src_dirs:
       - '../Src/'
-  unit_tests_path: &unit_tests_path 'test/'
-  build_path:      &build_path 'build/'
+  unit_tests_paths: &unit_tests_paths 
+      - 'test/'
+      - '../../tests/'
+  build_path: &build_path 'build/'
   options:
     - -c
   includes:
     prefix: '-I'
     items:
+      - *unit_tests_paths
       - '../Inc/'
       - '../Src/'
-      - '../test-core/CMock/vendor/unity/src'
-      - '../test-core/CMock/src'
-      - *unit_tests_path
+      - '../test-core/CMock/vendor/unity/src/'
+      - '../test-core/CMock/src/'
   defines:
     prefix: '-D'
     items:
@@ -23,7 +27,7 @@ compiler:
     extension: '.o'
     destination: *build_path
 linker:
-  path: gcc
+  path: gcc 
   options:
     - -lm
   includes:
@@ -33,12 +37,12 @@ linker:
     extension: '.o'
   bin_files:
     prefix: '-o'
-    extension: '.exe'
+    extension: '.out'
     destination: *build_path
 :cmock:
   :plugins: []
   #  :includes:
-  :mock_path: ./test/mocks
-  :mock_prefix: Mock_
+  :mock_path: mocks
+  :mock_prefix: 'Mock_'
 
 colour: true

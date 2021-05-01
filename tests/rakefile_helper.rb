@@ -14,7 +14,6 @@ module RakefileHelpers
     $board_cfg_file = board_file
     $cfg = YAML.load(File.read($common_cfg_file))
     $cfg = YAML.load(File.read($board_cfg_file)).merge($cfg)
-    
     $main_src_dirs = $cfg['board_cfg']['src_dirs'] + $cfg['compiler']['src_dirs']
     
 
@@ -32,9 +31,15 @@ module RakefileHelpers
   end
 
   def unit_test_files
-    path = $cfg['compiler']['unit_tests_path'] + 'Test*' + C_EXTENSION
-    path.tr!('\\', '/')
-    FileList.new(path)
+    paths = $cfg['compiler']['unit_tests_paths'] 
+    file_list = FileList.new()
+    paths.each { |path| 
+      path += 'Test*' + C_EXTENSION
+      path.tr('\\', '/')
+      file_list.include(path)
+    }
+    
+    file_list
   end
 
   def local_include_dirs
@@ -99,7 +104,6 @@ module RakefileHelpers
     include_dirs = local_include_dirs
 
     board_compiler_flags = $cfg['board_cfg']['compiler_flags']
-
     board_compiler_flags.each { |key, fields|
       options += squash(fields['prefix'], fields['items'])
     }

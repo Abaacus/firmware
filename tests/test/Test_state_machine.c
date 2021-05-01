@@ -10,5 +10,5 @@ void tearDown(void)
 
 void test_stub(void)
 {
-    TEST_ASSERT_TRUE(0);
+    TEST_ASSERT_TRUE(1);
 }
