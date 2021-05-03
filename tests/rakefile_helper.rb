@@ -15,14 +15,16 @@ module RakefileHelpers
     $cfg = YAML.load(File.read($common_cfg_file))
     $cfg = YAML.load(File.read($board_cfg_file)).merge($cfg)
     $main_src_dirs = $cfg['board_cfg']['src_dirs'] + $cfg['compiler']['src_dirs']
-    
+    $cfg['board_cfg']['src_dirs'].each { |src_dir|
+      $main_src_dirs.append(File.dirname(board_file) + src_dir) 
+    }
 
     $colour_output = false unless $cfg['colour']
 
   end
 
   def configure_clean
-    CLEAN.include($cfg['compiler']['build_path'] + '*.*') unless $cfg['compiler']['build_path'].nil?
+    CLEAN.include($cfg['compiler']['build_path'] + '*') unless $cfg['compiler']['build_path'].nil?
   end
 
   def configure_toolchain(common_config, board_config)
@@ -34,7 +36,7 @@ module RakefileHelpers
     paths = $cfg['compiler']['unit_tests_paths'] 
     file_list = FileList.new()
     paths.each { |path| 
-      path += 'Test*' + C_EXTENSION
+      path += 'test_*' + C_EXTENSION
       path.tr('\\', '/')
       file_list.include(path)
     }
@@ -201,7 +203,6 @@ module RakefileHelpers
     $cfg['compiler']['defines']['items'] << 'TEST'
 
     include_dirs = local_include_dirs
-
     # Build and execute each unit test
     test_files.each do |test|
       obj_list = []
@@ -211,15 +212,19 @@ module RakefileHelpers
       header_list.each do |header|
         # create mocks if needed
         next unless header =~ /Mock/
-
-        require '../../lib/cmock.rb'
-        @cmock ||= CMock.new($cfg_file)
-
+        require '../test-core/CMock/lib/cmock.rb'
+        @cmock ||= CMock.new($cfg[:cmock])
+        
         unmocked_srcs = []
-        $main_src_dirs.each { |src_dir|
-          unmocked_srcs += src_dir.gsub('Mock', '')
+        
+        include_dirs.each { |include_dir|
+          if header.include?($cfg[:cmock][:mock_prefix]) 
+            path_test = include_dir + header.gsub($cfg[:cmock][:mock_prefix], '')
+            if File.file?(path_test)
+              unmocked_srcs.append(path_test)
+            end
+          end
         }
-
         @cmock.setup_mocks(unmocked_srcs)
       end
 

@@ -3,3 +3,4 @@ Scripts/templates/outputs/
 *.pyc
 *_Runner.c
 *.o
+tests/build/
