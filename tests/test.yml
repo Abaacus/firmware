@@ -1,22 +1,23 @@
 board_cfg:
     src_dirs:
         - '../Src/'
-        - '../Cube-F0-Src/DCU/Src'
+        - '../Gen/Src/'
     include_dirs:
         - '../Inc/'
-        - '../Cube-F0-Src/DCU/Inc'
-        - '../Cube-F0-Src/DCU/Drivers/STM32F0xx_HAL_Driver/Inc'
-        - '../Cube-F0-Src/DCU/Drivers/CMSIS/Device/ST/STM32F0xx/Include'
-        - '../Cube-F0-Src/DCU/Drivers/CMSIS/Include'
-        - '../Cube-F0-Src/DCU/Middlewares/Third_Party/FreeRTOS/Source/include'
-        - '../Cube-F0-Src/DCU/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0'
+        - '../Cube-F0-Src/DCU/Inc/'
+        - '../Cube-F0-Src/DCU/Middlewares/Third_Party/FreeRTOS/Source/include/'
+        - '../Cube-F0-Src/DCU/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0/'
+        - '../Gen/Inc/'
+        - '../Cube-F0-Src/DCU/Drivers/STM32F0xx_HAL_Driver/Inc/'
+        - '../Cube-F0-Src/DCU/Drivers/CMSIS/Include/'
+        - '../Cube-F0-Src/DCU/Drivers/CMSIS/Device/ST/STM32F0xx/Include/'
     compiler_flags:
         defines:
             prefix: '-D'
             items:
                 - "STM32F072xB"
-                - "BOARD_NAME=VCU"
+                - "BOARD_NAME=DCU"
                 - "BOARD_TYPE_F0=1"
-                - "BOARD_ID=ID_VCU"
+                - "BOARD_ID=ID_DCU"
                 - "BOARD_VERSION=1"
                 - "USE_HAL_DRIVER"
