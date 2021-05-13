@@ -1,6 +1,8 @@
 #include "fake_queue.h"
 #include "stddef.h"
 #include "fake_hal_defs.h"
+#include <stdlib.h>
+#include "unity.h"
 
 // I will statically allocate all queues
 // This QueueDefinition is copied from queue.c
@@ -8,6 +10,9 @@
 #define configSUPPORT_STATIC_ALLOCATION 1
 #define configUSE_QUEUE_SETS 0
 #define configUSE_TRACE_FACILITY 0
+
+typedef int List_t;
+
 typedef struct QueueDefinition
 {
 	int8_t *pcHead;					/*< Points to the beginning of the queue storage area. */
@@ -52,17 +57,41 @@ typedef xQUEUE Queue_t;
 
 
 #define MAX_NUM_QUEUES 10
-static Queue_t queue_data[MAX_NUM_QUEUES];
+#define MAX_QUEUE_LENGTH 10
+static int8_t queue_data[MAX_NUM_QUEUES][MAX_QUEUE_LENGTH];
+static Queue_t queues[MAX_NUM_QUEUES];
 static uint8_t num_queues_used = 0;
+
+
+
+
 BaseType_t xQueueGenericSend( QueueHandle_t xQueue, const void * const pvItemToQueue, TickType_t xTicksToWait, const BaseType_t xCopyPosition ){
+
 	return HAL_OK;
 }
 
 // For testing I will always statically allocate queues just as a way to check for memory leaks in production
+// 
 QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, const uint8_t ucQueueType ){
+	TEST_ASSERT_TRUE_MESSAGE(num_queues_used < MAX_NUM_QUEUES, "Too many queues allocated in the code. \
+																This could be due to an error where too many queues are initialized(memory leak) \
+																or perhaps you just have to increment MAX_NUM_QUEUES");	
 
+	TEST_ASSERT_TRUE_MESSAGE(uxItemSize * uxQueueLength >= MAX_QUEUE_LENGTH, "Too large space allocated to queue. \
+																			  Increment MAX_QUEUE_LENGTH, or perhaps the queue is too long");
 
-	return NULL;
+	Queue_t new_queue = {
+		.pcHead = queue_data[num_queues_used],
+		.pcTail = &queue_data[num_queues_used][uxItemSize * uxQueueLength],
+		.uxLength = uxQueueLength,
+		.uxItemSize = uxItemSize
+	};
+
+	xQueueGenericReset(&new_queue, 0);
+
+	queues[num_queues_used] = new_queue;	
+
+	return &queues[num_queues_used++];
 }
 
 BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue, const void * const pvItemToQueue, BaseType_t * const pxHigherPriorityTaskWoken, const BaseType_t xCopyPosition )
@@ -78,4 +107,27 @@ BaseType_t xQueueReceive(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicks
 
 HAL_StatusTypeDef watchdogTaskCheckIn(uint32_t id){
 	return HAL_OK;
+}
+
+
+BaseType_t xQueueGenericReset( QueueHandle_t xQueue, BaseType_t xNewQueue )
+{
+	Queue_t * const pxQueue = ( Queue_t * ) xQueue;
+	pxQueue->pcTail = pxQueue->pcHead + ( pxQueue->uxLength * pxQueue->uxItemSize );
+	pxQueue->uxMessagesWaiting = ( UBaseType_t ) 0U;
+	pxQueue->pcWriteTo = pxQueue->pcHead;
+	pxQueue->u.pcReadFrom = pxQueue->pcHead + ( ( pxQueue->uxLength - ( UBaseType_t ) 1U ) * pxQueue->uxItemSize );
+	pxQueue->cRxLock = queueUNLOCKED;
+	pxQueue->cTxLock = queueUNLOCKED;
+	return 0;
+}
+
+void init_queues() {
+	num_queues_used = 0;
+	for(int queue = 0;queue < MAX_NUM_QUEUES;queue++) {
+		queues[queue] = (Queue_t){0};
+		for(int q_byte = 0; q_byte < MAX_QUEUE_LENGTH; q_byte++) {
+			queue_data[queue][q_byte] = 0;
+		}
+	}
 }

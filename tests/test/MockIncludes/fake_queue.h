@@ -8,6 +8,7 @@ typedef void* QueueHandle_t;
 
 QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, const uint8_t ucQueueType );
 
+BaseType_t xQueueGenericReset( QueueHandle_t xQueue, BaseType_t xNewQueue );
 
 // A couple of defs copied from queue.h
 typedef void* QueueHandle_t;
@@ -25,6 +26,12 @@ typedef void* QueueHandle_t;
 #define queueQUEUE_TYPE_COUNTING_SEMAPHORE	( ( uint8_t ) 2U )
 #define queueQUEUE_TYPE_BINARY_SEMAPHORE	( ( uint8_t ) 3U )
 #define queueQUEUE_TYPE_RECURSIVE_MUTEX		( ( uint8_t ) 4U )
+
+#define queueUNLOCKED					( ( int8_t ) -1 )
+#define queueLOCKED_UNMODIFIED			( ( int8_t ) 0 )
+
+void init_queues();
+
 
 
 #endif

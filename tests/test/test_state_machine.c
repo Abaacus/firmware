@@ -129,13 +129,21 @@ void *my_test_fsm_task(void *args){
 
 #define FSM_END(id) \
 	pthread_cancel(thread_id_##id);
-void test_Standard_Transitions(void)
+void test_Init_Close(void)
 {
   	FSM_START(1);
     TEST_ASSERT_TRUE(1);
     FSM_END(1);
-//	Error_Handler();
 }
+
+void test_One_Transition(void)
+{
+  	FSM_START(1);
+	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
+	FSM_END(1);
+}
+
 void test_Fail_Transition(void)
 {
 }
