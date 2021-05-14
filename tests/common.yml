@@ -11,6 +11,7 @@ compiler:
   options:
     - -c
     - -m32
+    - -g
   includes:
     prefix: '-I'
     items:

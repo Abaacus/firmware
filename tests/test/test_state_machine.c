@@ -6,9 +6,9 @@
 #include "fake_queue.h"
 #include "fake_main.h"
 #include "Mock_main.h"
+#include <unistd.h>
 
 // FSM common Data
-
 FSM_Handle_Struct fsmHandle;
 
 
@@ -65,6 +65,7 @@ Transition_t transitions_1[] = {
 // Unity Standard Functions
 void setUp(void)
 {
+	init_queues();
 	_Error_Handler_Stub(fake_Error_Handler);
 	debugInit();
 }
@@ -110,7 +111,8 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
     init.eventQueueLength = eventQueueLength;
     init.watchdogTaskId = watchdogTaskId;
     if (fsmInit(startingState, &init, handle) != HAL_OK) {
-        return HAL_ERROR;
+		TEST_MESSAGE("Failure initializing FSM");
+		return HAL_ERROR;
     }
     return HAL_OK;
 
@@ -118,6 +120,7 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
 }
 
 void *my_test_fsm_task(void *args){
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, 0);
 	fsmTaskFunction(args);
 }
 
@@ -129,18 +132,39 @@ void *my_test_fsm_task(void *args){
 
 #define FSM_END(id) \
 	pthread_cancel(thread_id_##id);
-void test_Init_Close(void)
+
+
+#define POLL_TIME_US 100 * 1000 // 100ms
+#define POLL_DURATION_US 1 * 1000 * 1000 // 5s
+#define POLL_COND(cond) { \
+	uint32_t count = 0; \
+	while(!(cond) && count < POLL_DURATION_US / POLL_TIME_US){ \
+		/*fprintf(stderr, "Poll\n");*/ \
+		usleep(POLL_TIME_US); \
+		count++; \
+	} \
+	if(count >= POLL_DURATION_US / POLL_TIME_US){TEST_MESSAGE("Failed Poll");}\
+}
+
+
+/*void test_Init_Close(void)
 {
   	FSM_START(1);
     TEST_ASSERT_TRUE(1);
     FSM_END(1);
-}
+}*/
 
 void test_One_Transition(void)
 {
   	FSM_START(1);
+	
+	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
+
 	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
+	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_2);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
+
 	FSM_END(1);
 }
 
