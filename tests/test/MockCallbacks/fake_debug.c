@@ -19,3 +19,18 @@ HAL_StatusTypeDef debugInit()
     }
 	return HAL_OK;
 }
+/*
+void printTask(void *pvParameters)
+{
+    char buffer[PRINT_QUEUE_STRING_SIZE] = {0};
+
+    for ( ;; )
+    {
+        if (xQueueReceive(printQueue, buffer, portMAX_DELAY) == pdTRUE)
+        {
+            int len = strlen(buffer);
+            HAL_UART_Transmit(&DEBUG_UART_HANDLE, (uint8_t*)buffer, len, UART_PRINT_TIMEOUT);
+        }
+    }
+}
+*/

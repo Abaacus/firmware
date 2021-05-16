@@ -82,6 +82,7 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
 	uint32_t event_any;
 	Transition_t *transitions;
 	size_t events_size;
+	size_t transitionTableLength;
 	
 	uint32_t eventQueueLength = 5;
 	uint32_t watchdogTaskId = 0;
@@ -93,6 +94,7 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
 			state_any = STATE_1_ANY;
 			event_any = EV_1_ANY;
 			transitions = transitions_1;
+			transitionTableLength = TRANS_COUNT(transitions_1);
 			events_size = sizeof(Events_1_t); 
 			break;
 		default:
@@ -107,7 +109,7 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
     init.ST_ANY = state_any;
     init.EV_ANY = event_any;
     init.transitions = transitions;
-    init.transitionTableLength = TRANS_COUNT(transitions);
+    init.transitionTableLength = transitionTableLength;
     init.eventQueueLength = eventQueueLength;
     init.watchdogTaskId = watchdogTaskId;
     if (fsmInit(startingState, &init, handle) != HAL_OK) {
@@ -126,7 +128,7 @@ void *my_test_fsm_task(void *args){
 
 #define FSM_START(id) \
 	FSM_Handle_Struct fsmHandle_##id; \
-	setup_fsm_handle(id, &fsmHandle_##id); \
+	if(HAL_OK != setup_fsm_handle(id, &fsmHandle_##id)){TEST_ASSERT_TRUE(0);} \
 	pthread_t thread_id_##id; \
 	pthread_create(&thread_id_##id, NULL, my_test_fsm_task, (void*)&fsmHandle_##id);  
 
@@ -134,7 +136,7 @@ void *my_test_fsm_task(void *args){
 	pthread_cancel(thread_id_##id);
 
 
-#define POLL_TIME_US 100 * 1000 // 100ms
+#define POLL_TIME_US 20 * 1000 // 100ms
 #define POLL_DURATION_US 1 * 1000 * 1000 // 5s
 #define POLL_COND(cond) { \
 	uint32_t count = 0; \
@@ -146,14 +148,15 @@ void *my_test_fsm_task(void *args){
 	if(count >= POLL_DURATION_US / POLL_TIME_US){TEST_MESSAGE("Failed Poll");}\
 }
 
-
-/*void test_Init_Close(void)
+/* Ensure FSM initialization works */
+void test_Init_Close(void)
 {
   	FSM_START(1);
     TEST_ASSERT_TRUE(1);
     FSM_END(1);
-}*/
+}
 
+/* Test at least one transition works, STATE_1_1 -> STATE_1_2 */
 void test_One_Transition(void)
 {
   	FSM_START(1);
@@ -168,6 +171,48 @@ void test_One_Transition(void)
 	FSM_END(1);
 }
 
+
+/* Basically just go through FSM 1, STATE_1_1 -> STATE_1_4 */
+void test_Multiple_Transition(void)
+{
+  	FSM_START(1);
+	
+	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
+
+	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
+	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_2);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
+
+	fsmSendEvent(&fsmHandle_1, EV_1_2, 0);
+	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_3);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_3);
+	
+	fsmSendEvent(&fsmHandle_1, EV_1_3, 0);
+	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_4);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_4);
+	TEST_ASSERT_FALSE(fsmGetState(&fsmHandle_1) == STATE_1_3);
+	TEST_ASSERT_FALSE(fsmGetState(&fsmHandle_1) == STATE_1_2);
+	TEST_ASSERT_FALSE(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	
+	FSM_END(1);
+}
+
+/* This is a stupid test that will always pass, I leave it in for future extension
+ * Basically whenever a state transition doesn't exist, we just do not change states
+ * But how do we check this? Because the test could run before event is processed. We need more robust tests.*/
+
 void test_Fail_Transition(void)
 {
+	FSM_START(1);
+	
+	fsmSendEvent(&fsmHandle_1, EV_1_4, 0);
+	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	
+	FSM_END(1);
+}
+
+void test_Multiple_FSMs(void){
+
 }
