@@ -6,6 +6,8 @@
 #include "fake_queue.h"
 #include "fake_main.h"
 #include "Mock_main.h"
+#include "fake_state_machine_interface.h"
+#include "fake_tasks.h"
 #include <unistd.h>
 
 // FSM common Data
@@ -121,19 +123,13 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
 
 }
 
-void *my_test_fsm_task(void *args){
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, 0);
-	fsmTaskFunction(args);
-}
-
 #define FSM_START(id) \
 	FSM_Handle_Struct fsmHandle_##id; \
 	if(HAL_OK != setup_fsm_handle(id, &fsmHandle_##id)){TEST_ASSERT_TRUE(0);} \
-	pthread_t thread_id_##id; \
-	pthread_create(&thread_id_##id, NULL, my_test_fsm_task, (void*)&fsmHandle_##id);  
+	pthread_t fsm_handle_thread_id_##id = fsm_run(&fsmHandle_##id);
 
 #define FSM_END(id) \
-	pthread_cancel(thread_id_##id);
+	end_task(fsm_handle_thread_id_##id);
 
 
 #define POLL_TIME_US 20 * 1000 // 100ms
@@ -213,6 +209,8 @@ void test_Fail_Transition(void)
 	FSM_END(1);
 }
 
-void test_Multiple_FSMs(void){
 
+/* To be implemented */
+void test_Multiple_FSMs(void){
+	TEST_ASSERT_TRUE(1);
 }

@@ -16,9 +16,8 @@ module RakefileHelpers
     $cfg = YAML.load(File.read($board_cfg_file)).merge($cfg)
     $main_src_dirs = $cfg['board_cfg']['src_dirs'] + $cfg['compiler']['src_dirs']
     $cfg['board_cfg']['src_dirs'].each { |src_dir|
-      $main_src_dirs.append(File.dirname(board_file) + src_dir) 
+      $main_src_dirs.append(File.dirname(board_file) + "/" + src_dir) 
     }
-
     $colour_output = false unless $cfg['colour']
 
   end
@@ -104,7 +103,7 @@ module RakefileHelpers
     options = squash('', $cfg['compiler']['options'])
 
     include_dirs = local_include_dirs
-
+    
     board_compiler_flags = $cfg['board_cfg']['compiler_flags']
     board_compiler_flags.each { |key, fields|
       options += squash(fields['prefix'], fields['items'])
@@ -226,12 +225,13 @@ module RakefileHelpers
           end
         }
         @cmock.setup_mocks(unmocked_srcs)
+        puts unmocked_srcs
       end
-
+  
       # compile all mocks
       header_list.each do |header|
         # compile source file header if it exists
-        src_file = find_source_file(header, include_dirs)
+        src_file = find_source_file(header, include_dirs) 
         unless src_file.nil?
           obj_list << compile(src_file, test_defines)
         end

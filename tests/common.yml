@@ -23,6 +23,10 @@ compiler:
       - '../Src/'
       - '../test-core/CMock/vendor/unity/src/'
       - '../test-core/CMock/src/'
+      - '../f0/Inc/'
+      - '../f7/Inc/'
+      - '../f0/Src/'
+      - '../f7/Src/'
   defines:
     prefix: '-D'
     items:
