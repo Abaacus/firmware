@@ -13,5 +13,13 @@ void end_task(pthread_t thread_id) {
 
 
 void vTaskDelay( const TickType_t xTicksToDelay ) {
+	// I don't think we need to do anything here
+	// If we actually put this here, it will cause tests to take along time
+	// It will also not fully emulate STM chip
+}
 
+
+
+BaseType_t xTaskGetSchedulerState( void ) {
+	return taskSCHEDULER_RUNNING;
 }

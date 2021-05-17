@@ -214,3 +214,5 @@ void test_Fail_Transition(void)
 void test_Multiple_FSMs(void){
 	TEST_ASSERT_TRUE(1);
 }
+
+/* Add test for queue testing, basically send a bunch of messages */
