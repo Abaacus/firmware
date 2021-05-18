@@ -103,7 +103,7 @@ module RakefileHelpers
     options = squash('', $cfg['compiler']['options'])
 
     include_dirs = local_include_dirs
-    
+
     board_compiler_flags = $cfg['board_cfg']['compiler_flags']
     board_compiler_flags.each { |key, fields|
       options += squash(fields['prefix'], fields['items'])

@@ -1,14 +1,25 @@
 //Includes
 #include "unity.h"
 #include "state_machine.h"
+
 #include <pthread.h>
+#include "Mock_debug.h"
 #include "fake_debug.h"
+
+#include "Mock_queue.h"
 #include "fake_queue.h"
-#include "fake_main.h"
+
 #include "Mock_main.h"
+#include "fake_main.h"
+
 #include "fake_state_machine_interface.h"
+
 #include "fake_tasks.h"
+
+#include "Mock_watchdog.h"
+
 #include <unistd.h>
+
 
 // FSM common Data
 FSM_Handle_Struct fsmHandle;
@@ -67,9 +78,9 @@ Transition_t transitions_1[] = {
 // Unity Standard Functions
 void setUp(void)
 {
-	init_queues();
+	fake_mock_init_queues();
+	fake_mock_init_debug();
 	_Error_Handler_Stub(fake_Error_Handler);
-	debugInit();
 }
 
 void tearDown(void)
@@ -216,3 +227,4 @@ void test_Multiple_FSMs(void){
 }
 
 /* Add test for queue testing, basically send a bunch of messages */
+

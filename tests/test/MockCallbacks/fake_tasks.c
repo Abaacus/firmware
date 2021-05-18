@@ -18,7 +18,13 @@ void vTaskDelay( const TickType_t xTicksToDelay ) {
 	// It will also not fully emulate STM chip
 }
 
-
+TickType_t xTaskGetTickCountFromISR(void) {
+	return 0;
+}
+// Real tick implementations should be created
+TickType_t xTaskGetTickCount( void ) {
+	return 0;
+}
 
 BaseType_t xTaskGetSchedulerState( void ) {
 	return taskSCHEDULER_RUNNING;

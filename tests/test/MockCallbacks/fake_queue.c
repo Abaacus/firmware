@@ -1,4 +1,5 @@
 #include "fake_queue.h"
+#include "FreeRTOS.h"
 #include "stddef.h"
 #include "fake_hal_defs.h"
 #include "projdefs.h"
@@ -6,16 +7,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include "unity.h"
+#include "queue.h"
 
-// I will statically allocate all queues
-// This QueueDefinition is copied from queue.c
-#define configSUPPORT_DYNAMIC_ALLOCATION 0
-#define configSUPPORT_STATIC_ALLOCATION 1
-#define configUSE_QUEUE_SETS 0
-#define configUSE_TRACE_FACILITY 0
-
+#define queueUNLOCKED					( ( int8_t ) -1 )
+#define queueLOCKED_UNMODIFIED			( ( int8_t ) 0 )
 typedef int List_t;
-
 typedef struct QueueDefinition
 {
 	int8_t *pcHead;					/*< Points to the beginning of the queue storage area. */
@@ -56,10 +52,6 @@ typedef struct QueueDefinition
 /* The old xQUEUE name is maintained above then typedefed to the new Queue_t
 name below to enable the use of older kernel aware debuggers. */
 typedef xQUEUE Queue_t;
-
-
-
-
 static BaseType_t prvCopyDataToQueue( Queue_t * const pxQueue, const void *pvItemToQueue, const BaseType_t xPosition );
 static void prvCopyDataFromQueue( Queue_t * const pxQueue, void * const pvBuffer );
 
@@ -131,9 +123,6 @@ BaseType_t xQueueReceive(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicks
 }
 
 
-HAL_StatusTypeDef watchdogTaskCheckIn(uint32_t id){
-	return HAL_OK;
-}
 
 
 BaseType_t xQueueGenericReset( QueueHandle_t xQueue, BaseType_t xNewQueue )
@@ -201,8 +190,7 @@ static void prvCopyDataFromQueue( Queue_t * const pxQueue, void * const pvBuffer
 }
 
 
-
-void init_queues() {
+void fake_mock_init_queues() {
 	num_queues_used = 0;
 	for(int queue = 0;queue < MAX_NUM_QUEUES;queue++) {
 		queues[queue] = (Queue_t){0};

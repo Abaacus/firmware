@@ -6,6 +6,7 @@
 
 
 
-pthread_t fsm_init(HAL_StatusTypeDef (*init_function)(void), FSM_Handle_Struct *handle);
-pthread_t fsm_run(FSM_Handle_Struct *handle);
+
+pthread_t fake_mock_fsm_init(HAL_StatusTypeDef (*init_function)(void), FSM_Handle_Struct *handle);
+pthread_t fake_mock_fsm_run(FSM_Handle_Struct *handle);
 #endif

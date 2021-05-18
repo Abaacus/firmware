@@ -17,4 +17,5 @@
 
 TickType_t xTaskGetTickCount( void );
 
+void fake_mock_init_timers(void);
 #endif

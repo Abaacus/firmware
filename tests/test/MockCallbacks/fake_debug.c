@@ -1,10 +1,12 @@
 #include "fake_debug.h"
 #include "stddef.h"
-#include "fake_hal_defs.h"
+#include "queue.h"
+#include "debug.h"
+
 QueueHandle_t printQueue;
 QueueHandle_t uartRxQueue;
 
-HAL_StatusTypeDef debugInit()
+HAL_StatusTypeDef fake_debugInit()
 {
     printQueue = xQueueCreate(PRINT_QUEUE_LENGTH, PRINT_QUEUE_STRING_SIZE);
     if (!printQueue)
@@ -34,3 +36,7 @@ void printTask(void *pvParameters)
     }
 }
 */
+
+void fake_mock_init_debug() {
+	fake_debugInit();
+}

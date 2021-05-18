@@ -17,12 +17,12 @@ compiler:
     items:
       - *unit_tests_paths
       - 'build/mocks/'
-      - 'test/MockIncludes/'
-      - 'test/MockCallbacks/'
       - '../Inc/'
       - '../Src/'
       - '../test-core/CMock/vendor/unity/src/'
       - '../test-core/CMock/src/'
+      - 'test/MockIncludes/'
+      - 'test/MockCallbacks/'
       - '../f0/Inc/'
       - '../f7/Inc/'
       - '../f0/Src/'
@@ -52,10 +52,9 @@ linker:
     destination: *build_path
 :cmock:
   :plugins: [callback,ignore]
-  #:includes:
   :mock_path: './build/mocks'
   :mock_prefix: 'Mock_'
-
+  :includes: ["FreeRTOS.h"]
 tests:
     prefix: 'test_'
 colour: true
