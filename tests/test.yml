@@ -4,10 +4,13 @@ board_cfg:
         - '../Gen/Src/'
     include_dirs:
         - '../Inc/'
+        - '../Src/'
         - '../Cube-F0-Src/DCU/Inc/'
         - '../Cube-F0-Src/DCU/Middlewares/Third_Party/FreeRTOS/Source/include/'
+        - '../Cube-F0-Src/DCU/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/'
         - '../Cube-F0-Src/DCU/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0/'
         - '../Gen/Inc/'
+        - '../Gen/Src/'
         - '../Cube-F0-Src/DCU/Drivers/STM32F0xx_HAL_Driver/Inc/'
         - '../Cube-F0-Src/DCU/Drivers/CMSIS/Include/'
         - '../Cube-F0-Src/DCU/Drivers/CMSIS/Device/ST/STM32F0xx/Include/'
