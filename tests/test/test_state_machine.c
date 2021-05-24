@@ -137,23 +137,12 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
 #define FSM_START(id) \
 	FSM_Handle_Struct fsmHandle_##id; \
 	if(HAL_OK != setup_fsm_handle(id, &fsmHandle_##id)){TEST_ASSERT_TRUE(0);} \
-	pthread_t fsm_handle_thread_id_##id = fsm_run(&fsmHandle_##id);
+	pthread_t fsm_handle_thread_id_##id = fake_mock_fsm_run(&fsmHandle_##id);
 
 #define FSM_END(id) \
 	end_task(fsm_handle_thread_id_##id);
 
 
-#define POLL_TIME_US 20 * 1000 // 100ms
-#define POLL_DURATION_US 1 * 1000 * 1000 // 5s
-#define POLL_COND(cond) { \
-	uint32_t count = 0; \
-	while(!(cond) && count < POLL_DURATION_US / POLL_TIME_US){ \
-		/*fprintf(stderr, "Poll\n");*/ \
-		usleep(POLL_TIME_US); \
-		count++; \
-	} \
-	if(count >= POLL_DURATION_US / POLL_TIME_US){TEST_MESSAGE("Failed Poll");}\
-}
 
 /* Ensure FSM initialization works */
 void test_Init_Close(void)
@@ -168,11 +157,11 @@ void test_One_Transition(void)
 {
   	FSM_START(1);
 	
-	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_1);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
 
 	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
-	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_2);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_2);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
 
 	FSM_END(1);
@@ -184,19 +173,19 @@ void test_Multiple_Transition(void)
 {
   	FSM_START(1);
 	
-	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_1);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
 
 	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
-	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_2);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_2);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
 
 	fsmSendEvent(&fsmHandle_1, EV_1_2, 0);
-	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_3);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_3);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_3);
 	
 	fsmSendEvent(&fsmHandle_1, EV_1_3, 0);
-	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_4);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_4);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_4);
 	TEST_ASSERT_FALSE(fsmGetState(&fsmHandle_1) == STATE_1_3);
 	TEST_ASSERT_FALSE(fsmGetState(&fsmHandle_1) == STATE_1_2);
@@ -214,7 +203,7 @@ void test_Fail_Transition(void)
 	FSM_START(1);
 	
 	fsmSendEvent(&fsmHandle_1, EV_1_4, 0);
-	POLL_COND(fsmGetState(&fsmHandle_1) == STATE_1_1);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_1);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
 	
 	FSM_END(1);

@@ -172,7 +172,7 @@ static BaseType_t prvCopyDataToQueue( Queue_t * const pxQueue, const void *pvIte
 		}
 	}
 
-	pxQueue->uxMessagesWaiting = uxMessagesWaiting + ( UBaseType_t ) 1;
+	pxQueue->uxMessagesWaiting = uxMessagesWaiting + 1;
 	return xReturn;
 }
 
