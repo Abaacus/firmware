@@ -55,6 +55,8 @@ linker:
   :mock_path: './build/mocks'
   :mock_prefix: 'Mock_'
   :includes: ["FreeRTOS.h"]
+  :c_calling_conventions:
+    - PRIVILEGED_FUNCTION
 tests:
     prefix: 'test_'
 colour: true

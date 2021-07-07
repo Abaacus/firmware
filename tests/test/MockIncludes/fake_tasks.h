@@ -22,5 +22,6 @@ void vTaskDelay( const TickType_t xTicksToDelay );
 
 
 BaseType_t xTaskGetSchedulerState( void );
-
+typedef void* TaskHandle_t;
+typedef TaskHandle_t osThreadId;
 #endif

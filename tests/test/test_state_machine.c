@@ -20,6 +20,8 @@
 
 #include <unistd.h>
 
+#include "Mock_generalErrorHandler.h"
+
 
 // FSM common Data
 FSM_Handle_Struct fsmHandle;
@@ -80,7 +82,7 @@ void setUp(void)
 {
 	fake_mock_init_queues();
 	fake_mock_init_debug();
-	_Error_Handler_Stub(fake_Error_Handler);
+	_handleError_Stub(fake_Error_Handler);
 }
 
 void tearDown(void)

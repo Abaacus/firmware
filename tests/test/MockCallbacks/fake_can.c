@@ -1,6 +1,10 @@
 #include "fake_can.h"
 #include "unity.h"
+#if BOARD_TYPE_F0
 CAN_HandleTypeDef hcan;
+#elif BOARD_TYPE_F7
+CAN_HandleTypeDef hcan3;
+#endif
 
 
 HAL_StatusTypeDef fake_HAL_CAN_ConfigFilter(CAN_HandleTypeDef *hcan, CAN_FilterTypeDef *sFilterConfig) {

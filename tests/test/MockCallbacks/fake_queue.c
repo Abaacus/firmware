@@ -56,7 +56,9 @@ static BaseType_t prvCopyDataToQueue( Queue_t * const pxQueue, const void *pvIte
 static void prvCopyDataFromQueue( Queue_t * const pxQueue, void * const pvBuffer );
 
 #define MAX_NUM_QUEUES 10
-#define MAX_QUEUE_LENGTH 1024
+
+// 10KiB
+#define MAX_QUEUE_LENGTH 10240
 static int8_t queue_data[MAX_NUM_QUEUES][MAX_QUEUE_LENGTH];
 static Queue_t queues[MAX_NUM_QUEUES];
 static uint8_t num_queues_used = 0;
@@ -82,7 +84,7 @@ QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength, const UBaseT
 	TEST_ASSERT_TRUE_MESSAGE(num_queues_used < MAX_NUM_QUEUES, "Too many queues allocated in the code. \
 																This could be due to an error where too many queues are initialized(memory leak) \
 																or perhaps you just have to increment MAX_NUM_QUEUES");	
-
+	
 	TEST_ASSERT_TRUE_MESSAGE(uxItemSize * uxQueueLength < MAX_QUEUE_LENGTH, "Too large space allocated to queue."
 																			  "Increment MAX_QUEUE_LENGTH, or perhaps the queue is too long");
 
