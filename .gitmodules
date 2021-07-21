@@ -1,3 +1,4 @@
 [submodule "test-core/CMock"]
 	path = test-core/CMock
-	url = git@github.com:ThrowTheSwitch/CMock.git
+	url = git@bitbucket.org:waterloohybrid/cmock.git
+	branch = github-master
