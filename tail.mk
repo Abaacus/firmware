@@ -357,7 +357,7 @@ docs:
 	make -C $(DOCS_MAKEFILE_PATH) html
 	@echo "Documentation generation complete. Location: $(DOCS_MAKEFILE_PATH)"
 
-test:
+test: all
 	make -C $(TEST_DIR)
 
 ######################################
