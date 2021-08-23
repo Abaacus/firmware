@@ -276,6 +276,15 @@ void test_Fail_Transition(void)
 	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
 	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_2);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
+
+	fsmSendEvent(&fsmHandle_1, 97, 0);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_2);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
+	
+	fsmSendEvent(&fsmHandle_1, EV_1_2, 0);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_3);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_3);
+
 }
 
 // Check running multiple concurrent FSMs works
