@@ -23,14 +23,10 @@
 #include "Mock_generalErrorHandler.h"
 
 
-// FSM common Data
-FSM_Handle_Struct fsmHandle;
-
-
 // FSM Data 1
 
 typedef enum States_1_t {
-    STATE_1_1,
+    STATE_1_1 = 0,
     STATE_1_2,
     STATE_1_3,
     STATE_1_4,
@@ -39,7 +35,7 @@ typedef enum States_1_t {
 } States_1_t;
 
 typedef enum Events_1_t {
-    EV_1_1,
+    EV_1_1 = 0,
     EV_1_2,
     EV_1_3,
     EV_1_4,
@@ -77,16 +73,83 @@ Transition_t transitions_1[] = {
 };
 
 
+// FSM Data 2
+
+typedef enum States_2_t {
+    STATE_2_1 = 0,
+    STATE_2_2,
+    STATE_2_3,
+    STATE_2_4,
+    STATE_2_ERROR,
+    STATE_2_ANY,
+} States_2_t;
+
+typedef enum Events_2_t {
+    EV_2_1 = 0,
+    EV_2_2,
+    EV_2_3,
+    EV_2_4,
+    EV_2_5,
+    EV_2_6,
+    EV_2_ANY,
+} Events_2_t;
+
+
+// Transitions Functions
+
+uint32_t transition_2_1(uint32_t event)
+{
+	switch(event){
+		case(EV_2_1):
+			return STATE_2_2;
+		case(EV_2_2):
+			return STATE_2_3;
+		case(EV_2_3):
+			return STATE_2_4;
+	}
+    return STATE_2_ERROR;
+}
+
+uint32_t transition_2_2(uint32_t event){
+	switch(event){
+		case(EV_2_1):
+			return STATE_2_1;
+		case(EV_2_2):
+			return STATE_2_1;
+		case(EV_2_3):
+			return STATE_2_1;
+	}
+	return STATE_2_ERROR;
+}
+// Transitions
+Transition_t transitions_2[] = {
+    {STATE_2_1,        EV_2_1,         &transition_2_1},
+    {STATE_2_1,        EV_2_2,         &transition_2_2},
+    {STATE_2_2,        EV_2_2,         &transition_2_1},
+    {STATE_2_3,        EV_2_3,         &transition_2_1},
+    {STATE_2_4,        EV_2_4,         &transition_2_1},
+};
+
+#define MAX_NUM_THREADS 8
+// Active Thread Addresses
+pthread_t thread_ids[MAX_NUM_THREADS] = {0};
+uint8_t num_threads = 0;
+
 // Unity Standard Functions
 void setUp(void)
 {
 	fake_mock_init_queues();
 	fake_mock_init_debug();
+
 	_handleError_Stub(fake_Error_Handler);
+	num_threads = 0;
 }
 
 void tearDown(void)
 {
+	for(int thread = 0; thread < num_threads; thread++) {
+		end_task(thread_ids[thread]);
+	}
 }
 
 
@@ -111,6 +174,13 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
 			transitions = transitions_1;
 			transitionTableLength = TRANS_COUNT(transitions_1);
 			events_size = sizeof(Events_1_t); 
+			break;
+		case(2):
+			state_any = STATE_2_ANY;
+			event_any = EV_2_ANY;
+			transitions = transitions_2;
+			transitionTableLength = TRANS_COUNT(transitions_2);
+			events_size = sizeof(Events_2_t);
 			break;
 		default:
 			return HAL_ERROR;
@@ -139,10 +209,11 @@ HAL_StatusTypeDef setup_fsm_handle(uint8_t data_num, FSM_Handle_Struct *handle){
 #define FSM_START(id) \
 	FSM_Handle_Struct fsmHandle_##id; \
 	if(HAL_OK != setup_fsm_handle(id, &fsmHandle_##id)){TEST_ASSERT_TRUE(0);} \
-	pthread_t fsm_handle_thread_id_##id = fake_mock_fsm_run(&fsmHandle_##id);
+	pthread_t fsm_handle_thread_id_##id = fake_mock_fsm_run(&fsmHandle_##id); \
+	thread_ids[num_threads] = fsm_handle_thread_id_##id; \
+	num_threads++;
 
-#define FSM_END(id) \
-	end_task(fsm_handle_thread_id_##id);
+
 
 
 
@@ -151,7 +222,6 @@ void test_Init_Close(void)
 {
   	FSM_START(1);
     TEST_ASSERT_TRUE(1);
-    FSM_END(1);
 }
 
 /* Test at least one transition works, STATE_1_1 -> STATE_1_2 */
@@ -166,7 +236,6 @@ void test_One_Transition(void)
 	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_2);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
 
-	FSM_END(1);
 }
 
 
@@ -193,7 +262,6 @@ void test_Multiple_Transition(void)
 	TEST_ASSERT_FALSE(fsmGetState(&fsmHandle_1) == STATE_1_2);
 	TEST_ASSERT_FALSE(fsmGetState(&fsmHandle_1) == STATE_1_1);
 	
-	FSM_END(1);
 }
 
 /* This is a stupid test that will always pass, I leave it in for future extension
@@ -208,13 +276,26 @@ void test_Fail_Transition(void)
 	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_1);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
 	
-	FSM_END(1);
 }
 
 
 /* To be implemented */
-void test_Multiple_FSMs(void){
-	TEST_ASSERT_TRUE(1);
+void test_Multiple_FSMs(void) {
+	FSM_START(1);
+	FSM_START(2);
+
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_1);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
+
+	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_2);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
+
+	
+	fake_mock_wait_for_fsm_state(&fsmHandle_2, STATE_2_1);
+	fsmSendEvent(&fsmHandle_2, EV_2_2, 0);	
+	fake_mock_wait_for_fsm_state(&fsmHandle_2, STATE_2_1);
+
 }
 
 /* Add test for queue testing, basically send a bunch of messages */

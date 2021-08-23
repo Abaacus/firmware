@@ -113,15 +113,17 @@ BaseType_t xQueueGenericSendFromISR( QueueHandle_t xQueue, const void * const pv
 }
 
 BaseType_t xQueueReceive(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicksToWait) {
-	Queue_t * const pxQueue = ( Queue_t * ) xQueue;
-	const UBaseType_t uxMessagesWaiting = pxQueue->uxMessagesWaiting;
-
-	if( uxMessagesWaiting > ( UBaseType_t ) 0 )
-	{
-		prvCopyDataFromQueue( pxQueue, pvBuffer );
-		pxQueue->uxMessagesWaiting = uxMessagesWaiting - ( UBaseType_t ) 1;
+	
+	while(true){
+		Queue_t * const pxQueue = ( Queue_t * ) xQueue;
+		const UBaseType_t uxMessagesWaiting = pxQueue->uxMessagesWaiting;
+		if( uxMessagesWaiting > ( UBaseType_t ) 0 )
+		{
+			prvCopyDataFromQueue( pxQueue, pvBuffer );
+			pxQueue->uxMessagesWaiting = uxMessagesWaiting - ( UBaseType_t ) 1;
+			return pdTRUE;
+		}
 	}
-	return pdTRUE;
 }
 
 
