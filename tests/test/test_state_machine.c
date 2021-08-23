@@ -264,10 +264,7 @@ void test_Multiple_Transition(void)
 	
 }
 
-/* This is a stupid test that will always pass, I leave it in for future extension
- * Basically whenever a state transition doesn't exist, we just do not change states
- * But how do we check this? Because the test could run before event is processed. We need more robust tests.*/
-
+// Check that passing an invalid event will make it so the state machine doesn't progress
 void test_Fail_Transition(void)
 {
 	FSM_START(1);
@@ -276,10 +273,12 @@ void test_Fail_Transition(void)
 	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_1);
 	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_1);
 	
+	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_2);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_2);
 }
 
-
-/* To be implemented */
+// Check running multiple concurrent FSMs works
 void test_Multiple_FSMs(void) {
 	FSM_START(1);
 	FSM_START(2);
@@ -298,5 +297,14 @@ void test_Multiple_FSMs(void) {
 
 }
 
-/* Add test for queue testing, basically send a bunch of messages */
+// Check sending multiple events in quick succession doesn't affect results
+void test_Spam_FSM(void) {
+	FSM_START(1);
+	fsmSendEvent(&fsmHandle_1, EV_1_1, 0);
+	fsmSendEvent(&fsmHandle_1, EV_1_2, 0);
+	fsmSendEvent(&fsmHandle_1, EV_1_3, 0);
+	fake_mock_wait_for_fsm_state(&fsmHandle_1, STATE_1_4);
+	TEST_ASSERT_TRUE(fsmGetState(&fsmHandle_1) == STATE_1_4);
+}
+
 
