@@ -1,6 +1,10 @@
 #ifndef FAKE_CAN_H
 #define FAKE_CAN_H
-#include "userCan.h"
+#include "FreeRTOS.h"
+
+typedef void* CAN_HandleTypeDef;
+typedef void* CAN_FilterTypeDef;
+
 #if BOARD_TYPE_F0
 extern CAN_HandleTypeDef hcan;
 #elif BOARD_TYPE_F7

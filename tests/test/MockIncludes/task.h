@@ -2,7 +2,7 @@
 #define FAKE_TASKS_H
 #include <pthread.h>
 #include <stdint.h>
-#include "fake_timer.h"
+#include "tim.h"
 
 
 typedef long BaseType_t;

@@ -2,21 +2,19 @@
 #include "unity.h"
 #include "state_machine.h"
 
+#include "queue.h"
+
 #include <pthread.h>
 #include "Mock_debug.h"
 #include "fake_debug.h"
 
-#include "Mock_queue.h"
-#include "fake_queue.h"
+#include "main.h"
 
-#include "Mock_main.h"
-#include "fake_main.h"
-
-#include "fake_state_machine_interface.h"
-
-#include "fake_tasks.h"
+#include "task.h"
 
 #include "Mock_watchdog.h"
+
+#include "fake_state_machine_interface.h"
 
 #include <unistd.h>
 
@@ -141,7 +139,6 @@ void setUp(void)
 	fake_mock_init_queues();
 	fake_mock_init_debug();
 
-	_handleError_Stub(fake_Error_Handler);
 	num_threads = 0;
 }
 

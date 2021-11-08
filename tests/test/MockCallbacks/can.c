@@ -1,4 +1,4 @@
-#include "fake_can.h"
+#include "can.h"
 #include "unity.h"
 #if BOARD_TYPE_F0
 CAN_HandleTypeDef hcan;
@@ -8,7 +8,8 @@ CAN_HandleTypeDef hcan3;
 
 
 HAL_StatusTypeDef fake_HAL_CAN_ConfigFilter(CAN_HandleTypeDef *hcan, CAN_FilterTypeDef *sFilterConfig) {
-    uint32_t filternbrbitpos;
+#if 0
+	uint32_t filternbrbitpos;
 	CAN_TypeDef *can_ip = hcan->Instance;
 	HAL_CAN_StateTypeDef state = hcan->State;
 
@@ -117,4 +118,6 @@ HAL_StatusTypeDef fake_HAL_CAN_ConfigFilter(CAN_HandleTypeDef *hcan, CAN_FilterT
 
 		return HAL_ERROR;
 	}
+#endif
+	return HAL_OK;
 }

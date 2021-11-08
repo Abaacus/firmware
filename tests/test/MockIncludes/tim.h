@@ -1,6 +1,10 @@
 #ifndef FAKE_TIMER_H
 #define FAKE_TIMER_H
 #include <stdint.h>
+#include "fake_hal_defs.h"
+
+typedef void* TimerHandle_t;
+typedef void (*TimerCallbackFunction_t)( TimerHandle_t xTimer );
 
 #if( configUSE_16_BIT_TICKS == 1 )
 	typedef uint16_t TickType_t;
@@ -18,4 +22,14 @@
 TickType_t xTaskGetTickCount( void );
 
 void fake_mock_init_timers(void);
+
+TimerHandle_t xTimerCreate(	const char * const pcTimerName,
+								const TickType_t xTimerPeriodInTicks,
+								const UBaseType_t uxAutoReload,
+								void * const pvTimerID,
+								TimerCallbackFunction_t pxCallbackFunction );
+
+BaseType_t xTimerStart(TimerHandle_t timer, const TickType_t xOptionalValue);
+BaseType_t xTimerStop(TimerHandle_t timer, const TickType_t xOptionalValue);
+
 #endif

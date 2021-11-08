@@ -1,4 +1,4 @@
-#include "fake_tasks.h"
+#include "task.h"
 #include <pthread.h>
 
 pthread_t start_task(void *(*task_function)(void *), void* args) {

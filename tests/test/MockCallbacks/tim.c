@@ -1,11 +1,12 @@
-#include "fake_timer.h"
+#include "tim.h"
 #include "FreeRTOS.h"
 #include "timers.h"
+#include <stdlib.h>
 
 typedef struct tmrTimerControl
 {
 	const char				*pcTimerName;		/*<< Text name.  This is not used by the kernel, it is included simply to make debugging easier. */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
-	ListItem_t				xTimerListItem;		/*<< Standard linked list item as used by all kernel features for event management. */
+//	ListItem_t				xTimerListItem;		/*<< Standard linked list item as used by all kernel features for event management. */
 	TickType_t				xTimerPeriodInTicks;/*<< How quickly and often the timer expires. */
 	UBaseType_t				uxAutoReload;		/*<< Set to pdTRUE if the timer should be automatically restarted once expired.  Set to pdFALSE if the timer is, in effect, a one-shot timer. */
 	void 					*pvTimerID;			/*<< An ID to identify the timer.  This allows the timer to be identified when the same callback is used for multiple timers. */
@@ -37,23 +38,12 @@ TimerHandle_t xTimerCreate(	const char * const pcTimerName,			/*lint !e971 Unqua
 							void * const pvTimerID,
 							TimerCallbackFunction_t pxCallbackFunction )
 {
-	Timer_t *pxNewTimer;
-	pxNewTimer = &timers[curr_timer];
-	if( pxNewTimer != NULL )
-	{
-		//prvInitialiseNewTimer( pcTimerName, xTimerPeriodInTicks, uxAutoReload, pvTimerID, pxCallbackFunction, pxNewTimer );
+	return 0;
+}
 
-		#if( configSUPPORT_STATIC_ALLOCATION == 1 )
-		{
-			/* Timers can be created statically or dynamically, so note this
-			timer was created dynamically in case the timer is later
-			deleted. */
-			pxNewTimer->ucStaticallyAllocated = pdFALSE;
-		}
-		#endif /* configSUPPORT_STATIC_ALLOCATION */
-	}
-
-	return pxNewTimer;
+BaseType_t xTimerStart(TimerHandle_t timer, const TickType_t xOptionalValue)
+{
+	return pdFAIL;
 }
 
 BaseType_t xTimerGenericCommand( TimerHandle_t xTimer, const BaseType_t xCommandID, const TickType_t xOptionalValue, BaseType_t * const pxHigherPriorityTaskWoken, const TickType_t xTicksToWait )

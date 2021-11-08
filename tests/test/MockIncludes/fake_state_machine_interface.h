@@ -1,9 +1,8 @@
 #ifndef FAKE_STATE_MACHINE_INTERFACE_H
 #define FAKE_STATE_MACHINE_INTERFACE_H
-#include "fake_tasks.h"
+#include "task.h"
 #include "fake_debug.h"
 #include "state_machine.h"
-
 
 
 
