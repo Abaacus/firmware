@@ -50,6 +50,12 @@ BaseType_t xTimerGenericCommand( TimerHandle_t xTimer, const BaseType_t xCommand
 {
 	return pdFAIL;
 }
+
+BaseType_t xTimerStop(TimerHandle_t timer, const TickType_t xOptionalValue)
+{
+	return pdFAIL;
+}
+
 void fake_mock_init_timers(void) {
 	for( int timer = 0; timer < NUM_TIMERS; timer++) {
 		timers[timer] = (Timer_t){0};
