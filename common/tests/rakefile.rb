@@ -18,10 +18,10 @@ BOARD_CONFIG_FILE = '../../tests/test.yml'
 configure_toolchain(COMMON_CONFIG_FILE, BOARD_CONFIG_FILE)
 
 
-
 task :unit do
   run_tests(unit_test_files)
 end
+
 
 desc 'Generate test summary'
 task :summary do

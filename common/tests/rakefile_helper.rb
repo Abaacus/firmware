@@ -1,8 +1,8 @@
 require 'yaml'
 require 'fileutils'
-require '../test-core/CMock/vendor/unity/auto/unity_test_summary'
-require '../test-core/CMock/vendor/unity/auto/generate_test_runner'
-require '../test-core/CMock/vendor/unity/auto/colour_reporter'
+require '../test-core/cmock/vendor/unity/auto/unity_test_summary'
+require '../test-core/cmock/vendor/unity/auto/generate_test_runner'
+require '../test-core/cmock/vendor/unity/auto/colour_reporter'
 
 module RakefileHelpers
   $return_error_on_failures = false

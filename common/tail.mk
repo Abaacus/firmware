@@ -46,6 +46,7 @@ CURRENT_HASH = \"$(shell git rev-parse HEAD)\"
 COMMON_LIB_DATA_DIR = $(COMMON_LIB_DIR)/Data
 DTC_CSV_FILE = $(COMMON_LIB_DATA_DIR)/dtc.csv
 DBC_FILE = $(COMMON_LIB_DATA_DIR)/2018CAR.dbc
+TEST_DIR = $(COMMON_LIB_DIR)/tests/
 
 COLORS_ENABLED ?= 1
 ifeq ($(COLORS_ENABLED), 1)
@@ -268,6 +269,9 @@ init:
 	git config core.hooksPath $(GITHOOKS_DIR)
 	git submodule init
 	git submodule update
+
+test: all
+	make -C $(TEST_DIR)
 
 BUILD_ONLY_ONCE = 1
 
