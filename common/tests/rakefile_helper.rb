@@ -45,8 +45,10 @@ module RakefileHelpers
 
   def local_include_dirs
     include_dirs = $cfg['compiler']['includes']['items'].dup
+
+    dir_prefix = File.dirname($board_cfg_file) + '/'
     $cfg['board_cfg']['include_dirs'].each { |include_dir|
-      include_dirs.append('../../tests/' + include_dir)
+      include_dirs.append(dir_prefix + include_dir)
     }
     include_dirs.delete_if { |dir| dir.is_a?(Array) }
     include_dirs
@@ -211,7 +213,7 @@ module RakefileHelpers
       header_list.each do |header|
         # create mocks if needed
         next unless header =~ /Mock/
-        require '../test-core/CMock/lib/cmock.rb'
+        require '../test-core/cmock/lib/cmock.rb'
         @cmock ||= CMock.new($cfg[:cmock])
         
         unmocked_srcs = []

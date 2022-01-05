@@ -1,0 +1,20 @@
+board_cfg:
+    src_dirs:
+        - '../Src/'
+        - '../Gen/Src/'
+    include_dirs:
+        - '../Inc/'
+        - '../Src/'
+        - '../Gen/Inc/'
+        - '../Gen/Src/'
+    compiler_flags:
+        defines:
+            prefix: '-D'
+            items:
+                - "STM32F072xB"
+                - "BOARD_NAME=DCU"
+                - "BOARD_TYPE_F0=1"
+                - "BOARD_ID=ID_DCU"
+                - "BOARD_VERSION=1"
+                - "USE_HAL_DRIVER"
+                - "BOARD_TYPE=F0"
