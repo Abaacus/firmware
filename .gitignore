@@ -32,3 +32,9 @@ common/Scripts/__pycache__/
 *__pycache__*
 *_Runner.c
 common/tests/build/
+common/test-core/cmock/test/system/build
+common/test-core/cmock/test/system/generated
+*.sublime-project
+*.sublime-workspace
+common/test-core/cmock/examples/
+
