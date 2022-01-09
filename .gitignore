@@ -37,4 +37,5 @@ common/test-core/cmock/test/system/generated
 *.sublime-project
 *.sublime-workspace
 common/test-core/cmock/examples/
-
+*/tests/build/*
+!*/tests/build/.gitkeep

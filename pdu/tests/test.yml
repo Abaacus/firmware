@@ -1,0 +1,21 @@
+board_cfg:
+    src_dirs:
+        - '../Src/'
+        - '../Gen/Src/'
+    include_dirs:
+        - '../Inc/'
+        - '../Src/'
+        - '../Gen/Inc/'
+        - '../Gen/Src/'
+        - 'BoardSpecificIncludes/'
+    compiler_flags:
+        defines:
+            prefix: '-D'
+            items:
+                - "STM32F767xx"
+                - "BOARD_NAME=PDU"
+                - "BOARD_ID=ID_PDU"
+                - "BOARD_VERSION=2"
+                - "USE_HAL_DRIVER"
+                - "BOARD_TYPE=F7"
+                - "BOARD_TYPE_F7"
