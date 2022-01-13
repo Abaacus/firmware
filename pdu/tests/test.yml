@@ -1,19 +1,21 @@
 board_cfg:
     src_dirs:
         - '../Src/'
-        - '../Gen/Src/'
+        - '../../Gen/pdu/Src/'
     include_dirs:
         - '../Inc/'
         - '../Src/'
-        - '../Gen/Inc/'
-        - '../Gen/Src/'
-        - 'BoardSpecificIncludes/'
+        - '../../Gen/pdu/Src/'
+        - '../../Gen/pdu/Inc/'
+        - 'MockIncludes/'
+    unit_tests_paths:
+        - './'
     compiler_flags:
         defines:
             prefix: '-D'
             items:
                 - "STM32F767xx"
-                - "BOARD_NAME=PDU"
+                - "BOARD_NAME=pdu"
                 - "BOARD_ID=ID_PDU"
                 - "BOARD_VERSION=2"
                 - "USE_HAL_DRIVER"

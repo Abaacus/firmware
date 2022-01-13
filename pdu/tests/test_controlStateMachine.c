@@ -19,17 +19,21 @@
 
 #include "tim.h"
 #include "can.h"
+
 #include "gpio.h"
 
 #include "Mock_userCan.h"
-#include "Mock_PDU_can.h"
+#include "pdu_can.h"
 
-volatile int64_t StatusPowerMCLeft;
-volatile int64_t StatusPowerMCRight;
+#include "Mock_canHeartbeat.h"
+
  
 extern HAL_StatusTypeDef motorControlInit(void);
 extern HAL_StatusTypeDef coolingControlInit(void);
 extern HAL_StatusTypeDef maincontrolInit(void);
+extern HAL_StatusTypeDef turnBoardsOn(void);
+extern HAL_StatusTypeDef turnBoardsOff(void);
+extern HAL_StatusTypeDef startLVCuttoffDelay(void);
  
 void setUp(void)
 {
