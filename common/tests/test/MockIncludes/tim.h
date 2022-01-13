@@ -32,4 +32,6 @@ TimerHandle_t xTimerCreate(	const char * const pcTimerName,
 BaseType_t xTimerStart(TimerHandle_t timer, const TickType_t xOptionalValue);
 BaseType_t xTimerStop(TimerHandle_t timer, const TickType_t xOptionalValue);
 
+#define xTimerStartFromISR(tim, xopt) (xTimerStart(tim, 0))
+
 #endif

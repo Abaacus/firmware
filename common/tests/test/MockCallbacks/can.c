@@ -6,8 +6,11 @@ CAN_HandleTypeDef hcan;
 CAN_HandleTypeDef hcan3;
 #endif
 
+void configCANFilters(CAN_HandleTypeDef* canHandle)
+{
+}
 
-HAL_StatusTypeDef fake_HAL_CAN_ConfigFilter(CAN_HandleTypeDef *hcan, CAN_FilterTypeDef *sFilterConfig) {
+HAL_StatusTypeDef HAL_CAN_ConfigFilter(CAN_HandleTypeDef *hcan, CAN_FilterTypeDef *sFilterConfig) {
 #if 0
 	uint32_t filternbrbitpos;
 	CAN_TypeDef *can_ip = hcan->Instance;

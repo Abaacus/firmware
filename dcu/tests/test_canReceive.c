@@ -7,45 +7,27 @@
 #include <assert.h>
 #include "stdint.h"
 
-#include "Mock_stm32f0xx_hal.h"
-#include "Mock_userCan.h"
-
-#include "Mock_can.h"
-#include "fake_can.h"
-
-#include "DCU_can.h"
-
 #include "state_machine.h"
 
 #include "fake_state_machine_interface.h"
 
-#include "Mock_debug.h"
+#include "can.h"
+#include "dcu_can.h"
+#include "main.h"
 #include "fake_debug.h"
-
-#include "fake_queue.h"
-
-#include "Mock_main.h"
-#include "fake_main.h"
-
-
-#include "fake_timer.h"
-#include "fake_tasks.h"
-
-#include "Mock_gpio.h"
-#include "fake_gpio.h"
+#include "queue.h"
+#include "gpio.h"
 
 #include "Mock_watchdog.h"
 
-#include "Mock_controlStateMachine.h"
-
+#include "task.h"
+#include "Mock_userCan.h"
 #include "Mock_canHeartbeat.h"
+
 
 FSM_Handle_Struct DCUFsmHandle;
 
 
-HAL_StatusTypeDef HAL_CAN_ConfigFilter(CAN_HandleTypeDef *hcan, CAN_FilterTypeDef *sFilterConfig) {
-	return fake_HAL_CAN_ConfigFilter(hcan, sFilterConfig);
-}
 
 void setUp() {
 }

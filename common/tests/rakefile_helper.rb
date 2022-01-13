@@ -16,7 +16,8 @@ module RakefileHelpers
     $cfg = YAML.load(File.read($board_cfg_file)).merge($cfg)
     $main_src_dirs = $cfg['board_cfg']['src_dirs'] + $cfg['compiler']['src_dirs']
     $cfg['board_cfg']['src_dirs'].each { |src_dir|
-      $main_src_dirs.append(File.dirname(board_file) + "/" + src_dir) 
+      $main_src_dirs.append(File.dirname(board_file) + "/" + src_dir)
+
     }
     $colour_output = false unless $cfg['colour']
 
@@ -33,6 +34,12 @@ module RakefileHelpers
 
   def unit_test_files
     paths = $cfg['compiler']['unit_tests_paths'] 
+    
+    
+    $cfg['board_cfg']['unit_tests_paths'].each { |test_paths|
+      paths.append(File.dirname($board_cfg_file) + "/" + test_paths)
+    }
+    
     file_list = FileList.new()
     paths.each { |path| 
       path += 'test_*' + C_EXTENSION

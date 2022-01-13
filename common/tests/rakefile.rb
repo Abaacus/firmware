@@ -17,7 +17,6 @@ COMMON_CONFIG_FILE = 'common.yml'.freeze
 
 
 task :unit do
-  run_tests(unit_test_files)
 end
 
 task :dcu do

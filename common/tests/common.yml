@@ -6,7 +6,6 @@ compiler:
       - '../Src/'
   unit_tests_paths: &unit_tests_paths 
       - 'test/'
-      - '../../tests/'
   build_path: &build_path './build/'
   options:
     - -c
