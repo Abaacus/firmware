@@ -1,4 +1,4 @@
-CUSTOM_COMMANDS = all clean autogen init test
+CUSTOM_COMMANDS = all clean autogen init lint test
 BOARDS = bmu pdu dcu vcu wsb
 .PHONY: $(CUSTOM_COMMANDS) $(BOARDS) 
 
