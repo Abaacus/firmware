@@ -18,7 +18,7 @@ typedef enum DCU_Events_t {
     EV_ANY,
 } DCU_Events_t;
 
-FSM_Handle_Struct DCUFsmHandle;
+extern FSM_Handle_Struct DCUFsmHandle;
 HAL_StatusTypeDef dcuFsmInit();
 
 #endif

@@ -8,6 +8,7 @@
 #include "adc.h"
 #include "usart.h"
 #include "iwdg.h"
+#include "gpio.h"
 #include "stdbool.h"
 
 #if IS_BOARD_F7

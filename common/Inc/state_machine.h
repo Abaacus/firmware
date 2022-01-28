@@ -1,6 +1,7 @@
 #ifndef __STATE_MACHINE_H
 #define __STATE_MACHINE_H
 #include "bsp.h"
+
 #include "FreeRTOS.h"
 #include "queue.h"
 
