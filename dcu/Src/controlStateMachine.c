@@ -12,11 +12,8 @@
 #include "watchdog.h"
 #include "canReceive.h"
 
-
 #define MAIN_TASK_ID 1
 #define MAIN_TASK_PERIOD_MS 1000
-
-FSM_Handle_Struct DCUFsmHandle;
 
 extern osThreadId mainTaskHandle;
 
@@ -293,4 +290,5 @@ uint32_t defaultTransition(uint32_t event)
 
     return fsmGetState(&DCUFsmHandle);
 }
+
 

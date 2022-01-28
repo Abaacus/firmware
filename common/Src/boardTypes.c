@@ -1,4 +1,4 @@
-#include "boardTypes.h"
+#include "boardType.h"
 
 #ifdef BOARD_TYPE_F7
 const BoardTypes_t boardType = F7;
