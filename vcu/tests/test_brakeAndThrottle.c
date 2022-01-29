@@ -1,0 +1,46 @@
+#include "unity.h"
+#include "brakeAndThrottle.h"
+#include "debug.g"
+#include "motorController.h"
+#include "vcu_F7_can.h"
+#include "vcu_F7_dtc.h"
+
+void setUp(void) {
+}
+
+void tearDown(void) {
+}
+
+void test_map_range(){
+	TEST_ASSERT_TRUE(map_range(1800, 1740, 1895, 0, 100) == 1200/31); //in is in current range
+	TEST_ASSERT_TRUE(map_range(1700, 1740, 1895, 0, 100) == 0); //in is lower than current range
+	TEST_ASSERT_TRUE(map_range(1900, 1740, 1895, 0, 100) == 100); //in is higher than current range
+	TEST_ASSERT_TRUE(map_range(1800, 1740, 1895, 50, 100) == 2150/31); //in current range, non-zero low_out	
+	TEST_ASSERT_TRUE(map_range(1700, 1740, 1895, 50, 100) == 50); //in is lower than current range, non-zero low_out
+	TEST_ASSERT_TRUE(map_range(1900, 1740, 1895, 50, 100) == 100); // in is higher than current range, non-zero low_out
+}
+
+void test_getBrakePositionPercent(){
+	brakeThrottleSteeringADCVals[BRAKE_POS_INDEX] = 1800; //in range
+	TEST_ASSERT_TRUE(getBrakePositionPercent() == (1200/31));
+	brakeThrottleSteeringADCVals[BRAKE_POS_INDEX] = 1700; //below range
+	TEST_ASSERT_TRUE(getBrakePositionPercent() == 0);
+	brakeThrottleSteeringADCVals[BRAKE_POS_INDEX] = 1900; //above range
+	TEST_ASSERT_TRUE(getBrakePositionPercent() == 100);
+	brakeThrottleSteeringADCVals[BRAKE_POS_INDEX] = 1740; //at low range
+	TEST_ASSERT_TRUE(getBrakePositionPercent() == 0);
+	brakeThrottleSteeringADCVals[BRAKE_POS_INDEX] = 1895; //at high range
+	TEST_ASSERT_TRUE(getBrakePositionPercent() == 100);
+}
+
+void test_is_throttle1_in_range(){
+	TEST_ASSERT_TRUE(!(is_throttle1_in_range(2199))); //below low range
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2100)); //at low range
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2200)); //in range
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2325)); //no deadzone max throttle
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2500)); //including deadzone
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2625)); //at max, including deadzone
+	TEST_ASSERT_TRUE(!(is_throttle1_in_range(2626))); //past max throttle, including deadzone
+}
+
+
