@@ -32,6 +32,12 @@ void setUp(void)
     fake_mock_init_debug();
  
 }
+
+void test_sample_delete_before_merge()
+{
+	TEST_ASSERT_TRUE(1 == 1);
+}
+
 void tearDown(void)
 {
 }
