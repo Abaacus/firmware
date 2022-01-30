@@ -1,6 +1,29 @@
 #include "unity.h"
 #include "brakeAndThrottle.h"
-#include "debug.g"
+
+#include "Mock_debug.h"
+#include "fake_debug.h"
+
+#include "queue.h"
+#include "main.h"
+
+#include "state_machine.h"
+#include "fake_state_machine_interface.h"
+
+#include "task.h"
+
+#include "Mock_watchdog.h"
+
+#include "tim.h"
+#include "can.h"
+
+#include "gpio.h"
+
+#include "Mock_userCan.h"
+#include "pdu_can.h"
+#include "Mock_canHeartbeat.h"
+
+#include "debug.h"
 #include "motorController.h"
 #include "vcu_F7_can.h"
 #include "vcu_F7_dtc.h"
@@ -43,4 +66,12 @@ void test_is_throttle1_in_range(){
 	TEST_ASSERT_TRUE(!(is_throttle1_in_range(2626))); //past max throttle, including deadzone
 }
 
-
+void test_is_throttle2_in_range(){
+	TEST_ASSERT_TRUE(!(is_throttle2_in_range(1824))); //below low minus deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range(1825)); //at lowest point, including deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range(1900)); //within deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2125)); //at low point, not including deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2340)); //within range
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2350)); //at max point
+	TEST_ASSERT_TRUE(!(is_throttle2_in_range(2360))); // past max point
+}
