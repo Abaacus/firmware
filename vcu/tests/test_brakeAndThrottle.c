@@ -75,3 +75,19 @@ void test_is_throttle2_in_range(){
 	TEST_ASSERT_TRUE(is_throttle2_in_range(2350)); //at max point
 	TEST_ASSERT_TRUE(!(is_throttle2_in_range(2360))); // past max point
 }
+
+void test_calculate_throttle_percent1(){
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2000) == 100); //below low
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2100) == 100); //at low
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2145) == (80)); //in range
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2325) == 0); //at max
+	TEST_ASSERT_TRUE(is_throttle1_in_range(2400) == 0); //above max
+}
+
+void test_calculate_throttle_percent2(){
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2000) == 0); //below low
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2125) == 0); //at low
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2170) == 20); //in range
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2350) == 100); //at max
+	TEST_ASSERT_TRUE(is_throttle2_in_range(2400) == 100); //above max
+}
