@@ -1,9 +1,12 @@
-.PHONY: all dcu
+.PHONY: all dcu bmu
 
-all: dcu pdu
+all: dcu pdu bmu
 
 pdu:
 	rake pdu
 
 dcu: 
 	rake dcu
+
+bmu:
+	rake bmu

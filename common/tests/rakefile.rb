@@ -25,6 +25,12 @@ task :dcu do
   run_tests(unit_test_files)
 end
 
+task :bmu do
+  BOARD_CONFIG_FILE = '../../bmu/tests/test.yml'
+  configure_toolchain(COMMON_CONFIG_FILE, BOARD_CONFIG_FILE)
+  run_tests(unit_test_files)
+end
+
 task :pdu do
   BOARD_CONFIG_FILE = '../../pdu/tests/test.yml'
   configure_toolchain(COMMON_CONFIG_FILE, BOARD_CONFIG_FILE)
