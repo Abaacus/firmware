@@ -8,7 +8,7 @@ board_cfg:
         - '../../Gen/bmu/Inc/'
         - '../../Gen/bmu/Src/'
         - 'MockIncludes/'
-    unit_test_paths:
+    unit_tests_paths:
         - './'
     compiler_flags:
         defines:
