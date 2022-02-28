@@ -20,6 +20,7 @@
 #include "tim.h"
 #include "stdbool.h"
 #include "iwdg.h"
+#include "gpio.h"
 #include "usart.h"
 
 #if IS_BOARD_F7
