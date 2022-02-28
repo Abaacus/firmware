@@ -24,4 +24,13 @@ void vTaskDelay( const TickType_t xTicksToDelay );
 BaseType_t xTaskGetSchedulerState( void );
 typedef void* TaskHandle_t;
 typedef TaskHandle_t osThreadId;
+typedef enum
+{
+	eNoAction = 0,				/* Notify the task without updating its notify value. */
+	eSetBits,					/* Set bits in the task's notification value. */
+	eIncrement,					/* Increment the task's notification value. */
+	eSetValueWithOverwrite,		/* Set the task's notification value to a specific value even if the previous value has not yet been read by the task. */
+	eSetValueWithoutOverwrite	/* Set the task's notification value if the previous value has been read by the task. */
+} eNotifyAction;
+
 #endif
