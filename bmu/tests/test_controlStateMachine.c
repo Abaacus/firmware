@@ -22,10 +22,11 @@
 #include "gpio.h"
 
 #include "Mock_userCan.h"
-#include "Mock_BMU_can.h"
+#include "bmu_can.h"
 
- 
- 
+#include "canHeartbeat.h" 
+//#include "chargerControl.h"
+#include "threads.h" 
 void setUp(void)
 {
     fake_mock_init_queues();

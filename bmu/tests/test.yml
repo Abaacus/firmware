@@ -8,6 +8,7 @@ board_cfg:
         - '../../Gen/bmu/Inc/'
         - '../../Gen/bmu/Src/'
         - 'MockIncludes/'
+        - 'MockSource/'
     unit_tests_paths:
         - './'
     compiler_flags:
