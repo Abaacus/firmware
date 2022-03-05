@@ -1,0 +1,26 @@
+typedef struct __ADC_HandleTypeDef
+{
+  ADC_TypeDef                   *Instance;                   /*!< Register base address */
+
+  ADC_InitTypeDef               Init;                        /*!< ADC required parameters */
+
+  __IO uint32_t                 NbrOfCurrentConversionRank;  /*!< ADC number of current conversion rank */
+
+  DMA_HandleTypeDef             *DMA_Handle;                 /*!< Pointer DMA Handler */
+
+  HAL_LockTypeDef               Lock;                        /*!< ADC locking object */
+
+  __IO uint32_t                 State;                       /*!< ADC communication state */
+
+  __IO uint32_t                 ErrorCode;                   /*!< ADC Error code */
+#if (USE_HAL_ADC_REGISTER_CALLBACKS == 1)
+  void (* ConvCpltCallback)(struct __ADC_HandleTypeDef *hadc);              /*!< ADC conversion complete callback */
+  void (* ConvHalfCpltCallback)(struct __ADC_HandleTypeDef *hadc);          /*!< ADC conversion DMA half-transfer callback */
+  void (* LevelOutOfWindowCallback)(struct __ADC_HandleTypeDef *hadc);      /*!< ADC analog watchdog 1 callback */
+  void (* ErrorCallback)(struct __ADC_HandleTypeDef *hadc);                 /*!< ADC error callback */
+  void (* InjectedConvCpltCallback)(struct __ADC_HandleTypeDef *hadc);      /*!< ADC group injected conversion complete callback */
+  void (* MspInitCallback)(struct __ADC_HandleTypeDef *hadc);               /*!< ADC Msp Init callback */
+  void (* MspDeInitCallback)(struct __ADC_HandleTypeDef *hadc);             /*!< ADC Msp DeInit callback */
+#endif /* USE_HAL_ADC_REGISTER_CALLBACKS */
+}
+extern ADC_HandleTypeDef hadc1;

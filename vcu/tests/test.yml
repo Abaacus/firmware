@@ -1,0 +1,23 @@
+board_cfg:
+    src_dirs:
+        - '../Src/'
+        - '../../Gen/vcu/Src/'
+    include_dirs:
+        - '../Inc/'
+        - '../Src/'
+        - '../../Gen/vcu_F7/Src/'
+        - '../../Gen/vcu_F7/Inc/'
+        - 'MockIncludes/'
+    unit_tests_paths:
+        - './'
+    compiler_flags:
+        defines:
+            prefix: '-D'
+            items:
+                - "STM32F072xB"
+                - "BOARD_NAME=vcu_F7"
+                - "BOARD_TYPE_F7=1"
+                - "BOARD_ID=ID_VCU"
+                - "BOARD_VERSION=1"
+                - "USE_HAL_DRIVER"
+                - "BOARD_TYPE=F7"

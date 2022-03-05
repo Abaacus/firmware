@@ -1,4 +1,5 @@
 #include "unity.h"
+#include "adc_units.h"
 #include "brakeAndThrottle.h"
 
 #include "Mock_debug.h"
@@ -17,8 +18,6 @@
 #include "tim.h"
 #include "can.h"
 
-#include "gpio.h"
-
 #include "Mock_userCan.h"
 #include "pdu_can.h"
 #include "Mock_canHeartbeat.h"
@@ -27,6 +26,8 @@
 #include "motorController.h"
 #include "vcu_F7_can.h"
 #include "vcu_F7_dtc.h"
+
+typedef void* ADC_HandleTypeDef;
 
 void setUp(void) {
 }
@@ -56,38 +57,37 @@ void test_getBrakePositionPercent(){
 	TEST_ASSERT_TRUE(getBrakePositionPercent() == 100);
 }
 
-void test_is_throttle1_in_range(){
-	TEST_ASSERT_TRUE(!(is_throttle1_in_range(2199))); //below low range
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2100)); //at low range
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2200)); //in range
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2325)); //no deadzone max throttle
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2500)); //including deadzone
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2625)); //at max, including deadzone
-	TEST_ASSERT_TRUE(!(is_throttle1_in_range(2626))); //past max throttle, including deadzone
+void test_is_throttle1_in_range(){i
+	TEST_ASSERT_TRUE(!(is_throttle1_in_range((THROTT_A_LOW - 1)))); //below low range
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_LOW)); //at low range
+	TEST_ASSERT_TRUE(is_throttle1_in_range((THROTT_A_LOW + THROTT_A_HIGH)/2)); //in range
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_HIGH)); //no deadzone max throttle
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_HIGH + MAX_THROTTLE_A_DEADZONE)); //at max, including deadzone
+	TEST_ASSERT_TRUE(!(is_throttle1_in_range(THROTT_A_HIGH + MAX_THROTTLE_A_DEADZONE + 1))); //past max throttle, including deadzone
 }
 
 void test_is_throttle2_in_range(){
-	TEST_ASSERT_TRUE(!(is_throttle2_in_range(1824))); //below low minus deadzone
-	TEST_ASSERT_TRUE(is_throttle2_in_range(1825)); //at lowest point, including deadzone
-	TEST_ASSERT_TRUE(is_throttle2_in_range(1900)); //within deadzone
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2125)); //at low point, not including deadzone
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2340)); //within range
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2350)); //at max point
-	TEST_ASSERT_TRUE(!(is_throttle2_in_range(2360))); // past max point
+	TEST_ASSERT_TRUE(!(is_throttle2_in_range(THROTT_B_LOW - MAX_THROTTLE_B_DEADZONE - 1))); //below low minus deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_LOW - MAX_THROTT_B_DEADZONE)); //at lowest point, including deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_LOW - (MAX_THROTT_B_DEADZONE/2))); //within deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_LOW)); //at low point, not including deadzone
+	TEST_ASSERT_TRUE(is_throttle2_in_range((THROTT_B_HIGH + (THROTT_B_LOW - MAX_THROTTLE_B_DEADZONE))/2); //within range
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_HIGH)); //at max point
+	TEST_ASSERT_TRUE(!(is_throttle2_in_range(THROTT_B_HIGH + 10))); // past max point
 }
 
 void test_calculate_throttle_percent1(){
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2000) == 100); //below low
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2100) == 100); //at low
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2145) == (80)); //in range
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2325) == 0); //at max
-	TEST_ASSERT_TRUE(is_throttle1_in_range(2400) == 0); //above max
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_LOW - 10) == 100); //below low
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_LOW) == 100); //at low
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_LOW + 1) == 100 - (100 * 1/(THROTT_A_HIGH - THROTT_A_LOW))); //in range
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_HIGH) == 0); //at max
+	TEST_ASSERT_TRUE(is_throttle1_in_range(THROTT_A_HIGH + 10) == 0); //above max
 }
 
 void test_calculate_throttle_percent2(){
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2000) == 0); //below low
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2125) == 0); //at low
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2170) == 20); //in range
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2350) == 100); //at max
-	TEST_ASSERT_TRUE(is_throttle2_in_range(2400) == 100); //above max
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_LOW - 10) == 0); //below low
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_LOW) == 0); //at low
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_LOW + 1) == 100 * 1/(THROTT_B_HIGH + THROTT_B_LOW)); //in range
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_HIGH) == 100); //at max
+	TEST_ASSERT_TRUE(is_throttle2_in_range(THROTT_B_HIGH + 10) == 100); //above max
 }

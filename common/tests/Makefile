@@ -1,6 +1,10 @@
-.PHONY: all dcu
+.PHONY: all dcu vcu
 
-all: dcu
+all: vcu dcu
+
+vcu:
+	rake vcu
 
 dcu: 
 	rake dcu
+

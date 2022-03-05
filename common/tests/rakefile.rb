@@ -25,6 +25,12 @@ task :dcu do
   run_tests(unit_test_files)
 end
 
+task :vcu do
+  BOARD_CONFIG_FILE = '../../vcu/tests/test.yml'
+  configure_toolchain(COMMON_CONFIG_FILE, BOARD_CONFIG_FILE)
+  run_tests(unit_test_files)
+end
+
 desc 'Generate test summary'
 task :summary do
   report_summary
