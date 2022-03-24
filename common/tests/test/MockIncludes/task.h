@@ -32,5 +32,6 @@ typedef enum
 	eSetValueWithOverwrite,		/* Set the task's notification value to a specific value even if the previous value has not yet been read by the task. */
 	eSetValueWithoutOverwrite	/* Set the task's notification value if the previous value has been read by the task. */
 } eNotifyAction;
+#define xTaskNotify( xTaskToNotify, ulValue, eAction )
 
 #endif

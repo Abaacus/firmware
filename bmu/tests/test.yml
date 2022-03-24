@@ -22,3 +22,4 @@ board_cfg:
                 - "USE_HAL_DRIVER"
                 - "BOARD_TYPE=F7"
                 - "BOARD_TYPE_F7"
+                - "BOARD_NAME_UPPER=BMU"

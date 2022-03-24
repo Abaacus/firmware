@@ -12,6 +12,7 @@
 
 #include "Mock_state_machine.h"
 #include "fake_state_machine_interface.h"
+#include "fake_chargerControl.h"
 
 #include "task.h"
 
