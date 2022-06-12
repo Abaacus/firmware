@@ -15,9 +15,6 @@
 #include "state_machine.h"
 #include "fanControl.h"
 
-#define FAN_PERIOD_COUNT 400
-#define FAN_TASK_PERIOD_MS 100
-
 uint32_t calculateFanRPM()
 {
     int RPM = 0; // RPM = (1/period) * 60 * 1000
@@ -27,7 +24,6 @@ uint32_t calculateFanRPM()
 
     return RPM;
 }
-
 
 BaseType_t getFanRPM(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
