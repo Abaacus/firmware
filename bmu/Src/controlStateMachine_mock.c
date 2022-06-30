@@ -802,6 +802,24 @@ static const CLI_Command_Definition_t forceChargeModeCommandDefinition =
     1 /* Number of parameters */
 };
 
+BaseType_t getFanRPM(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    COMMAND_OUTPUT("Fan RPM: %i \n", ((int)calculateFanRPM));
+    //%%, (adcVal: %lu)
+    //adcVal???
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t getFanRPMDefinition =
+{
+    "getFan", /* The command string to type. */
+    "getFan:\r\n Get Fan RPM\r\n", /* Descriptive help text displayed when the command is typed wrong. */
+    getFanRPM, /* The function to run. */
+    0 /* Number of parameters */
+};
+
 HAL_StatusTypeDef stateMachineMockInit()
 {
     cliSetVBatt(0);
@@ -913,6 +931,8 @@ HAL_StatusTypeDef stateMachineMockInit()
     if (FreeRTOS_CLIRegisterCommand(&forceChargeModeCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-
+    if (FreeRTOS_CLIRegisterCommand(&getFanRPMDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
     return HAL_OK;
 }

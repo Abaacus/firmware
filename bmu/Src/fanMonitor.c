@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "controlStateMachine.h"
 #include "state_machine.h"
+#include "FreeRTOS_CLI.h"
 #include "fanControl.h"
 
 uint32_t calculateFanRPM()
@@ -24,20 +25,4 @@ uint32_t calculateFanRPM()
 
     return RPM;
 }
-
-BaseType_t getFanRPM(char *writeBuffer, size_t writeBufferLength,
-                       const char *commandString)
-{
-    COMMAND_OUTPUT("Fan RPM: %f %%, (adcVal: %lu)\n", (calculateFanRPM));
-    //adcVal???
-
-    return pdFALSE;
-}
-
-static const CLI_Command_Definition_t getFanRPMDefinition =
-{
-    "getFan", /* The command string to type. */
-    "getFan:\r\n Get Fan RPM\r\n", /* Descriptive help text displayed when the command is typed wrong. */
-    getFanRPM, /* The function to run. */
-    0 /* Number of parameters */
-};
+//consider moving this to fanControl
