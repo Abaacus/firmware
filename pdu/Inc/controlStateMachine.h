@@ -2,6 +2,20 @@
 #define __DRIVE_BY_WIRE_H
 #include "stm32f7xx_hal.h"
 #include "state_machine.h"
+#include "cmsis_os.h"
+
+HAL_StatusTypeDef motorControlInit();
+HAL_StatusTypeDef coolingControlInit();
+HAL_StatusTypeDef maincontrolInit();
+void coolingControlTask(void *pvParameters);
+void motorControlTask(void *pvParameters);
+uint32_t startCriticalFailureDelay();
+extern Transition_t mainTransitions[];
+extern Transition_t motorTransitions[];
+extern Transition_t coolingTransitions[];
+extern TimerHandle_t criticalDelayTimer;
+extern TimerHandle_t coolingDelayTimer;
+extern TimerHandle_t lvShutdownDelayTimer;
 
 typedef enum Main_PDU_States_t {
     MN_STATE_Boards_Off = 0,

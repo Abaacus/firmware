@@ -4,6 +4,8 @@
 #include "bsp.h"
 #include "debug.h"
 
+void mainTaskFunction(void const * argument);
+
 void mainTaskFunction(void const * argument)
 {
     printf("Starting up!!\n");

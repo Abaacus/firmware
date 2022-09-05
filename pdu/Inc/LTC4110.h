@@ -5,6 +5,8 @@
 
 #define POWER_TASK_INTERVAL_MS 250
 
+void powerTask(void *pvParameters);
+
 HAL_StatusTypeDef LTC4110Init(void);
 
 #endif /* end of include guard: SENSORS_H */

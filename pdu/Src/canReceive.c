@@ -5,6 +5,7 @@
 #include "controlStateMachine.h"
 #include "debug.h"
 #include "boardTypes.h"
+#include "canReceive.h"
 
 void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
     if (EM_Power_State_Request == EM_Power_State_Request_On) {
