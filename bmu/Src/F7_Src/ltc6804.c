@@ -247,7 +247,8 @@ HAL_StatusTypeDef batt_send_command(ltc_command_t curr_command, bool broadcast, 
     const size_t TX_BUFF_SIZE = COMMAND_SIZE + PEC_SIZE;
     uint8_t txBuffer[TX_BUFF_SIZE];
 	
-	uint8_t command_byte_low, command_byte_high;
+	uint8_t command_byte_low;
+    uint8_t command_byte_high;
 	uint8_t address = LTC_ADDRESS[board][ltc_chip];
 	switch(curr_command) {
 		case(ADCV): 
@@ -349,7 +350,8 @@ HAL_StatusTypeDef batt_readBackCellVoltage(float *cell_voltage_array, voltage_op
 			for (int block = 0; block < VOLTAGE_BLOCKS_PER_CHIP; block++) {
 				
 				uint8_t address = LTC_ADDRESS[board][ltc_chip]; 
-				uint8_t cmdByteLow, cmdByteHigh;
+				uint8_t cmdByteLow;
+                uint8_t cmdByteHigh;
 				// Select appropriate voltage register group
 				switch(block){
 					case 0:

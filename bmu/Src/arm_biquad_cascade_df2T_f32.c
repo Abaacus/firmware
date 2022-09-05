@@ -165,17 +165,49 @@ uint32_t blockSize)
    float32_t *pState = S->pState;                 /*  State pointer             */
    float32_t *pCoeffs = S->pCoeffs;               /*  coefficient pointer       */
    float32_t acc1;                                /*  accumulator               */
-   float32_t b0, b1, b2, a1, a2;                  /*  Filter coefficients       */
+   float32_t b0;
+   float32_t b1;
+   float32_t b2;
+   float32_t a1;
+   float32_t a2;                                  /*  Filter coefficients       */
    float32_t Xn1;                                 /*  temporary input           */
-   float32_t d1, d2;                              /*  state variables           */
-   uint32_t sample, stage = S->numStages;         /*  loop counters             */
+   float32_t d1;
+   float32_t d2;                                  /*  state variables           */
+   uint32_t sample = S->numStages;
+   uint32_t stage = S->numStages;                 /*  loop counters             */
 
 #if defined(ARM_MATH_CM7)
 	
-   float32_t Xn2, Xn3, Xn4, Xn5, Xn6, Xn7, Xn8;   /*  Input State variables     */
-   float32_t Xn9, Xn10, Xn11, Xn12, Xn13, Xn14, Xn15, Xn16;
-   float32_t acc2, acc3, acc4, acc5, acc6, acc7;  /*  Simulates the accumulator */
-   float32_t acc8, acc9, acc10, acc11, acc12, acc13, acc14, acc15, acc16;
+   float32_t Xn2;
+   float32_t Xn3;
+   float32_t Xn4;
+   float32_t Xn5;
+   float32_t Xn6;
+   float32_t Xn7;
+   float32_t Xn8;   /*  Input State variables     */
+   float32_t Xn9;
+   float32_t Xn10;
+   float32_t Xn11;
+   float32_t Xn12;
+   float32_t Xn13;
+   float32_t Xn14;
+   float32_t Xn15;
+   float32_t Xn16;
+   float32_t acc2;
+   float32_t acc3;
+   float32_t acc4;
+   float32_t acc5;
+   float32_t acc6;
+   float32_t acc7;  /*  Simulates the accumulator */
+   float32_t acc8;
+   float32_t acc9;
+   float32_t acc10;
+   float32_t acc11;
+   float32_t acc12;
+   float32_t acc13;
+   float32_t acc14;
+   float32_t acc15;
+   float32_t acc16;
 
    do
    {

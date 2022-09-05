@@ -187,7 +187,9 @@ float HITL_VPACK = 0;
  */
 Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
 {
-    float VBatt, VBus, IBus;
+    float VBatt;
+    float VBus;
+    float IBus;
     uint32_t dbwTaskNotifications;
     DEBUG_PRINT("precharge type %d\n", prechargeType);
     if (prechargeType >= PC_NumTypes) {
@@ -521,7 +523,9 @@ Precharge_Discharge_Return_t discharge()
     sendDTC_WARNING_CONTACTOR_OPEN_IMPENDING();
     DEBUG_PRINT("Discharge start, waiting for zero current\n");
     uint32_t startTickVal = xTaskGetTickCount();
-    float IBus, VBus, VBatt;
+    float IBus;
+    float VBus;
+    float VBatt;
     do {
         if (getIBus(&IBus) != HAL_OK) {
             break;
