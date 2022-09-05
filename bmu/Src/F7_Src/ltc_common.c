@@ -184,7 +184,9 @@ void delay_us(uint32_t time_us)
 	__HAL_TIM_SetCounter(&DELAY_TIMER,0);
 	__HAL_TIM_SetAutoreload(&DELAY_TIMER,0xffff);
 	HAL_TIM_Base_Start(&DELAY_TIMER);
-	while(DELAY_TIMER_INSTANCE->CNT < time_us);
+	while(DELAY_TIMER_INSTANCE->CNT < time_us){
+        
+    }
 	HAL_TIM_Base_Stop(&DELAY_TIMER);
 }
 

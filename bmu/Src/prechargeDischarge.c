@@ -71,8 +71,11 @@ typedef enum ContactorState_t {
 void setNegContactor(ContactorState_t state)
 {
     DEBUG_PRINT("%s negative contactor\n", state==CONTACTOR_CLOSED?"Closing":"Opening");
-    if (state==CONTACTOR_CLOSED) CONT_NEG_CLOSE;
-    else if (state == CONTACTOR_OPEN) CONT_NEG_OPEN;
+    if (state==CONTACTOR_CLOSED) {
+        CONT_NEG_CLOSE;
+    } else if (state == CONTACTOR_OPEN) {
+        CONT_NEG_OPEN;
+    }
 }
 
 /**
@@ -84,8 +87,11 @@ void setPosContactor(ContactorState_t state)
 {
     DEBUG_PRINT("%s positive contactor\n", state==CONTACTOR_CLOSED?"Closing":"Opening");
 
-    if (state==CONTACTOR_CLOSED) CONT_POS_CLOSE;
-    else if (state == CONTACTOR_OPEN) CONT_POS_OPEN;
+    if (state==CONTACTOR_CLOSED) {
+        CONT_POS_CLOSE;
+    } else if (state == CONTACTOR_OPEN) {
+        CONT_POS_OPEN;
+    }
 }
 
 /**
@@ -98,8 +104,11 @@ void setPrechargeContactor(ContactorState_t state)
 {
     DEBUG_PRINT("%s precharge contactor\n", state==CONTACTOR_CLOSED?"Closing":"Opening");
 
-    if (state==CONTACTOR_CLOSED) PCDC_PC;
-    else if (state == CONTACTOR_OPEN) PCDC_DC;
+    if (state==CONTACTOR_CLOSED) {
+        PCDC_PC;
+    } else if (state == CONTACTOR_OPEN) {
+        PCDC_DC;   
+    }
 }
 
 /**
