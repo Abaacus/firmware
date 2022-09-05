@@ -3,6 +3,7 @@
 
 #include "bsp.h"
 #include "debug.h"
+#include "mainTaskEntry.h"
 
 void mainTaskFunction(void const * argument)
 {

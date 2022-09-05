@@ -38,5 +38,12 @@ HAL_StatusTypeDef initMotorControllerProcanSettings();
 HAL_StatusTypeDef setMotorControllerProcanSettings(MotorControllerProcanSettings settings);
 HAL_StatusTypeDef setForwardSpeedLimit(float limit);
 HAL_StatusTypeDef setTorqueLimit(float limit);
+float min(float a, float b);
+HAL_StatusTypeDef mcRightCommand(uint16_t commandVal);
+HAL_StatusTypeDef mcLeftCommand(uint16_t commandVal);
+float map_range_float(float in, float low, float high, float low_out, float high_out);
+float limit(float in, float min, float max);
+extern MotorControllerProcanSettings mcRightSettings;
+extern MotorControllerProcanSettings mcLeftSettings;
 
 #endif /* end of include guard: MOTORCONTROLLER_H */
