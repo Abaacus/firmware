@@ -18,6 +18,7 @@
 #include "userCan.h"
 #include "dcu_can.h"
 #include "controlStateMachine.h"
+#include "userInit.h"
 /**
  * Called by FreeRTOS on stack overflow
  */

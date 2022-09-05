@@ -30,6 +30,8 @@ TimerHandle_t debounceTimer;
 void debounceTimerCallback(TimerHandle_t timer);
 bool debounceTimerStarted = false;
 
+FSM_Handle_Struct DCUFsmHandle;
+
 uint32_t selfTests(uint32_t event);
 uint32_t toggleHV(uint32_t event);
 uint32_t toggleEM(uint32_t event);
