@@ -145,7 +145,8 @@ bool is_tps_within_tolerance(uint16_t throttle1_percent, uint16_t throttle2_perc
 // @ret False if implausibility, true otherwise
 bool getThrottlePositionPercent(float *throttleOut)
 {
-    uint32_t throttle1_percent, throttle2_percent;
+    uint32_t throttle1_percent;
+    uint32_t throttle2_percent;
     float throttle;
     (*throttleOut) = 0;
 

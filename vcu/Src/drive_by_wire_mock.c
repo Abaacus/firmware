@@ -91,7 +91,8 @@ BaseType_t setFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     BaseType_t paramLen;
-    float throttlePercent1, throttlePercent2;
+    float throttlePercent1;
+    float throttlePercent2;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(param, "%f", &throttlePercent1);
