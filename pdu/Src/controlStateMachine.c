@@ -227,7 +227,9 @@ void coolingControlTask(void *pvParameters)
 
     fsmTaskFunction(&coolingFsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){
+
+    } // Shouldn't reach here
 }
 
 void motorControlTask(void *pvParameters)
@@ -240,7 +242,9 @@ void motorControlTask(void *pvParameters)
 
     fsmTaskFunction(&motorFsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){
+        
+    } // Shouldn't reach here
 }
 
 void mainControlTask(void *pvParameters)
@@ -256,7 +260,9 @@ void mainControlTask(void *pvParameters)
 
     fsmTaskFunction(&mainFsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){
+
+    } // Shouldn't reach here
 }
 
 HAL_StatusTypeDef startControl()
