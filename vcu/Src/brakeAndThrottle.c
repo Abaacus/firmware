@@ -170,7 +170,7 @@ bool getThrottlePositionPercent(float *throttleOut)
         return false;
     } else {
         /*DEBUG_PRINT("t1 %ld, t2 %ld\n", throttle1_percent, throttle2_percent);*/
-        throttle = (throttle1_percent + throttle2_percent) / 2;
+        throttle = (float)((throttle1_percent + throttle2_percent) / 2);
     }
 
     *throttleOut = throttle;
@@ -185,7 +185,7 @@ bool getThrottlePositionPercent(float *throttleOut)
  */
 ThrottleStatus_t getNewThrottle(float *throttleOut)
 {
-    float throttle = 0;
+    float throttle = 0.0;
     (*throttleOut) = 0;
 
     if (!getThrottlePositionPercent(&throttle)) {

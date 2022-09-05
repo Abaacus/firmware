@@ -118,7 +118,7 @@ static const CLI_Command_Definition_t throttleABCommandDefinition =
 BaseType_t getThrottle(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    float throttle = 0;
+    float throttle = 0.0;
     ThrottleStatus_t rc = getNewThrottle(&throttle);
     COMMAND_OUTPUT("Throttle %f, status (%s)\n", throttle, rc==THROTTLE_OK?"OK":"FAIL");
 
