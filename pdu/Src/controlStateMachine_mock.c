@@ -6,7 +6,7 @@
 #include "FreeRTOS_CLI.h"
 #include "sensors.h"
 
-// volatile uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
+volatile uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 
 BaseType_t getChannelCurrents(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
