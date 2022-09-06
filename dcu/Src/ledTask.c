@@ -25,7 +25,6 @@
 
 #define FLASH_DURATION_MS 150
 
-FSM_Handle_Struct DCUFsmHandle;
 void selfTestLEDs(void);
 void flashLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void flashDualLED(GPIO_TypeDef* GPIOx1, uint16_t GPIO_Pin1,
