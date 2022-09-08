@@ -22,7 +22,7 @@
 #include "dcu_dtc.h"
 
 extern osThreadId mainTaskHandle;
-
+extern FSM_Handle_Struct DCUFsmHandle;
 
 /**
  * Get current HV power state, updated from BMU CAN messages
