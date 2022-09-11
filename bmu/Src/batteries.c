@@ -1325,7 +1325,7 @@ ChargeReturn balanceCharge(void)
                          0);                    /* Timeout */
 
         if (rc == pdTRUE) {
-            if (dbwTaskNotifications & (1<<CHARGE_STOP_NOTIFICATION)) {
+            if ((dbwTaskNotifications & (1 << CHARGE_STOP_NOTIFICATION))) {
                 DEBUG_PRINT("Stopping charge\n");
                 if (stopCharging() != HAL_OK) {
                     stopBalance();
