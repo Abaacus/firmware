@@ -58,6 +58,7 @@
 #define DELAY_TIMER_INSTANCE TIM9
 #define FAN_HANDLE htim12
 #define HW_CHECK_HANDLE htim2
+#define FAN_TIM_HANDLE htim8
 
 
 #elif IS_BOARD_NUCLEO_F7
