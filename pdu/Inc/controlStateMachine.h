@@ -17,6 +17,7 @@ extern TimerHandle_t criticalDelayTimer;
 extern TimerHandle_t coolingDelayTimer;
 extern TimerHandle_t lvShutdownDelayTimer;
 
+
 typedef enum Main_PDU_States_t {
     MN_STATE_Boards_Off = 0,
     MN_STATE_Boards_On,
@@ -25,6 +26,14 @@ typedef enum Main_PDU_States_t {
     MN_STATE_Critical_Failure,
     MN_STATE_ANY, // Must be the last state
 } Main_PDU_States_t;
+
+char PDU_Main_States_String[][25]={
+    "Boards Off", 
+    "Boards On", 
+    "Warning Critical", 
+    "LV Shutting Down", 
+    "Critical Failure"
+};
 
 typedef enum MAIN_PDU_Events_t {
     MN_EV_Init = 0,
@@ -42,6 +51,12 @@ typedef enum MotorControl_PDU_States_t {
     MTR_STATE_ANY, // Must be the last state
 } MotorControl_PDU_States_t;
 
+char PDU_Motor_States_String[][20]={
+    "Motors Off", 
+    "Motors On", 
+    "Critical"
+};
+
 typedef enum MotorControl_PDU_Events_t {
     MTR_EV_EM_ENABLE = 0,
     MTR_EV_EM_DISABLE,
@@ -57,6 +72,14 @@ typedef enum CoolingControl_PDU_States_t {
     COOL_STATE_LV_Cuttoff,
     COOL_STATE_ANY, // Must be the last state
 } CoolingControl_PDU_States_t;
+
+char PDU_Cool_States_String[][15]={
+    "OFF", 
+    "WAIT", 
+    "ON", 
+    "HV_CRITICAL", 
+    "LV_Cutoff"
+};
 
 typedef enum CoolingControl_PDU_Events_t {
     COOL_EV_EM_ENABLE,
