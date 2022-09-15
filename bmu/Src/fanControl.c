@@ -147,7 +147,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 
 			__HAL_TIM_SET_COUNTER(htim, 0);  // reset the counter
 			Is_First_Captured = 0; // set it back to false
-      RPM = frequency * 60;
+      RPM = (frequency/2.0) * 60.0; //fan produces two pulses per revolution
 		}
 	}
 }
