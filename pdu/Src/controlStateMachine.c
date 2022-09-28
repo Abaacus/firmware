@@ -408,7 +408,7 @@ uint32_t motorsOff(uint32_t event)
     if (sendCAN_PDU_ChannelStatus() != HAL_OK) {
         ERROR_PRINT("Failed to send pdu channel status CAN message\n");
     }
-
+// cppcheck-suppress misra-c2012-10.4
     if (event == MTR_EV_EM_DISABLE) {
         return MTR_STATE_Motors_Off;
     } else {
