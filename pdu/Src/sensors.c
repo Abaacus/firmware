@@ -62,9 +62,12 @@ HAL_StatusTypeDef startADCConversions()
 }
 
 void printRawADCVals() {
+    // cppcheck-suppress misra-c2012-10.4
     for (int i=0; i < NUM_PDU_CHANNELS; i++) {
+        // cppcheck-suppress misra-c2012-10.4
         if (i == LV_Voltage) {
             DEBUG_PRINT("Bus Voltage: %lu\n", ADC_Buffer[i]);
+            // cppcheck-suppress misra-c2012-10.4
         } else if (i == LV_Current) {
             DEBUG_PRINT("Bus current: %lu\n", ADC_Buffer[i]);
         } else {

@@ -1,0 +1,2 @@
+PYTHONPATH="/usr/bin/python3"
+export PYTHONPATH
