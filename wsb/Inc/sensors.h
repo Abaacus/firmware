@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "stm32f0xx_hal.h"
 
+void pollSensorsTask(void const *argument);
+
 uint32_t sensor_encoder_count(void);
 uint32_t sensor_encoder_mm(void);
 float sensor_encoder_speed(void);
