@@ -100,10 +100,12 @@ void begin_fanRPM_measurement()
  
   MX_GPIO_Init();
  
+  TickType_t xLastWakeTime = xTaskGetTickCount();
+
   while (1)
   {
     FAN_RPM = SIGNAL_COUNTER/(60*2*5); //2 signals per revolution and 5 fans
-    vTaskDelay(ONE_SEC_MS);
+    vTaskDelayUntil(&xLastWakeTime, ONE_SEC_MS);
   }
 }
  
