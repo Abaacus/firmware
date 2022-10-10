@@ -1,6 +1,7 @@
 
 import json
 import sys
+import re
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
@@ -18,14 +19,13 @@ def error(message = "Error: Please check your input"):
      msg.exec_()
 
 def showGraph():
-     print("log")
      dbcFile = ui.DBCFile.text()
      if (ui.FileLocation.toPlainText() != ''):
           data_dict = json.loads(logToJsonDict(ui.FileLocation.toPlainText(), dbcFile))
      else:
           error("Please select a file to graph")
           return
-     #save all the checked signal in list which is named checked_list 
+     # save all the checked signal in list which is named checked_list 
      checked_list = []
      root = ui.CANSignals.invisibleRootItem()
      all_signals = root.child(0)
@@ -36,16 +36,21 @@ def showGraph():
                checked_list.append(child.text(0))
      # print(checked_list)
 
-     # in data_dict, if signal name is selected, save into checked_data_dict (filtering)
+     # in data_dict, if signal name is selected or it's selected by regex, save into checked_data_dict (filtering)
      checked_data_dict = {}
-     for i in data_dict:
-          if (i in checked_list):
-               checked_data_dict[i] = data_dict[i]
+     regexInput = ui.RegexInput.text()
+     if (regexInput != ""):
+          for i in data_dict:
+               if (i in checked_list) or (re.search(regexInput, i) is not None):
+                    checked_data_dict[i] = data_dict[i]
+     else:
+          for i in data_dict:
+               if (i in checked_list):
+                    checked_data_dict[i] = data_dict[i]
      # print(checked_data_dict)
 
      #obtain all other constraints and save in args_dict
      args_dict = {}
-     args_dict["RegexInput"] = ui.RegexInput.text()
      args_dict["MaxXInput"] = ui.MaxXInput.text()
      args_dict["MinXInput"] = ui.MinXInput.text()
      args_dict["MaxYInput"] = ui.MaxYInput.text()
@@ -53,8 +58,6 @@ def showGraph():
      # print(args_dict)
 
      graph(checked_data_dict, args_dict)
-
-     
 
 def getSignalNames():
      if (ui.FileLocation.toPlainText() != ''):
@@ -69,14 +72,18 @@ def getSignalNames():
 def loadExtraUiLogic(ui):
      ui.SelectFile.clicked.connect(selectFile)
      ui.GraphBtn.clicked.connect(showGraph)
+     ui.SelectDBC.clicked.connect(selectDBC)
 
 def selectFile():
-     print(ui.RegexInput.text())
      fileLocation = QFileDialog.getOpenFileName(None, "Select file", "Log file (.log)", "*.log")[0]
      if fileLocation != "":
           ui.FileLocation.setText(fileLocation)
-          # graph(ui.FileLocation.toPlainText(), None)
      loadSignalList(ui.CANSignals, getSignalNames())
+
+def selectDBC():
+     fileLocation = QFileDialog.getOpenFileName(None, "Select file", "DBC file (.dbc)", "*.dbc")[0]
+     if fileLocation != "":
+          ui.DBCFile.setText(fileLocation)
 
 def loadSignalList(treeWidget, data_list):
      treeWidget.clear()

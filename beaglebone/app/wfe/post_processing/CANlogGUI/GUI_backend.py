@@ -1,8 +1,6 @@
 import argparse
-import logging
 import csv
 import re
-import codecs
 import cantools
 
 def toDict(src_file):
@@ -22,7 +20,6 @@ def toDict(src_file):
                     )
                     for signal in decoded_data:
                          sig_data = decoded_data[signal]
-                         # print(f"{timestamp},{signal},{sig_data}")
                          if signal in signals:
                               signals[signal].append((timestamp, sig_data))
                          else:
@@ -55,7 +52,6 @@ def filter(src_file, signals_l, regex_l):
           except:
                pass
      return filtered_data
-
 
 def graph(data_dict, args):
      import matplotlib.pyplot as plt

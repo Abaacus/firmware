@@ -1,4 +1,3 @@
-from unittest import skip
 import cantools
 import matplotlib.pyplot as plt
 
@@ -35,9 +34,6 @@ def graph(checked_data_dict, args):
     for signal in checked_data_dict:
         ax.plot(*zip(*checked_data_dict[signal]), label=signal)
     #check if users has inputed any constraints on graph
-    if (args['RegexInput'] != ''):
-        #do something about regex
-        skip
     if (args['MaxXInput'] != ''):
         MaxXInput = int(args['MaxXInput'])
         plt.xlim(right=MaxXInput)
