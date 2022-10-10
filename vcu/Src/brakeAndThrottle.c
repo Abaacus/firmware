@@ -25,9 +25,11 @@
 #define BRAKE_POS_LOW (1117)
 #define BRAKE_POS_HIGH (1410)
 
-#define STEERING_POT_LOW (1040)
-#define STEERING_POT_CENTER (2122)
-#define STEERING_SCALE_DIVIDER ((STEERING_POT_CENTER-STEERING_POT_LOW)/(90))
+#define STEERING_POT_LOW (35) //Pot value when the wheel is all the way to the left
+#define STEERING_POT_HIGH (3660) //Pot value when the wheel is all the way to the right
+
+#define STEERING_POT_CENTER (((STEERING_POT_HIGH-STEERING_POT_LOW)/2) + STEERING_POT_LOW) //The pot value while the wheel is neutral
+#define STEERING_SCALE_DIVIDER (STEERING_POT_CENTER/(100)) //Scale the pot value to range (-100,100) 
 #define STEERING_POT_OFFSET (STEERING_POT_CENTER)
 
 /*#define THROTT_A_LOW (0xd44)*/
@@ -231,12 +233,7 @@ HAL_StatusTypeDef outputThrottle() {
         DEBUG_PRINT("Throttle disabled due brake pressed\n");
     }
 
-    static uint64_t count = 0;
-    count++;
-    if (count % 20 == 0) {
-      DEBUG_PRINT("Setting MC throttles to %f\n", throttle);
-    }
-    sendThrottleValueToMCs(throttle);
+    sendThrottleValueToMCs(throttle, getSteeringAngle());
 
     return HAL_OK;
 }
@@ -282,10 +279,11 @@ int getBrakePressure() {
   return brakeThrottleSteeringADCVals[BRAKE_PRES_INDEX] * BRAKE_PRESSURE_MULTIPLIER / BRAKE_PRESSURE_DIVIDER;
 }
 
+// Full left turn angle: -100 degrees
+// Full right turn angle: 100 degrees
 int getSteeringAngle() {
   int steeringPotVal = brakeThrottleSteeringADCVals[STEERING_INDEX];
-
-  return -1 *(steeringPotVal - STEERING_POT_OFFSET) / STEERING_SCALE_DIVIDER;
+  return (steeringPotVal-STEERING_POT_OFFSET) / STEERING_SCALE_DIVIDER;
 }
 
 

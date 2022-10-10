@@ -19,6 +19,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "math.h"
+#include "bmu_can.h"
 #include "bmu_dtc.h"
 #include "batteries.h"
 
@@ -200,6 +201,8 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         DEBUG_PRINT("pack voltage %f\n", packVoltage);
     }
 
+    PrechargeState = 0; 
+    sendCAN_PrechargeState();
     /*
      * Step 1:
      * IShunt == 0
@@ -245,11 +248,6 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
                     packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK);
         return PCDC_ERROR;
     }
-	if (VBatt < packVoltage * PRECHARGE_STEP_1_VBATT_MIN_PERCENT_VPACK) {
-        ERROR_PRINT("ERROR: VBatt %f < %f\n", VBatt,
-                    packVoltage * PRECHARGE_STEP_1_VBATT_MIN_PERCENT_VPACK);
-        return PCDC_ERROR;
-	}
 
     ERROR_PRINT("INFO: IBus %f\n", IBus);
     if (IBus > PRECHARGE_STEP_1_CURRENT_MAX) {
@@ -257,6 +255,8 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         return PCDC_ERROR;
     }
 
+    PrechargeState = 1; 
+    sendCAN_PrechargeState();
     /*
      * Step 2:
      * IShunt == 0
@@ -318,7 +318,8 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
     }
     packVoltage = VBatt;
 
-
+    PrechargeState = 2; 
+    sendCAN_PrechargeState();
     /*
      * Step 3:
      * IShunt == 0
@@ -365,6 +366,8 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         return PCDC_ERROR;
     }
 
+    PrechargeState = 3; 
+    sendCAN_PrechargeState();
     /*
      * Step 4:
      * IShunt >= 1
@@ -442,6 +445,8 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         }
     }
 
+    PrechargeState = 4; 
+    sendCAN_PrechargeState();
     /*
      * Step 5:
      * IShunt has spike due to closing pos contactor
@@ -501,6 +506,9 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
     ERROR_PRINT("INFO: IBus %f\n", IBus);
 
     DEBUG_PRINT("Finished Precharge\n");
+
+    PrechargeState = 5; 
+    sendCAN_PrechargeState();
     return PCDC_DONE;
 }
 
@@ -519,6 +527,13 @@ Precharge_Discharge_Return_t discharge()
     DEBUG_PRINT("Discharge start, waiting for zero current\n");
     uint32_t startTickVal = xTaskGetTickCount();
     float IBus, VBus, VBatt;
+
+    //Reset the can logs signals
+    DischargeState = 0;
+    VBus_Data = 0;
+    VBatt_Data = 0;
+    IBus_Data = 0;
+
     do {
         if (getIBus(&IBus) != HAL_OK) {
             break;
@@ -530,8 +545,18 @@ Precharge_Discharge_Return_t discharge()
             ERROR_PRINT("Timed out waiting for zero current before opening contactors\n");
             break;
         }
+        IBus_Data = IBus;
+        sendCAN_Discharge_Data();
         vTaskDelay(1);
     } while (IBus > ZERO_CURRENT_MAX_AMPS);
+
+    //Publish Discharge state for can logs
+    DischargeState = 1;
+    VBus_Data = 0;
+    VBatt_Data = 0;
+    IBus_Data = 0;
+    sendCAN_Discharge_Data();
+
     DEBUG_PRINT("Opening contactors\n");
     openAllContactors();
 
@@ -554,7 +579,10 @@ Precharge_Discharge_Return_t discharge()
             ERROR_PRINT("INFO: IBus %f\n", IBus);
             return PCDC_ERROR;
         }
-
+        VBus_Data = VBus;
+        VBatt_Data = VBatt;
+        IBus_Data = IBus;
+        sendCAN_Discharge_Data();
         vTaskDelay(pdMS_TO_TICKS(DISCHARGE_MEASURE_PERIOD_MS));
     } while (VBus > DISCHARGE_DONE_BUS_VOLTAGE);
 
@@ -564,6 +592,11 @@ Precharge_Discharge_Return_t discharge()
 
     DEBUG_PRINT("Discharge done\n");
 
+    VBus_Data = 0;
+    VBatt_Data = 0;
+    IBus_Data = 0;
+    DischargeState = 2;
+    sendCAN_Discharge_Data();
     return PCDC_DONE;
 }
 

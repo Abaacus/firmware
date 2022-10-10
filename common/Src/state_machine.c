@@ -6,6 +6,25 @@
 #include "debug.h"
 #include "watchdog.h"
 
+#if BOARD_ID == ID_BMU
+    #include "bmu_can.h"
+#elif BOARD_ID  == ID_DCU
+	#include "dcu_can.h"
+#elif BOARD_ID  == ID_VCU_F7
+	#include "vcu_F7_can.h"
+#elif BOARD_ID  == ID_PDU
+	#include "pdu_can.h"
+#elif BOARD_ID  == ID_WSBFL
+    #include "wsbfl_can.h"
+#elif BOARD_ID  == ID_WSBFR
+    #include "wsbfr_can.h"
+#elif BOARD_ID  == ID_WSBRL
+    #include "wsbrl_can.h"
+#elif BOARD_ID  == ID_WSBRR
+    #include "wsbrr_can.h"
+#endif
+
+
 HAL_StatusTypeDef fsmInit(uint32_t startingState, FSM_Init_Struct *init,
                           FSM_Handle_Struct *handle)
 {
@@ -86,7 +105,7 @@ HAL_StatusTypeDef fsmProcessEvent(FSM_Handle_Struct *handle, uint32_t event)
     uint32_t newState;
     uint32_t i;
     Transition_t *trans = handle->init.transitions;
-
+    uint32_t current_state = handle->state;
 
     if (event == WATCHDOG_REQUEST_EVENT_NUM) {
         watchdogTaskCheckIn(handle->init.watchdogTaskId);
@@ -101,8 +120,8 @@ HAL_StatusTypeDef fsmProcessEvent(FSM_Handle_Struct *handle, uint32_t event)
     }
 
     for (i = 0; i < handle->init.transitionTableLength; i++) {
-        if ((handle->state == trans[i].st) || (handle->init.ST_ANY == trans[i].st)) {
-            if ((event == trans[i].ev) || (handle->init.EV_ANY == trans[i].ev)) {
+        if ((current_state == trans[i].st) || (handle->init.ST_ANY == trans[i].st)) {
+            if ((event == trans[i].ev) || (trans[i].ev == handle->init.EV_ANY)) {
                 newState = (trans[i].fn)(event);
                 if (newState > handle->init.maxStateNum) {
                     ERROR_PRINT("FSM: New state out of range\n");
@@ -131,6 +150,9 @@ void fsmTaskFunction(FSM_Handle_Struct *handle)
 {
     uint32_t event;
 
+    //Used to log state machine processing if event != UINT32_MAX
+    uint8_t validEvent = 0;
+
     while(1)
     {
         if (xQueueReceive(handle->eventQueue, &event, portMAX_DELAY) != pdTRUE)
@@ -141,12 +163,26 @@ void fsmTaskFunction(FSM_Handle_Struct *handle)
 
         if (event != UINT32_MAX) {
             DEBUG_PRINT("Received event %lu\n", event);
+            
+            validEvent = 1;
+            StateMachineBoardID = BOARD_ID;
+            StateMachineWatchdogID =  handle->init.watchdogTaskId;
+            StateMachineEvent = event;
+            StateMachineState = fsmGetState(handle);
         }
 
         if (fsmProcessEvent(handle, event) != HAL_OK)
         {
             ERROR_PRINT("Failed to process event %lu\n", event);
         }
+
+        if (validEvent)
+        {
+            StateMachineNewState = fsmGetState(handle);
+            sendCAN_StateMachineEventProcessed(); 
+            validEvent = 0;
+        }
+
     }
 }
 
