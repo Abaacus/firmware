@@ -2,7 +2,7 @@ import cantools
 import matplotlib.pyplot as plt
 
 def toDict(src_file):
-     db = cantools.database.load_file("dependencies/2018CAR.dbc")
+     db = cantools.database.load_file("../../../../../common/Data/2018CAR.dbc")
      signals = {}
      with open(src_file, "r") as f:
           lines = f.readlines()
@@ -73,7 +73,7 @@ def serialize(msg):
 
 def logToJsonDict(logFilePath, dbcFile):
     if dbcFile == "":
-        db = cantools.database.load_file("dependencies/2018CAR.dbc")
+        db = cantools.database.load_file("../../../../../common/Data/2018CAR.dbc")
     else:
         db = cantools.database.load_file(dbcFile)
     signals = {}

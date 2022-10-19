@@ -61,7 +61,7 @@ def showGraph():
 
 def getSignalNames():
      if (ui.FileLocation.toPlainText() != ''):
-          data_dict = json.loads(logToJsonDict(ui.FileLocation.toPlainText(), "dependencies/2018CAR.dbc"))
+          data_dict = json.loads(logToJsonDict(ui.FileLocation.toPlainText(), "../../../../../common/Data/2018CAR.dbc"))
      signalNames = []
      for key in data_dict.keys():
           if(signalNames.count(key) == 0):
