@@ -109,7 +109,7 @@ void driveByWireTask(void *pvParameters)
 
     fsmTaskFunction(&fsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){} // Shouldn't reach here
 }
 
 HAL_StatusTypeDef startDriveByWire()

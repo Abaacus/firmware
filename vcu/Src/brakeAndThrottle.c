@@ -29,8 +29,8 @@
 #define STEERING_POT_HIGH (3660) //Pot value when the wheel is all the way to the right
 
 #define STEERING_POT_CENTER (((STEERING_POT_HIGH-STEERING_POT_LOW)/2) + STEERING_POT_LOW) //The pot value while the wheel is neutral
-#define STEERING_SCALE_DIVIDER (STEERING_POT_CENTER/(100)) //Scale the pot value to range (-100,100) 
-#define STEERING_POT_OFFSET (STEERING_POT_CENTER)
+#define STEERING_SCALE_DIVIDER ((int32_t)STEERING_POT_CENTER/(100)) //Scale the pot value to range (-100,100) 
+#define STEERING_POT_OFFSET ((int32_t) STEERING_POT_CENTER)
 
 /*#define THROTT_A_LOW (0xd44)*/
 /*#define THROTT_B_LOW (0x5d2)*/
@@ -282,7 +282,7 @@ int getBrakePressure() {
 // Full left turn angle: -100 degrees
 // Full right turn angle: 100 degrees
 int getSteeringAngle() {
-  int steeringPotVal = brakeThrottleSteeringADCVals[STEERING_INDEX];
+  int32_t steeringPotVal = (int32_t) brakeThrottleSteeringADCVals[STEERING_INDEX];
   return (steeringPotVal-STEERING_POT_OFFSET) / STEERING_SCALE_DIVIDER;
 }
 
