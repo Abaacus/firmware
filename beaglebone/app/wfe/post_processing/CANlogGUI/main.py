@@ -75,7 +75,7 @@ def loadExtraUiLogic(ui):
      ui.SelectDBC.clicked.connect(selectDBC)
 
 def selectFile():
-     fileLocation = QFileDialog.getOpenFileName(None, "Select file", "Log file (.log)", "*.log")[0]
+     fileLocation = QFileDialog.getOpenFileName(None, "Select file", "CAN Log File", "Log file (*.log);;CSV Log file (*.csv);; All Files (*.*)")[0]
      if fileLocation != "":
           ui.FileLocation.setText(fileLocation)
      loadSignalList(ui.CANSignals, getSignalNames())
