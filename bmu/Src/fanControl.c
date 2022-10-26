@@ -89,22 +89,16 @@ void fanTask()
 #define ONE_SEC_MS 1000
 
 /* Captured Value */
-uint32_t FAN_RPM = 0;
-uint32_t SIGNAL_COUNTER = 0;
+uint32_t FanRPM = 0;
+uint32_t SignalCounter = 0;
 
 void begin_fanRPM_measurement()
 {
-  HAL_Init();
- 
-  SystemClock_Config();
- 
-  MX_GPIO_Init();
- 
   TickType_t xLastWakeTime = xTaskGetTickCount();
 
   while (1)
   {
-    FAN_RPM = SIGNAL_COUNTER/(60*2*5); //2 signals per revolution and 5 fans
+    FanRPM = SignalCounter/(60*2*5); //2 signals per revolution and 5 fans
     vTaskDelayUntil(&xLastWakeTime, ONE_SEC_MS);
   }
 }
@@ -114,7 +108,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if(GPIO_Pin == GPIO_PIN_6 || GPIO_PIN_12 || GPIO_PIN_13 || GPIO_PIN_14 || GPIO_PIN_15)
     {
-      SIGNAL_COUNTER++; // increment counter
+      SignalCounter++; // increment counter
     }
 }
 
