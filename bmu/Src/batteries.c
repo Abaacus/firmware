@@ -208,7 +208,7 @@ float voltageToSOCLookup[NUM_SOC_LOOKUP_VALS] = {
  */
 #define HV_MEASURE_TASK_PERIOD_MS 1
 #define HV_MEASURE_TASK_ID 4
-#define STATE_BUS_HV_CAN_SEND_PERIOD_MS 200
+#define STATE_BUS_HV_CAN_SEND_PERIOD_MS 100
 static uint32_t StateBusHVSendPeriod = STATE_BUS_HV_CAN_SEND_PERIOD_MS;
 
 /// Queue holding most recent bus current measurement
@@ -502,7 +502,7 @@ void HVMeasureTask(void *pvParamaters)
             sendCAN_BMU_AmsVBatt();
             lastStateBusHVSend = xTaskGetTickCount();
         }
-		integrate_bus_current(IBus, (float)(xTaskGetTickCount() - xLastWakeTime));
+		integrate_bus_current(IBus, (float)HV_MEASURE_TASK_PERIOD_MS);
 	
         watchdogTaskCheckIn(HV_MEASURE_TASK_ID);
         vTaskDelayUntil(&xLastWakeTime, HV_MEASURE_TASK_PERIOD_MS);
