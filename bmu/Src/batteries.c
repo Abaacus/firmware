@@ -31,6 +31,7 @@
 #include "watchdog.h"
 #include "canReceive.h"
 #include "chargerControl.h"
+#include "state_of_charge.h"
 
 
 /*
@@ -60,7 +61,8 @@
  */
 
 // This is subject to change and is expected to be 50ms
-#define BATTERY_TASK_PERIOD_MS 50
+// I moved it to 75ms to be safe
+#define BATTERY_TASK_PERIOD_MS 75
 #define BATTERY_CHARGE_TASK_PERIOD_MS 2000
 #define BATTERY_TASK_ID 2
 
@@ -86,7 +88,7 @@ volatile float LIMIT_OVERVOLTAGE = DEFAULT_LIMIT_OVERVOLTAGE;
 #define DEFAULT_LIMIT_UNDERVOLTAGE 2.5F
 volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 /// Warning voltage of a cell, will send a warning DTC if it goes below
-#define LIMIT_LOWVOLTAGE_WARNING 3.2F
+#define LIMIT_LOWVOLTAGE_WARNING 2.8F
 /// Rate at which the low voltage threshold dynamically lowers vs current
 #define LIMIT_LOWVOLTAGE_WARNING_SLOPE 0.0043125F
 
@@ -98,6 +100,11 @@ volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 #define CELL_DCR (0.01)                         ///< Ohms
 #define CELL_HEAT_CAPACITY (1034.2)             ///< kJ/kg*K
 #define CELL_MASS (0.496)                       ///< kg
+
+// A constant which defines how much we adjust our AdjustedCellVoltage factoring in the cell's Internal Resistance
+// This is a very conservative number of 3mOhms. This is not the measured cell internal resistance.
+// Our current pack is 70s7p. So this assumption factors in that IBus is total current from cells and the current gets divided by 7
+#define ADJUSTED_CELL_IR (0.00286F)
 
 /** Maximum allowable cell temperature, will send critical DTC if surpassed */
 #define CELL_OVERTEMP (CELL_MAX_TEMP_C)
@@ -201,7 +208,8 @@ float voltageToSOCLookup[NUM_SOC_LOOKUP_VALS] = {
  */
 #define HV_MEASURE_TASK_PERIOD_MS 1
 #define HV_MEASURE_TASK_ID 4
-#define STATE_BUS_HV_CAN_SEND_PERIOD_MS 500
+#define STATE_BUS_HV_CAN_SEND_PERIOD_MS 100
+static uint32_t StateBusHVSendPeriod = STATE_BUS_HV_CAN_SEND_PERIOD_MS;
 
 /// Queue holding most recent bus current measurement
 QueueHandle_t IBusQueue;
@@ -219,6 +227,10 @@ QueueHandle_t PackVoltageQueue;
 #define IMD_TASK_PERIOD_MS 1000
 #define IMD_TASK_ID 5
 
+/// Array is used to store the filtered voltages
+float cellVoltagesFiltered[NUM_VOLTAGE_CELLS];
+
+extern osThreadId stateOfChargeHandle;
 /*
  * HV Measure
  */
@@ -422,6 +434,25 @@ HAL_StatusTypeDef cliSetIBus(float IBus)
 }
 
 /**
+ * @brief Allows setting of the interval for sending state bus HV CAN messages
+ *
+ * @param period The period of time, in milliseconds
+ */
+void cliSetStateBusHVSendPeriod(uint32_t period)
+{
+    StateBusHVSendPeriod = period;
+}
+
+/**
+ * @brief Allows getting of the interval for sending state bus HV CAN messages
+ */
+uint32_t cliGetStateBusHVSendPeriod() 
+{
+    return StateBusHVSendPeriod;
+}
+
+
+/**
  * Measures the voltage and current on the HV Bus as well as the HV battery
  * pack voltage.
  *
@@ -448,9 +479,9 @@ void HVMeasureTask(void *pvParamaters)
     uint32_t lastStateBusHVSend = 0;
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
-  float VBus;
-  float VBatt;
-  float IBus;
+    float VBus;
+    float VBatt;
+    float IBus;
     while (1) {
         if (readBusVoltagesAndCurrents(&IBus, &VBus, &VBatt) != HAL_OK) {
             ERROR_PRINT("Failed to read bus voltages and current!\n");
@@ -462,14 +493,17 @@ void HVMeasureTask(void *pvParamaters)
 
 
         if (xTaskGetTickCount() - lastStateBusHVSend
-            > pdMS_TO_TICKS(STATE_BUS_HV_CAN_SEND_PERIOD_MS))
+            > pdMS_TO_TICKS(StateBusHVSendPeriod))
         {
             CurrentBusHV = IBus;
             VoltageBusHV = VBus;
             sendCAN_BMU_stateBusHV();
+            publishVbatt = VBatt;
+            sendCAN_BMU_AmsVBatt();
             lastStateBusHVSend = xTaskGetTickCount();
         }
-
+		integrate_bus_current(IBus, (float)(xTaskGetTickCount() - xLastWakeTime));
+	
         watchdogTaskCheckIn(HV_MEASURE_TASK_ID);
         vTaskDelayUntil(&xLastWakeTime, HV_MEASURE_TASK_PERIOD_MS);
     }
@@ -581,7 +615,6 @@ HAL_StatusTypeDef readCellVoltagesAndTemps()
 #if IS_BOARD_F7 && defined(ENABLE_AMS)
    /*_Static_assert(VOLTAGECELL_COUNT == NUM_VOLTAGE_CELLS, "Length of array for sending cell voltages over CAN doesn't match number of cells");*/
    /*_Static_assert(TEMPCELL_COUNT == NUM_TEMP_CELLS, "Length of array for sending cell temperatures over CAN doesn't match number of temperature cells");*/
-	
    return batt_read_cell_voltages_and_temps((float *)VoltageCell, (float *)TempChannel);
 #elif IS_BOARD_NUCLEO_F7 || !defined(ENABLE_AMS)
    // For nucleo, cell voltages and temps can be manually changed via CLI for
@@ -592,6 +625,18 @@ HAL_StatusTypeDef readCellVoltagesAndTemps()
 #endif
 }
 
+/*
+ * Adjusts cell voltages based on cell internal resistance and current
+ * */
+void enterAdjustedCellVoltages(void)
+{
+	float bus_current_A;
+	getIBus(&bus_current_A);
+	for (int cell = 0; cell < NUM_VOLTAGE_CELLS; cell++)
+	{
+		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * ADJUSTED_CELL_IR);
+	}
+}
 /**
  * @brief This functions sets all cell voltages and temps to known values.
  * This is necessary for testing on Nucleo so it doesn't immediately error
@@ -694,8 +739,6 @@ void ERROR_COUNTER_SUCCESS()
  */
 #define CELL_VOLTAGE_FILTER_ALPHA 0.18
 
-/// Array is used to store the filtered voltages
-float cellVoltagesFiltered[NUM_VOLTAGE_CELLS];
 
 
 /**
@@ -715,10 +758,19 @@ float cellVoltagesFiltered[NUM_VOLTAGE_CELLS];
  */
 void filterCellVoltages(float *cellVoltages, float *cellVoltagesFiltered)
 {
-  for (int i = 0; i < NUM_VOLTAGE_CELLS; i++) {
-    cellVoltagesFiltered[i] = CELL_VOLTAGE_FILTER_ALPHA*cellVoltages[i]
-                              + (1-IBUS_FILTER_ALPHA)*cellVoltagesFiltered[i];
-  }
+	static bool first_run = true;
+	if(first_run)
+	{
+		for(int i = 0; i < NUM_VOLTAGE_CELLS; i++)
+		{
+			cellVoltagesFiltered[i] = cellVoltages[i];
+		}
+		first_run = false;
+	}
+	for (int i = 0; i < NUM_VOLTAGE_CELLS; i++) {
+		cellVoltagesFiltered[i] = CELL_VOLTAGE_FILTER_ALPHA*cellVoltages[i]
+								+ (1-CELL_VOLTAGE_FILTER_ALPHA)*cellVoltagesFiltered[i];
+	}
 }
 
 /**
@@ -739,6 +791,8 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 {
    HAL_StatusTypeDef rc = HAL_OK;
    float measure;
+   float measure_high;
+   float measure_low;
    float currentReading;
    if(getIBus(&currentReading) != HAL_OK){
        ERROR_PRINT("Cannot read current from bus!!");
@@ -753,38 +807,44 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 
    // Unfortunately the thermistors may run slower than the cell voltage measurements
    static uint8_t thermistor_lag_counter = 0;
+   enterAdjustedCellVoltages();
 
-   filterCellVoltages((float *)VoltageCell, cellVoltagesFiltered);
-
+   // We should only send a warning at max every cycle otherwise we could trigger a watchdog timeout
+   bool warning_dtc_sent_this_period = false;
    for (int i=0; i < NUM_VOLTAGE_CELLS; i++)
    {
-      measure = VoltageCell[i];
+	  // We have 2 basically confidence measurements
+	  // We have an adjusted cell measurement which probably overestimates the cell voltage a little at high current
+	  // We have our standard cell measurement which probably underestimates the cell voltage a little at high current
+      measure_high = AdjustedVoltageCell[i];
+      measure_low = VoltageCell[i];
 
       // Check it is within bounds
-      if (measure < LIMIT_UNDERVOLTAGE) {
-         ERROR_PRINT("Cell %d is undervoltage at %f Volts\n", i, measure);
+      if (measure_high < LIMIT_UNDERVOLTAGE) {
+         ERROR_PRINT("Cell %d is undervoltage at %f Volts\n", i, measure_high);
          sendDTC_CRITICAL_CELL_VOLTAGE_LOW(i);
          rc = HAL_ERROR;
-      } else if (measure > LIMIT_OVERVOLTAGE) {
-		 ERROR_PRINT("Cell %d is overvoltage at %f Volts\n", i, measure);
+      } else if (measure_low > LIMIT_OVERVOLTAGE) {
+		 ERROR_PRINT("Cell %d is overvoltage at %f Volts\n", i, measure_low);
          sendDTC_CRITICAL_CELL_VOLTAGE_HIGH(i);
          rc = HAL_ERROR;
-      } else if (measure < LIMIT_LOWVOLTAGE_WARNING - (LIMIT_LOWVOLTAGE_WARNING_SLOPE*(currentReading))) {
-         if (!warningSentForCellVoltage[i]) {
-            ERROR_PRINT("WARN: Cell %d is low voltage at %f Volts\n", i, measure);
+      } else if (measure_high < LIMIT_LOWVOLTAGE_WARNING) {
+         if (!warningSentForCellVoltage[i] && !warning_dtc_sent_this_period) {
+            ERROR_PRINT("WARN: Cell %d is low voltage at %f Volts\n", i, measure_high);
             sendDTC_WARNING_CELL_VOLTAGE_LOW(i);
             warningSentForCellVoltage[i] = true;
+            warning_dtc_sent_this_period = true;
          }
       } else if (warningSentForCellVoltage[i] == true) {
          warningSentForCellVoltage[i] = false;
       }
 
       // Update max voltage
-      if (measure > (*maxVoltage)) {(*maxVoltage) = measure;}
-      if (measure < (*minVoltage)) {(*minVoltage) = measure;}
+      if (measure_low > (*maxVoltage)) {(*maxVoltage) = measure_low;}
+      if (measure_high < (*minVoltage)) {(*minVoltage) = measure_high;}
 
       // Sum up cell voltages to get overall pack voltage
-      (*packVoltage) += measure;
+      (*packVoltage) += measure_low;
    }
 
    if(thermistor_lag_counter >= THERMISTORS_PER_BOARD/NUM_THERMISTOR_MEASUREMENTS_PER_CYCLE)
@@ -1169,10 +1229,10 @@ float getSOCFromVoltage(float cellVoltage)
  *
  * @return @ref ChargeReturn
  */
-ChargeReturn balanceCharge(void)
+ChargeReturn balanceCharge(Balance_Type_t using_charger)
 {
     // Start charge
-    if (startCharging() != HAL_OK) {
+    if (using_charger && startCharging() != HAL_OK) {
         return CHARGE_ERROR;
     }
 
@@ -1186,7 +1246,8 @@ ChargeReturn balanceCharge(void)
        /*
         * Need to send msg to charger every second to continue charging
         */
-       if (!waitingForBalanceDone) {
+       if (using_charger && !waitingForBalanceDone) {
+       	   DEBUG_PRINT("Still Charging\n");
           if (continueCharging() != HAL_OK) {
              ERROR_PRINT("Failed to send charge continue message\n");
              if (boundedContinue()) { continue; }
@@ -1214,6 +1275,8 @@ ChargeReturn balanceCharge(void)
         }
 
         if (readCellVoltagesAndTemps() != HAL_OK) {
+            BatteryTaskFailure = READ_CELL_VOLTAGE_TEMPS_FAIL_BIT;
+            sendCAN_BMU_BatteryChecks();
             ERROR_PRINT("Failed to read cell voltages and temperatures!\n");
 			BatteryTaskError();
         }
@@ -1226,7 +1289,7 @@ ChargeReturn balanceCharge(void)
 #endif
 
         if (resumeBalance() != HAL_OK) {
-            ERROR_PRINT("Failed to pause balance!\n");
+            ERROR_PRINT("Failed to resume balance!\n");
             if (boundedContinue()) { continue; }
         }
 
@@ -1246,7 +1309,7 @@ ChargeReturn balanceCharge(void)
          * Check if we should balance any cells
          * Only balance above a minimum voltage
          */
-        if (VoltageCellMin >= BALANCE_START_VOLTAGE)
+        if (VoltageCellMin >= BALANCE_START_VOLTAGE || !using_charger)
         {
             if (xTaskGetTickCount() - lastBalanceCheck
                 > pdMS_TO_TICKS(BALANCE_RECHECK_PERIOD_MS))
@@ -1262,9 +1325,8 @@ ChargeReturn balanceCharge(void)
                 float minCellSOC = getSOCFromVoltage(VoltageCellMin);
                 float maxCellSOC = getSOCFromVoltage(VoltageCellMax);
                 DEBUG_PRINT("Voltage min %f (SOC %f), max %f (SOC %f)\n\n", VoltageCellMin, minCellSOC, VoltageCellMax, maxCellSOC);
-
                 for (int cell=0; cell < NUM_VOLTAGE_CELLS; cell++) {
-                    float cellSOC = getSOCFromVoltage(VoltageCell[cell]);
+                    float cellSOC = getSOCFromVoltage(AdjustedVoltageCell[cell]);
                     watchdogTaskCheckIn(BATTERY_TASK_ID);
                     /*DEBUG_PRINT("Cell %d SOC: %f\n", cell, cellSOC);*/
 
@@ -1296,20 +1358,19 @@ ChargeReturn balanceCharge(void)
             }
         } else {
             balancingCells = false;
-
+            DEBUG_PRINT("Can't balance cells as VoltageCellMin (%f) < BALANCE_START_VOLTAGE (%f)\n", VoltageCellMin, BALANCE_START_VOLTAGE);
             if (stopBalance() != HAL_OK) {
                 ERROR_PRINT("Failed to stop balance\n");
                 if (boundedContinue()) { continue; }
             }
         }
 
-
         /*
-         * Check if we are done charging
+         * Check if we are done charging/balancing
          */
-        if (getSOCFromVoltage(VoltageCellMin) >= CHARGE_STOP_SOC && !balancingCells) {
+        if (using_charger && getSOCFromVoltage(VoltageCellMin) >= CHARGE_STOP_SOC && !balancingCells) {
             DEBUG_PRINT("Done charging\n");
-            if (stopCharging() != HAL_OK) {
+            if (using_charger && stopCharging() != HAL_OK) {
                 return CHARGE_ERROR;
             }
             break;
@@ -1325,21 +1386,25 @@ ChargeReturn balanceCharge(void)
                          0);                    /* Timeout */
 
         if (rc == pdTRUE) {
-            if ((dbwTaskNotifications & (1 << CHARGE_STOP_NOTIFICATION))) {
+            if (dbwTaskNotifications & (1<<BATTERY_STOP_NOTIFICATION)) {
                 DEBUG_PRINT("Stopping charge\n");
-                if (stopCharging() != HAL_OK) {
+                if (using_charger && stopCharging() != HAL_OK) {
                     stopBalance();
                     return CHARGE_ERROR;
                 }
-
-                if (balancingCells) {
+                else if (!using_charger) // CLI command to stop was called
+                {
+                    stopBalance();
+                    return CHARGE_STOPPED;
+                }
+                else if (balancingCells) {
                     DEBUG_PRINT("Balance ongoing, waiting for finish\n");
                     waitingForBalanceDone = true;
                 } else {
                     DEBUG_PRINT("Not balancing, can stop safely\n");
                     return CHARGE_DONE;
                 }
-            } else if (dbwTaskNotifications & (1<<CHARGE_STOP_NOTIFICATION)) {
+            } else if (dbwTaskNotifications & (1<<CHARGE_START_NOTIFICATION)) {
                 DEBUG_PRINT("Received charge start, but already charging\n");
             } else {
                 DEBUG_PRINT("Received invalid notification\n");
@@ -1354,21 +1419,7 @@ ChargeReturn balanceCharge(void)
             return CHARGE_STOPPED;
         }
 
-        /*
-         * Check if we are still connected to charge cart
-         */
-        /*
-         *if (xTaskGetTickCount() - lastChargeCartHeartbeat
-         *    > CHARGE_CART_HEARTBEAT_MAX_PERIOD)
-         *{
-         *   ERROR_PRINT("Charge cart not responding\n");
-         *   // Notify ourselves that we should stop charging
-         *   xTaskNotify(BatteryTaskHandle, (1<<CHARGE_STOP_NOTIFICATION), eSetBits);
-         *}
-         */
-
         StateBatteryPowerHV = calculateStateOfPower();
-        StateBatteryChargeHV = calculateStateOfCharge();
         StateBMS = fsmGetState(&fsmHandle);
 
 
@@ -1423,6 +1474,8 @@ void batteryTask(void *pvParameter)
 	}
 	if(ret != HAL_OK)
 	{
+        BatteryTaskFailure = BATTERY_START_FAIL_BIT;
+        sendCAN_BMU_BatteryChecks();
 		BatteryTaskError();
 	}
 #endif
@@ -1447,18 +1500,36 @@ void batteryTask(void *pvParameter)
                          0);                    /* Timeout */
 
         if (rc == pdTRUE) {
-            if (dbwTaskNotifications & (1<<CHARGE_START_NOTIFICATION)) {
-                ChargeEN_State = ChargeEN_State_On;
-                sendCAN_BMU_ChargeEN_State();
+            if (dbwTaskNotifications & ((1<<CHARGE_START_NOTIFICATION) | (1<<BALANCE_START_NOTIFICATION))) {
+                
+                if (dbwTaskNotifications & (1<<CHARGE_START_NOTIFICATION))
+                {
+                    ChargeEN_State = ChargeEN_State_On;
+                    sendCAN_BMU_ChargeEN_State();
+                }
                 if (HAL_OK != watchdogTaskChangeTimeout(BATTERY_TASK_ID,
-                                                        BATTERY_CHARGE_TASK_PERIOD_MS))
+                                                        2*BATTERY_CHARGE_TASK_PERIOD_MS))
                 {
                     ERROR_PRINT("Failed to change watchdog timeout for battery task\n");
                 } else {
-                    ChargeReturn chargeRc = balanceCharge();
+                    ChargeReturn chargeRc;
+                    
+                    if (dbwTaskNotifications & (1<<CHARGE_START_NOTIFICATION))
+                    {
+                        chargeRc = balanceCharge(USING_CHARGER);
+                    }
+                    else if (dbwTaskNotifications & (1<<BALANCE_START_NOTIFICATION))
+                    {
+                        chargeRc = balanceCharge(USING_CLI);
+                    }
+                    else
+                    {
+                        ERROR_PRINT("Processing unknown notification in batteryTask\n");
+                        chargeRc = CHARGE_ERROR;
+                    }
 
                     if (HAL_OK != watchdogTaskChangeTimeout(BATTERY_TASK_ID,
-                                                            BATTERY_TASK_PERIOD_MS))
+                                                            2*BATTERY_TASK_PERIOD_MS))
                     {
                         ERROR_PRINT("Failed to change watchdog timeout for battery task\n");
                     }
@@ -1467,19 +1538,22 @@ void batteryTask(void *pvParameter)
                         ERROR_PRINT("Failed to balance charge\n");
                         fsmSendEvent(&fsmHandle, EV_Charge_Error, portMAX_DELAY);
                     } else if (chargeRc == CHARGE_DONE) {
-                        DEBUG_PRINT("Finished charge\n");
-                        fsmSendEvent(&fsmHandle, EV_Charge_Done, 20);
+                        DEBUG_PRINT("Finished charge/balancing\n");
+                        fsmSendEvent(&fsmHandle, EV_Notification_Done, 20);
                     } else if (chargeRc == CHARGE_STOPPED) {
-                        DEBUG_PRINT("Stopped charge\n");
-                        fsmSendEvent(&fsmHandle, EV_Charge_Done, 20);
+                        DEBUG_PRINT("Stopped charge/balancing\n");
                     } else {
                         ERROR_PRINT("Unkown charge return code %d\n", chargeRc);
                         fsmSendEvent(&fsmHandle, EV_Charge_Error, portMAX_DELAY);
                     }
                 }
-                ChargeEN_State = ChargeEN_State_Off;
-                sendCAN_BMU_ChargeEN_State();
-            } else if (dbwTaskNotifications & (1<<CHARGE_STOP_NOTIFICATION)) {
+                if (dbwTaskNotifications & (1<<CHARGE_START_NOTIFICATION))
+                {
+                    ChargeEN_State = ChargeEN_State_Off;
+                    sendCAN_BMU_ChargeEN_State();
+                }
+            }
+            else if (dbwTaskNotifications & (1<<BATTERY_STOP_NOTIFICATION)) {
                 DEBUG_PRINT("Received charge stop, but not charging\n");
             } else {
                 DEBUG_PRINT("Received invalid notification\n");
@@ -1487,6 +1561,8 @@ void batteryTask(void *pvParameter)
         }
 #if IS_BOARD_F7 && defined(ENABLE_AMS)
         if (checkForOpenCircuit() != HAL_OK) {
+            BatteryTaskFailure = OPEN_CIRCUIT_FAIL_BIT;
+            sendCAN_BMU_BatteryChecks();
             ERROR_PRINT("Open wire test failed!\n");
             if (boundedContinue()) { continue; }
         }
@@ -1494,27 +1570,31 @@ void batteryTask(void *pvParameter)
 
 #if IS_BOARD_F7 && defined(ENABLE_AMS)
         if (readCellVoltagesAndTemps() != HAL_OK) {
+            BatteryTaskFailure = READ_CELL_VOLTAGE_TEMPS_FAIL_BIT;
+            sendCAN_BMU_BatteryChecks();
             ERROR_PRINT("Failed to read cell voltages and temperatures!\n");
             if (boundedContinue()) { continue; }
 		}
 #endif
-
         if (checkCellVoltagesAndTemps(
               ((float *)&VoltageCellMax), ((float *)&VoltageCellMin),
               ((float *)&TempCellMax), ((float *)&TempCellMin),
               &packVoltage) != HAL_OK)
         {
+            BatteryTaskFailure = CHECK_CELL_VOLTAGE_TEMPS_FAIL_BIT;
+            sendCAN_BMU_BatteryChecks();
         	ERROR_PRINT("Failed check of battery cell voltages and temps\n");
             if (boundedContinue()) { continue; }
         }
 
         if (publishPackVoltage(packVoltage) != HAL_OK) {
+            BatteryTaskFailure = PACK_VOLTAGE_FAIL_BIT;
+            sendCAN_BMU_BatteryChecks();
             ERROR_PRINT("Failed to publish pack voltage\n");
             if (boundedContinue()) { continue; }
         }
 
         StateBatteryPowerHV = calculateStateOfPower();
-        StateBatteryChargeHV = calculateStateOfCharge();
         StateBMS = fsmGetState(&fsmHandle);
 
 
@@ -1531,6 +1611,14 @@ void batteryTask(void *pvParameter)
             ERROR_PRINT("Failed to send batter status HV\n");
             if (boundedContinue()) { continue; }
         }
+
+		static bool released_soc = false;
+		if(!released_soc)
+		{
+			xTaskNotifyGive(stateOfChargeHandle);
+			released_soc = true;
+		}
+
 
         // Succesfully reach end of loop, update error counter to reflect that
         ERROR_COUNTER_SUCCESS();
@@ -1592,6 +1680,7 @@ void canSendCellTask(void *pvParameters)
     }
 
     sendCAN_BMU_CellVoltage(cellIdxToSend);
+    sendCAN_BMU_CellVoltage_Adjusted(cellIdxToSend);
     sendCAN_BMU_ChannelTemp(cellIdxToSend);
 
     // Move on to next cells

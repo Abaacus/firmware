@@ -13,6 +13,9 @@
 #include "task.h"
 #include "cmsis_os.h"
 
+#include "endurance_mode.h"
+#include "traction_control.h"
+
 /*
  * External Board Statuses:
  * Variables for keeping track of external board statuses that get updated by
@@ -20,7 +23,6 @@
  */
 volatile bool motorControllersStatus = false;
 uint32_t lastBrakeValReceiveTimeTicks = 0;
-
 /*
  * Functions to get external board status
  */
@@ -38,15 +40,23 @@ extern osThreadId driveByWireHandle;
 
 void CAN_Msg_DCU_buttonEvents_Callback()
 {
-	DEBUG_PRINT_ISR("Received DCU button Event\n");
+    DEBUG_PRINT_ISR("Received DCU button Event\n");
     if (ButtonEMEnabled) {
-		DEBUG_PRINT_ISR("Received ButtonEMEnabled CAN signal\n");
         fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
     }
-    // For now, ignore HV Enable button, as we really want to wait for BMU to
-    // complete HV Enable
+    else if(ButtonEnduranceToggleEnabled) 
+    {
+		toggle_endurance_mode();
+	}
+	else if(ButtonEnduranceLapEnabled)
+	{
+		trigger_lap();
+	}
+	else if(ButtonTCEnabled)
+	{
+		toggle_TC();
+	}
 }
-
 
 void CAN_Msg_PDU_ChannelStatus_Callback()
 {
@@ -92,6 +102,19 @@ void CAN_Msg_BMU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
     switch (DTC_CODE) {
         case WARNING_CONTACTOR_OPEN_IMPENDING:
             fsmSendEventISR(&fsmHandle, EV_Hv_Disable);
+            break;
+        default:
+            // Do nothing, other events handled by fatal callback
+            break;
+    }
+}
+
+void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
+    switch (DTC_CODE)
+    {
+        case ERROR_DCDC_Shutoff:
+            //The DCDC unexpectedly stopped working. The PDU turned off cooling and the motors, now disable EM
+            fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
             break;
         default:
             // Do nothing, other events handled by fatal callback

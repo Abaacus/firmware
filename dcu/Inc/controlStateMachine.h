@@ -20,11 +20,16 @@ typedef enum DCU_Events_t {
     EV_EM_Toggle,
     EV_CAN_Recieve_HV,
     EV_CAN_Recieve_EM,
+    EV_TC_Toggle,
+    EV_Endurance_Mode_Toggle,
+    EV_Endurance_Lap_Toggle,
     EV_CAN_Recieve_Fatal,
     EV_ANY,
 } DCU_Events_t;
 
-extern FSM_Handle_Struct DCUFsmHandle;
+extern bool TC_on;
+extern bool endurance_on;
+FSM_Handle_Struct DCUFsmHandle;
 HAL_StatusTypeDef dcuFsmInit();
 uint32_t updateFromCAN(uint32_t event);
 uint32_t fatalTransition(uint32_t event);

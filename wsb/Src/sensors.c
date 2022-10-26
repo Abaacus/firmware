@@ -13,19 +13,19 @@
 
 // Task Information
 #define POLL_SENSORS_TASK_ID 2
-#define POLL_SENSORS_PERIOD_MS 500
+#define POLL_SENSORS_PERIOD_MS 100
 
 // Encoder Information
 #define ENCODER_COUNTER (__HAL_TIM_GET_COUNTER(&ENCODER_TIM_HANDLE))
-#define ENCODER_PULSES_PER_REVOLUTION (3)
+#define ENCODER_PULSES_PER_REVOLUTION (6)
 #define WHEEL_DIAMETER_MM (525)
 
 // About a 0.6% error due to integer rounding of PI
 // Increasing scale of PI does not improve accuracy
 #define PI_SCALE (100)
 #define PI_SCALED (314)
-#define ENCODER_COUNT_TO_MM(count) ((count) * (((WHEEL_DIAMETER_MM * PI_SCALED) / PI_SCALE) / 12))
-#define ENCODER_COUNT_TO_RADS_S(delta_count, period) (((2 * PI_SCALED * delta_count) / (ENCODER_PULSES_PER_REVOLUTION * PI_SCALE)) / period)
+#define ENCODER_COUNT_TO_MM(count) ((count*(WHEEL_DIAMETER_MM*PI_SCALED/PI_SCALE))/ENCODER_PULSES_PER_REVOLUTION)
+#define ENCODER_COUNT_TO_RADS_S(delta_count, period) (((2*PI_SCALED*delta_count)/(ENCODER_PULSES_PER_REVOLUTION*PI_SCALE))/(period))
 
 typedef struct
 {
@@ -44,8 +44,8 @@ static void poll_encoder(void)
 
 	// TIM3 uses lower 16 bits
 	uint16_t current_count = ENCODER_COUNTER;
-	uint16_t count_diff = current_count - last_count;
-	sensors_data.encoder_counts += ((uint32_t)current_count - (uint32_t)last_count);
+	uint32_t count_diff = current_count - last_count;
+	sensors_data.encoder_counts += count_diff;
 	sensors_data.encoder_mm = ENCODER_COUNT_TO_MM(sensors_data.encoder_counts);
 	sensors_data.encoder_speed = ENCODER_COUNT_TO_RADS_S(count_diff, (float)(POLL_SENSORS_PERIOD_MS) / 1000.0f);
 	last_count = current_count;
@@ -53,15 +53,15 @@ static void poll_encoder(void)
 
 void pollSensorsTask(void const *argument)
 {
-	TickType_t xLastWakeTime;
-
-	if (registerTaskToWatch(POLL_SENSORS_TASK_ID, 5 * pdMS_TO_TICKS(POLL_SENSORS_PERIOD_MS), false, NULL) != HAL_OK)
-	{
-		ERROR_PRINT("Failed to register sensors task with watchdog!\n");
-		Error_Handler();
-	}
-
-	while (1)
+    if (registerTaskToWatch(POLL_SENSORS_TASK_ID, 5*pdMS_TO_TICKS(POLL_SENSORS_PERIOD_MS), false, NULL) != HAL_OK)
+    {
+        ERROR_PRINT("Failed to register sensors task with watchdog!\n");
+        Error_Handler();
+    }
+	
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+    
+    while(1)
 	{
 		poll_encoder();
 
@@ -71,16 +71,17 @@ void pollSensorsTask(void const *argument)
 
 		// Always poll at almost exactly PERIOD
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(POLL_SENSORS_PERIOD_MS));
-		xLastWakeTime = xTaskGetTickCount();
 	}
 }
 
 static void transmit_encoder(void)
 {
 #if (BOARD_ID == ID_WSBFL)
+	FL_Speed = sensors_data.encoder_speed;
 	FL_WheelDistance = sensors_data.encoder_mm;
 	sendCAN_WSBFL_Sensors();
 #elif (BOARD_ID == ID_WSBFR)
+	FR_Speed = sensors_data.encoder_speed;
 	FR_WheelDistance = sensors_data.encoder_mm;
 	sendCAN_WSBFR_Sensors();
 #endif
