@@ -25,6 +25,8 @@
 #define FAN_ON_DUTY_PERCENT 0.2
 #define FAN_PERIOD_COUNT 400
 #define FAN_TASK_PERIOD_MS 100
+#define FAN_RPM_POLLING_MS 1000
+#define FAN_PUBLISH_PERIOD_MS 10000
 
 uint32_t calculateFanPeriod()
 {
@@ -79,6 +81,8 @@ void fanTask()
     Error_Handler();
   }
 
+  begin_fanRPM_measurement();
+
   while (1) {
     setFan();
     vTaskDelay(pdMS_TO_TICKS(FAN_TASK_PERIOD_MS));
@@ -86,8 +90,6 @@ void fanTask()
 }
 
 /**** Measuring Average RPM of 5 Fans ****/
-#define ONE_SEC_MS 1000
-
 /* Captured Value */
 uint32_t FanRPM = 0;
 uint32_t SignalCounter = 0;
@@ -96,10 +98,13 @@ void begin_fanRPM_measurement()
 {
   TickType_t xLastWakeTime = xTaskGetTickCount();
 
+  sendFanRPM();
+
   while (1)
   {
     FanRPM = SignalCounter/(60*2*5); //2 signals per revolution and 5 fans
-    vTaskDelayUntil(&xLastWakeTime, ONE_SEC_MS);
+    SignalCounter = 0; 
+    vTaskDelayUntil(&xLastWakeTime, FAN_RPM_POLLING_MS);
   }
 }
  
@@ -108,19 +113,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if(GPIO_Pin == GPIO_PIN_6 || GPIO_PIN_12 || GPIO_PIN_13 || GPIO_PIN_14 || GPIO_PIN_15)
     {
-      SignalCounter++; // increment counter
+      SignalCounter++;
     }
 }
 
-/*
-TickType_t xLastWakeTime = xTaskGetTickCount();
-
-void get_fanRPM ()
+//send FanRPM value as a CAN message every 10 seconds
+void sendFanRPM()
 {
+  TickType_t xLastWakeTime = xTaskGetTickCount();
+
   while (1)
   {
-      CONSOLE_PRINT("&d", measure_fanRPM);
-      vTaskDelayUntil(&xLastWakeTime, FAN_TASK_PERIOD_MS);
+    BMU_FanRPM = FanRPM; 
+    sendCAN_BMU_FanRPM(); 
+    vTaskDelayUntil(&xLastWakeTime, FAN_PUBLISH_PERIOD_MS);
   }
 }
-*/
