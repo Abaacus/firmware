@@ -9,7 +9,6 @@ def main():
     args = parser.parse_args()
 
     db = cantools.database.load_file(args.dbc)
-    signals = {}
     with open(args.src_file, "r") as f:
         lines = f.readlines()
         for line in lines:
@@ -24,17 +23,10 @@ def main():
                 )
                 for signal in decoded_data:
                     sig_data = decoded_data[signal]
-                    # print(f"{timestamp},{signal},{sig_data}")
-                    if signal in signals:
-                        signals[signal].append((timestamp, sig_data))
-                    else:
-                        signals[signal] = [(timestamp, sig_data)]
+                    print(f"{timestamp},{signal},{sig_data}")
             except:
                 # Sometimes messages not in DBC 
                 pass
-    # print(signals)
-    return signals
-
             
 if __name__ == "__main__":
-    print(main())
+    main()
