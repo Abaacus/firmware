@@ -20,8 +20,15 @@ def error(message = "Error: Please check your input"):
 
 def showGraph():
      dbcFile = ui.DBCFile.text()
+     data_dict = {}
      if (ui.FileLocation.toPlainText() != ''):
-          data_dict = json.loads(logToJsonDict(ui.FileLocation.toPlainText(), dbcFile))
+          # print(ui.FileLocation.toPlainText()[-4:])
+          if (ui.FileLocation.toPlainText()[-4:] == ".log"):
+               data_dict = json.loads(logToJsonDict(ui.FileLocation.toPlainText(), dbcFile))
+               # print("log graph")
+          elif(ui.FileLocation.toPlainText()[-4:] == ".csv"):
+               data_dict = csvToDict(ui.FileLocation.toPlainText())
+               # print("csv graph")
      else:
           error("Please select a file to graph")
           return
@@ -61,7 +68,13 @@ def showGraph():
 
 def getSignalNames():
      if (ui.FileLocation.toPlainText() != ''):
-          data_dict = json.loads(logToJsonDict(ui.FileLocation.toPlainText(), "../../../../../common/Data/2018CAR.dbc"))
+          if (ui.FileLocation.find(".log")):
+               # print("log signal names")
+               data_dict = json.loads(logToJsonDict(ui.FileLocation.toPlainText(), "../../../../../common/Data/2018CAR.dbc"))
+          elif(ui.FileLocation.find(".csv")):
+               # print("csv signal names")
+               data_dict = csvToDict(ui.FileLocation.toPlainText())
+
      signalNames = []
      for key in data_dict.keys():
           if(signalNames.count(key) == 0):

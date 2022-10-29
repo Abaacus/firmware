@@ -1,5 +1,8 @@
+from readline import set_pre_input_hook
 import cantools
 import matplotlib.pyplot as plt
+import csv
+import numpy as np
 
 def toDict(src_file):
      db = cantools.database.load_file("../../../../../common/Data/2018CAR.dbc")
@@ -48,6 +51,28 @@ def graph(checked_data_dict, args):
         plt.ylim(bottom=MinYInput)
     ax.legend()
     plt.xlabel("Time")
+
+    #get the maximum number of data points that one signal has for setting x-axis
+    signalnames = list(checked_data_dict.keys())
+    max_num_of_data_list  = 0
+    step = 1
+    # for signalname in signalnames:
+    #     if(len(checked_data_dict[signalname]) > 2):
+    #         max_timestamp = float(checked_data_dict[signalname][0][0])
+    #         min_timestamp = float(checked_data_dict[signalname][-1][0])
+    #         step = (max_timestamp - min_timestamp) // 10
+    #         break
+    
+    for signalname in signalnames:
+        if(len(checked_data_dict[signalname]) > max_num_of_data_list):
+            max_num_of_data_list = len(checked_data_dict[signalname])
+    
+    # print(step)
+    print(max_num_of_data_list)
+    step = (max_num_of_data_list) // 4
+    print(step)
+    print(np.append(np.arange(0, max_num_of_data_list + step, step), max_num_of_data_list-1))
+    plt.xticks(np.append(np.arange(0, max_num_of_data_list + step, step), max_num_of_data_list-1))
     plt.show()
 
 import json
@@ -102,3 +127,19 @@ def logToJsonDict(logFilePath, dbcFile):
     # print(signals)
     signals = serialize(signals)
     return signals
+
+def csvToDict(csvFilePath):
+    with open(csvFilePath, "r") as csv_file:
+        lines = csv.reader(csv_file)
+        data_dict = {}
+        for line in lines:
+            timestamp = line[0]
+            signal_name = line[1]
+            value = line[2]
+            if (value == "Wait_System_Up"):
+                value = -1
+            if (signal_name in data_dict.keys()):
+                data_dict[signal_name].append((timestamp,value))
+            else:
+                data_dict[signal_name] = [(timestamp,value)]
+    return data_dict
