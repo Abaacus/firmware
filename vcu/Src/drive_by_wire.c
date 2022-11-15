@@ -16,6 +16,7 @@
 #include "motorController.h"
 #include "endurance_mode.h"
 #include "traction_control.h"
+#include "errorHandler.h"
 
 #define DRIVE_BY_WIRE_TASK_ID 1
 
@@ -87,7 +88,7 @@ void driveByWireTask(void *pvParameters)
     startDriveByWire();
 
     if (canStart(&CAN_HANDLE) != HAL_OK) {
-        Error_Handler();
+        VCU_error(Failed_driveByWireTask);
     }
 
     fsmTaskFunction(&fsmHandle);

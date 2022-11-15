@@ -8,6 +8,7 @@
 #include "drive_by_wire_mock.h"
 #include "motorController.h"
 #include "beaglebone.h"
+#include "errorHandler.h"
 
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
@@ -24,30 +25,29 @@ void userInit()
 {
     /* Should be the first thing initialized, otherwise print will fail */
     if (debugInit() != HAL_OK) {
-        Error_Handler();
+      VCU_error(Failed_debugInit);
     }
 
-    if (driveByWireInit() != HAL_OK)
-    {
-        Error_Handler();
+    if (driveByWireInit() != HAL_OK){
+      VCU_error(Failed_driveByWireInit);
     }
 
     uartStartReceiving(&DEBUG_UART_HANDLE);
 
     if (canInit(&CAN_HANDLE) != HAL_OK) {
-      Error_Handler();
+      VCU_error(Failed_canInit);
     }
 
     if (stateMachineMockInit() != HAL_OK) {
-      Error_Handler();
+      VCU_error(Failed_stateMachineMockInit);
     }
 
     if (initMotorControllerProcanSettings() != HAL_OK) {
-      Error_Handler();
+      VCU_error(Failed_initMotorControllerProcanSettings);
     }
 
     if (beagleboneOff() != HAL_OK) {
-      Error_Handler();
+      VCU_error(Failed_beagleboneOff);
     }
 }
 
