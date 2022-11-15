@@ -173,13 +173,6 @@ float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
 float maxChargeVoltage = DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS;
 
 /**
- * Set to true if we've already sent a low voltage warning for this cell to
- * stop repeated warnings being sent. Reset to false on init or when cell
- * voltage increases above low voltage warning limit
- */
-bool warningSentForCellVoltage[NUM_VOLTAGE_CELLS];
-
-/**
  * Set to true if we've already sent a high temperature warning for this cell to
  * stop repeated warnings being sent. Reset to false on init or when cell
  * voltage increases above high temperature warning limit
@@ -477,11 +470,11 @@ void HVMeasureTask(void *pvParamaters)
     }
 
     uint32_t lastStateBusHVSend = 0;
-    TickType_t xLastWakeTime = xTaskGetTickCount();
 
     float VBus;
     float VBatt;
     float IBus;
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     while (1) {
         if (readBusVoltagesAndCurrents(&IBus, &VBus, &VBatt) != HAL_OK) {
             ERROR_PRINT("Failed to read bus voltages and current!\n");
@@ -498,11 +491,11 @@ void HVMeasureTask(void *pvParamaters)
             CurrentBusHV = IBus;
             VoltageBusHV = VBus;
             sendCAN_BMU_stateBusHV();
-            publishVbatt = VBatt;
+            AMS_PackVoltage = VBatt;
             sendCAN_BMU_AmsVBatt();
             lastStateBusHVSend = xTaskGetTickCount();
         }
-		integrate_bus_current(IBus, (float)(xTaskGetTickCount() - xLastWakeTime));
+		integrate_bus_current(IBus, (float)HV_MEASURE_TASK_PERIOD_MS);
 	
         watchdogTaskCheckIn(HV_MEASURE_TASK_ID);
         vTaskDelayUntil(&xLastWakeTime, HV_MEASURE_TASK_PERIOD_MS);
@@ -542,6 +535,7 @@ void imdTask(void *pvParamaters)
      ERROR_PRINT("Failed to register imd task with watchdog!\n");
      Error_Handler();
    }
+   TickType_t xLastWakeTime = xTaskGetTickCount();
    while (1) {
       imdStatus =  get_imd_status();
 
@@ -586,7 +580,7 @@ void imdTask(void *pvParamaters)
       }
 
       watchdogTaskCheckIn(IMD_TASK_ID);
-      vTaskDelay(IMD_TASK_PERIOD_MS);
+      vTaskDelayUntil(&xLastWakeTime, IMD_TASK_PERIOD_MS);
    }
 #else
    // Notify control fsm that IMD is ready
@@ -658,7 +652,6 @@ HAL_StatusTypeDef initVoltageAndTempArrays()
    for (int i=0; i < NUM_VOLTAGE_CELLS; i++)
    {
       VoltageCell[i] = initVoltage;
-      warningSentForCellVoltage[i] = false;
    }
    for (int i=0; i < NUM_TEMP_CELLS; i++)
    {
@@ -683,10 +676,11 @@ void BatteryTaskError()
     AMS_CONT_OPEN;
 #endif
     fsmSendEventUrgent(&fsmHandle, EV_HV_Fault, pdMS_TO_TICKS(500));
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     while (1) {
         // Suspend this task while still updating watchdog
         watchdogTaskCheckIn(BATTERY_TASK_ID);
-        vTaskDelay(pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS));
+        vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS));
     }
 }
 
@@ -809,8 +803,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
    static uint8_t thermistor_lag_counter = 0;
    enterAdjustedCellVoltages();
 
-   // We should only send a warning at max every cycle otherwise we could trigger a watchdog timeout
-   bool warning_dtc_sent_this_period = false;
+   static bool warning_dtc_sent = false;
    for (int i=0; i < NUM_VOLTAGE_CELLS; i++)
    {
 	  // We have 2 basically confidence measurements
@@ -828,15 +821,10 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 		 ERROR_PRINT("Cell %d is overvoltage at %f Volts\n", i, measure_low);
          sendDTC_CRITICAL_CELL_VOLTAGE_HIGH(i);
          rc = HAL_ERROR;
-      } else if (measure_high < LIMIT_LOWVOLTAGE_WARNING) {
-         if (!warningSentForCellVoltage[i] && !warning_dtc_sent_this_period) {
-            ERROR_PRINT("WARN: Cell %d is low voltage at %f Volts\n", i, measure_high);
-            sendDTC_WARNING_CELL_VOLTAGE_LOW(i);
-            warningSentForCellVoltage[i] = true;
-            warning_dtc_sent_this_period = true;
-         }
-      } else if (warningSentForCellVoltage[i] == true) {
-         warningSentForCellVoltage[i] = false;
+      } else if (!warning_dtc_sent && measure_high < LIMIT_LOWVOLTAGE_WARNING) {
+         ERROR_PRINT("WARN: Cell %d is low voltage at %f Volts\n", i, measure_high);
+         sendDTC_WARNING_CELL_VOLTAGE_LOW(i);
+         warning_dtc_sent = true;
       }
 
       // Update max voltage
@@ -1668,6 +1656,7 @@ void clearSendOnlyOneCell()
 void canSendCellTask(void *pvParameters)
 {
   uint32_t cellIdxToSend = 0;
+  TickType_t xLastWakeTime = xTaskGetTickCount();
 
   while (1) {
     if (sendOneCellVoltAndTemp) {
@@ -1685,6 +1674,6 @@ void canSendCellTask(void *pvParameters)
     cellIdxToSend += 3;
     cellIdxToSend = cellIdxToSend % NUM_VOLTAGE_CELLS;
 
-    vTaskDelay(pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
   }
 }

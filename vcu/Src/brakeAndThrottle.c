@@ -16,11 +16,11 @@
 #define TPS_MAX_WHILE_BRAKE_PRESSED_PERCENT 25
 #define TPS_WHILE_BRAKE_PRESSED_RESET_PERCENT 5
 
-#define THROTT_A_LOW (1810)
-#define THROTT_B_LOW (616)
+#define THROTT_A_LOW (1835)
+#define THROTT_B_LOW (570)
 
-#define THROTT_A_HIGH (2095)
-#define THROTT_B_HIGH (939)
+#define THROTT_A_HIGH (2142)
+#define THROTT_B_HIGH (915)
 
 #define BRAKE_POS_LOW (1117)
 #define BRAKE_POS_HIGH (1410)
@@ -43,7 +43,7 @@
 /*#define MAX_THROTTLE_DEADZONE (0x20)*/
 
 #define VCU_DATA_PUBLISH_TIME_MS 200
-
+#define ADC_DELAY_PERIOD 500
 
 uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS] = {0};
 

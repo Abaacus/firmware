@@ -1,4 +1,4 @@
-VERSION "1"
+VERSION "0"
 
 
 NS_ : 
@@ -65,6 +65,10 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ CurrentHVBusInverterLeft : 0|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
+BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
+ SG_ SpeedMotorRightKPH : 16|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
+ SG_ SpeedMotorLeftKPH : 0|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
+
 BO_ 2282032130 TC_wheelSpeed_right: 8 VCU_F7
  SG_ VCU_wheelSpeed_RR : 0|32@1+ (1,0) [0|0] ""  VCU_BeagleBone
 
@@ -98,7 +102,7 @@ BO_ 2281835521 BMU_BatteryChecks: 8 BMU
  SG_ BatteryTaskFailure : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 2281769985 BMU_AmsVBatt: 8 BMU
- SG_ publishVbatt : 0|16@1+ (0.01,0) [0|655.35] ""  VCU_BeagleBone
+ SG_ AMS_PackVoltage : 0|16@1+ (0.01,0) [0|655.35] ""  VCU_BeagleBone
 
 BO_ 2282884097 BMU_FanPeriod: 8 BMU
  SG_ FanPeriod : 0|8@1- (1,0) [0|0] ""  VCU_BeagleBone
