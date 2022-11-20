@@ -15,6 +15,18 @@
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
 
+BaseType_t setDataPublishTime(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    BaseType_t paramLen;
+    uint32_t dataPublishTime;
+    const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    sscanf(param, "%lu", &dataPublishTime);
+    vcuDataPublishTimeMs = dataPublishTime;
+    COMMAND_OUTPUT("Setting Data Publish Time %lu\n", dataPublishTime);
+    return pdFALSE;
+}
+
 BaseType_t setBrakePosition(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {

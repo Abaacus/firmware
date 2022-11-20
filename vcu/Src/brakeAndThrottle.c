@@ -42,7 +42,6 @@
 #define MAX_THROTTLE_B_DEADZONE (200)
 /*#define MAX_THROTTLE_DEADZONE (0x20)*/
 
-#define VCU_DATA_PUBLISH_TIME_MS 200
 #define ADC_DELAY_PERIOD 500
 
 uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS] = {0};
@@ -315,6 +314,6 @@ void canPublishTask(void *pvParameters)
     if (sendCAN_VCU_Data() != HAL_OK) {
       ERROR_PRINT("Failed to send vcu can data\n");
     }
-    vTaskDelay(pdMS_TO_TICKS(VCU_DATA_PUBLISH_TIME_MS));
+    vTaskDelay(pdMS_TO_TICKS(vcuDataPublishTimeMs));
   }
 }
