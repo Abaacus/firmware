@@ -82,11 +82,7 @@
 
 
 static const uint8_t LTC_ADDRESS[NUM_BOARDS][NUM_LTC_CHIPS_PER_BOARD] = {
-	{0, 1},
-	{2, 3},
-	{4, 5},
-	{6, 7},
-	{8, 9}
+	{0}
 };
 
 
@@ -175,13 +171,18 @@ static HAL_StatusTypeDef batt_read_data(uint8_t first_byte, uint8_t second_byte,
 		return HAL_ERROR;
 	}
 	
+	DEBUG_PRINT("Recieved Data Packet: ");
+	for(int response_byte_i = 0; response_byte_i < response_size; response_byte_i++) {
+		data_buffer[response_byte_i] = rxBuffer[DATA_START_IDX + response_byte_i];
+		DEBUG_PRINT("%x ", data_buffer[response_byte_i]);
+	}
+	DEBUG_PRINT("\n");
 
 	if (checkPEC(&(rxBuffer[DATA_START_IDX]), response_size) != HAL_OK)
 	{
 		PEC_count++;
 		return HAL_ERROR;
 	}
-
 
 	if(xTaskGetTickCount() - last_PEC_tick > 10000)
 	{
@@ -190,9 +191,6 @@ static HAL_StatusTypeDef batt_read_data(uint8_t first_byte, uint8_t second_byte,
 		last_PEC_tick = xTaskGetTickCount();
 	}
 
-	for(int response_byte_i = 0; response_byte_i < response_size; response_byte_i++) {
-		data_buffer[response_byte_i] = rxBuffer[DATA_START_IDX + response_byte_i];
-	}
 	return HAL_OK;
 }
 
@@ -339,6 +337,14 @@ HAL_StatusTypeDef batt_readBackCellVoltage(float *cell_voltage_array, voltage_op
 {
 
 
+	if (batt_spi_wakeup(false /* not sleeping*/))
+	{
+		return HAL_ERROR;
+	}
+	if (batt_spi_wakeup(false /* not sleeping*/))
+	{
+		return HAL_ERROR;
+	}
 	if (batt_spi_wakeup(false /* not sleeping*/))
 	{
 		return HAL_ERROR;

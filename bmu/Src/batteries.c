@@ -1469,7 +1469,7 @@ void batteryTask(void *pvParameter)
         Error_Handler();
     }
 
-    float packVoltage;
+    //float packVoltage;
     uint32_t dbwTaskNotifications;
     while (1)
     {
@@ -1543,12 +1543,14 @@ void batteryTask(void *pvParameter)
             }
         }
 #if IS_BOARD_F7 && defined(ENABLE_AMS)
+#if 0
         if (checkForOpenCircuit() != HAL_OK) {
             BatteryTaskFailure = OPEN_CIRCUIT_FAIL_BIT;
             sendCAN_BMU_BatteryChecks();
             ERROR_PRINT("Open wire test failed!\n");
             if (boundedContinue()) { continue; }
         }
+#endif
 #endif
 
 #if IS_BOARD_F7 && defined(ENABLE_AMS)
@@ -1559,6 +1561,7 @@ void batteryTask(void *pvParameter)
             if (boundedContinue()) { continue; }
 		}
 #endif
+#if 0
         if (checkCellVoltagesAndTemps(
               ((float *)&VoltageCellMax), ((float *)&VoltageCellMin),
               ((float *)&TempCellMax), ((float *)&TempCellMin),
@@ -1569,7 +1572,6 @@ void batteryTask(void *pvParameter)
         	ERROR_PRINT("Failed check of battery cell voltages and temps\n");
             if (boundedContinue()) { continue; }
         }
-
         if (publishPackVoltage(packVoltage) != HAL_OK) {
             BatteryTaskFailure = PACK_VOLTAGE_FAIL_BIT;
             sendCAN_BMU_BatteryChecks();
@@ -1580,6 +1582,7 @@ void batteryTask(void *pvParameter)
         StateBatteryPowerHV = calculateStateOfPower();
         StateBMS = fsmGetState(&fsmHandle);
 
+#endif
 
         /* This sends the following data, all of which get updated each time
          * through the loop
