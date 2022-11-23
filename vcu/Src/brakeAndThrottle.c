@@ -41,10 +41,10 @@
 #define MAX_THROTTLE_A_DEADZONE (200)
 #define MAX_THROTTLE_B_DEADZONE (200)
 /*#define MAX_THROTTLE_DEADZONE (0x20)*/
-
 #define ADC_DELAY_PERIOD 500
 
 uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS] = {0};
+// vcuDataPublishTimeMs = VCU_DATA_PUBLISH_TIME_MS_DEFAULT;
 
 HAL_StatusTypeDef startADCConversions()
 {

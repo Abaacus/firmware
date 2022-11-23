@@ -19,11 +19,11 @@ BaseType_t setDataPublishTime(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     BaseType_t paramLen;
-    uint32_t dataPublishTime;
+    uint16_t dataPublishTime;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
-    sscanf(param, "%lu", &dataPublishTime);
+    sscanf(param, "%hu", &dataPublishTime);
     vcuDataPublishTimeMs = dataPublishTime;
-    COMMAND_OUTPUT("Setting Data Publish Time %lu\n", dataPublishTime);
+    COMMAND_OUTPUT("Setting Data Publish Time %hu\n", dataPublishTime);
     return pdFALSE;
 }
 

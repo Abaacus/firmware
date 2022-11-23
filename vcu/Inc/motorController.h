@@ -12,6 +12,7 @@
 #define CHARGE_CURRENT_LIMIT_DEFAULT    0
 #define HIGH_VOLTAGE_LIMIT_DEFAULT      300
 #define LOW_VOLTAGE_LIMIT_DEFAULT       100
+#define VCU_DATA_PUBLISH_TIME_MS_DEFAULT 200
 
 #define INVERTER_STOP_TIMEOUT_MS        10000   // TODO: Chose a good value for this
 #define MC_INIT_DISCHARGE_TIME_MS       1000
@@ -32,7 +33,7 @@ typedef struct MotorControllerProcanSettings {
 } MotorControllerProcanSettings;
 
 extern uint64_t maxTorqueDemand;
-uint32_t vcuDataPublishTimeMs;
+uint32_t vcuDataPublishTimeMs = VCU_DATA_PUBLISH_TIME_MS_DEFAULT;
 
 HAL_StatusTypeDef mcInit();
 HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle);
