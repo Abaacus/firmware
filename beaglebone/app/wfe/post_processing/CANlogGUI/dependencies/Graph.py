@@ -12,7 +12,7 @@ def toDict(src_file):
           for line in lines:
                try:
                     words = line.split()
-                    timestamp = words[0].strip("()")
+                    timestamp = float(words[0].strip("()"))
                     iden = int(words[2], 16)
                     data = [int(d, 16) for d in words[4:]]
                     decoded_data = db.decode_message(
@@ -36,6 +36,7 @@ def graph(checked_data_dict, args):
     fig, ax = plt.subplots()
     for signal in checked_data_dict:
         ax.plot(*zip(*checked_data_dict[signal]), label=signal)
+
     #check if users has inputed any constraints on graph
     if (args['MaxXInput'] != ''):
         MaxXInput = int(args['MaxXInput'])
@@ -52,27 +53,6 @@ def graph(checked_data_dict, args):
     ax.legend()
     plt.xlabel("Time")
 
-    #get the maximum number of data points that one signal has for setting x-axis
-    signalnames = list(checked_data_dict.keys())
-    max_num_of_data_list  = 0
-    step = 1
-    # for signalname in signalnames:
-    #     if(len(checked_data_dict[signalname]) > 2):
-    #         max_timestamp = float(checked_data_dict[signalname][0][0])
-    #         min_timestamp = float(checked_data_dict[signalname][-1][0])
-    #         step = (max_timestamp - min_timestamp) // 10
-    #         break
-    
-    for signalname in signalnames:
-        if(len(checked_data_dict[signalname]) > max_num_of_data_list):
-            max_num_of_data_list = len(checked_data_dict[signalname])
-    
-    # print(step)
-    print(max_num_of_data_list)
-    step = (max_num_of_data_list) // 4
-    print(step)
-    print(np.append(np.arange(0, max_num_of_data_list + step, step), max_num_of_data_list-1))
-    plt.xticks(np.append(np.arange(0, max_num_of_data_list + step, step), max_num_of_data_list-1))
     plt.show()
 
 import json
@@ -107,7 +87,7 @@ def logToJsonDict(logFilePath, dbcFile):
         for line in lines:
             try:
                 words = line.split()
-                timestamp = words[0].strip("()")
+                timestamp = float(words[0].strip("()"))
                 iden = int(words[2], 16)
                 data = [int(d, 16) for d in words[4:]]
                 decoded_data = db.decode_message(
@@ -130,9 +110,11 @@ def logToJsonDict(logFilePath, dbcFile):
 
 def csvToDict(csvFilePath):
     with open(csvFilePath, "r") as csv_file:
-        lines = csv.reader(csv_file)
+        lines = csv.reader(x.replace('\0', '') for x in csv_file)
         data_dict = {}
         for line in lines:
+            if(len(line) < 3):
+                continue
             timestamp = line[0]
             signal_name = line[1]
             value = line[2]

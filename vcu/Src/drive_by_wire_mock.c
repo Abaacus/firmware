@@ -15,6 +15,21 @@
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
 
+BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    COMMAND_OUTPUT("isUartOverCanEnabled: %u\n", isUartOverCanEnabled);
+
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
+{
+    "isUartOverCanEnabled",
+    "isUartOverCanEnabled help string",
+    debugUartOverCan,
+    0 /* Number of parameters */
+};
+
 BaseType_t setBrakePosition(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -426,10 +441,12 @@ BaseType_t torqueDemandMaxCommand(char *writeBuffer, size_t writeBufferLength,
     uint64_t maxTorqueDemand;
     sscanf(torqueMaxString, "%llu", &maxTorqueDemand);
 
-    setTorqueLimit(maxTorqueDemand);
-
-    COMMAND_OUTPUT("Setting max torque demand to %llu (Nm)\n", maxTorqueDemand);
-
+    if(maxTorqueDemand > 30){
+        COMMAND_OUTPUT("Max torque input out of range, must be between 0 and 30");
+    }else{
+        setTorqueLimit(maxTorqueDemand);    
+        COMMAND_OUTPUT("Setting max torque demand to %llu (Nm)\n", maxTorqueDemand); 
+    }
     return pdFALSE;
 }
 static const CLI_Command_Definition_t torqueDemandMaxCommandDefinition =
@@ -520,6 +537,9 @@ HAL_StatusTypeDef stateMachineMockInit()
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&brakePositionCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&getThrottleABCommandDefinition) != pdPASS) {
