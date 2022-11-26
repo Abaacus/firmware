@@ -4,6 +4,9 @@
 #include "stdbool.h"
 #include "bsp.h"
 
+
+#define MC_ENCODER_OFFSET 32768
+
 bool getHvEnableState();
 bool getMotorControllersStatus();
 uint32_t lastBrakeValReceiveTimeTicks;

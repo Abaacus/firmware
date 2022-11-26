@@ -9,6 +9,7 @@
 #include "task.h"
 #include "bsp.h"
 #include "stm32f7xx_hal_tim.h"
+#include "canReceive.h"
 
 #define PI 3.14159
 
@@ -17,7 +18,6 @@ The motor controllers will return a 16 bit unsigned integer that needs to be con
 This exists and isn't done in the DBC bc the CAN driver has issues with the order of casting gives us large numbers around the middle point when the speed is around 0 
 We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uint32_t)rpm-32768)
 */
-#define MC_ENCODER_OFFSET 32768
 
 #define TRACTION_CONTROL_TASK_ID 3
 #define TRACTION_CONTROL_TASK_PERIOD_MS 200
@@ -66,14 +66,14 @@ static float get_RR_speed()
 {
 	//Value comes from MC
 	int64_t val = SpeedMotorRight;
-	return RPM_TO_RADS(val - MC_ENCODER_OFFSET);
+	return RPM_TO_RADS(val);
 }
 
 static float get_RL_speed()
 {
 	//Value comes from MC
 	int64_t val = SpeedMotorLeft;
-	return RPM_TO_RADS(val - MC_ENCODER_OFFSET);
+	return RPM_TO_RADS(val);
 }
 
 float kP = kP_DEFAULT;
