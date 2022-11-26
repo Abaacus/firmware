@@ -111,11 +111,8 @@ def logToJsonDict(logFilePath, dbcFile):
 def csvToDict(csvFilePath):
     with open(csvFilePath, "r") as csv_file:
         lines = csv.reader(csv_file)
-        lines = csv.reader(x.replace('\0', '') for x in csv_file)
         data_dict = {}
         for line in lines:
-            if(len(line) < 3):
-                continue
             timestamp = line[0]
             signal_name = line[1]
             value = line[2]
