@@ -65,14 +65,14 @@ static float get_FL_speed()
 static float get_RR_speed()
 {
 	//Value comes from MC
-	int64_t val = SpeedMotorRight;
+	uint16_t val = ScaledMotorSpeedRight;
 	return RPM_TO_RADS(val);
 }
 
 static float get_RL_speed()
 {
 	//Value comes from MC
-	int64_t val = SpeedMotorLeft;
+	uint16_t val = ScaledMotorSpeedLeft;
 	return RPM_TO_RADS(val);
 }
 

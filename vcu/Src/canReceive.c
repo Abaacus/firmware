@@ -156,13 +156,11 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
 
 
 void CAN_Msg_SpeedFeedbackRight_Callback(){
-    int64_t val = SpeedMotorRight;
-    val -= MC_ENCODER_OFFSET;
-    SpeedMotorRight=val;
+    ScaledMotorSpeedRight = SpeedMotorRight - MC_ENCODER_OFFSET;
+    sendCAN_ScaledSpeedMotorRight();
 }
 
 void CAN_Msg_SpeedFeedbackLeft_Callback(){
-    int64_t val = SpeedMotorLeft;
-    val -= MC_ENCODER_OFFSET;
-    SpeedMotorLeft=val;
+    ScaledMotorSpeedLeft = SpeedMotorLeft - MC_ENCODER_OFFSET;
+    sendCAN_ScaledSpeedMotorLeft();
 }
