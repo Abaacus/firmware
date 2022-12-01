@@ -9,7 +9,6 @@
 #include "task.h"
 #include "bsp.h"
 #include "stm32f7xx_hal_tim.h"
-#include "canReceive.h"
 
 #define PI 3.14159
 
@@ -65,15 +64,13 @@ static float get_FL_speed()
 static float get_RR_speed()
 {
 	//Value comes from MC
-	uint16_t val = ScaledMotorSpeedRight;
-	return RPM_TO_RADS(val);
+	return RPM_TO_RADS(ScaledMotorSpeedRight);
 }
 
 static float get_RL_speed()
 {
 	//Value comes from MC
-	uint16_t val = ScaledMotorSpeedLeft;
-	return RPM_TO_RADS(val);
+	return RPM_TO_RADS(ScaledMotorSpeedLeft);
 }
 
 float kP = kP_DEFAULT;

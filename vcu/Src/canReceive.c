@@ -154,7 +154,6 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
     }
 }
 
-
 void CAN_Msg_SpeedFeedbackRight_Callback(){
     ScaledMotorSpeedRight = SpeedMotorRight - MC_ENCODER_OFFSET;
     sendCAN_ScaledSpeedMotorRight();
