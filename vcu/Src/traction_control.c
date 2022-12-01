@@ -9,6 +9,7 @@
 #include "task.h"
 #include "bsp.h"
 #include "stm32f7xx_hal_tim.h"
+#include "canReceive.h"
 
 #define PI 3.14159
 
