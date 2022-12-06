@@ -65,8 +65,10 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ CurrentHVBusInverterLeft : 0|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
-BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
- SG_ SpeedMotorRightKPH : 16|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
+BO_ 2287537154 SpeedMotorRightKPH: 8 VCU_F7
+ SG_ SpeedMotorRightKPH : 0|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
+
+BO_ 2287471618 SpeedMotorLeftKPH: 8 VCU_F7
  SG_ SpeedMotorLeftKPH : 0|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
 
 BO_ 2214986495 UartOverCanRx: 4 PDU
