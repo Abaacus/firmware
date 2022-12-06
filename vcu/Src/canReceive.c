@@ -16,6 +16,8 @@
 #include "endurance_mode.h"
 #include "traction_control.h"
 
+#define PI 3.14159
+
 // Macros for converting RPM to KPH
 #define GEAR_RATIO 15.0/52.0
 #define M_TO_KM 1.0/1000.0f
@@ -23,6 +25,7 @@
 #define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
 #define HOUR_TO_MIN 60
 #define RPM_TO_KPH(rpm) ((rpm)*HOUR_TO_MIN*WHEEL_CIRCUMFERENCE*M_TO_KM*GEAR_RATIO)
+#define RPM_TO_RADS(rpm) ((rpm)*2*PI/60.0f)
 
 /*
  * External Board Statuses:

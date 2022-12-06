@@ -11,8 +11,6 @@
 #include "stm32f7xx_hal_tim.h"
 #include "canReceive.h"
 
-#define PI 3.14159
-
 /*
 The motor controllers will return a 16 bit unsigned integer that needs to be converted to an integer value with the middle being at 32768. Negative numbers mean the wheels are spinning backwards, Positive values indicate forward spin
 This exists and isn't done in the DBC bc the CAN driver has issues with the order of casting gives us large numbers around the middle point when the speed is around 0 
@@ -21,7 +19,6 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 
 #define TRACTION_CONTROL_TASK_ID 3
 #define TRACTION_CONTROL_TASK_PERIOD_MS 200
-#define RPM_TO_RADS(rpm) ((rpm)*2*PI/60.0f)
 
 // For every 1rad/s, decrease torque by kP
 #define kP_DEFAULT (0.1f)
