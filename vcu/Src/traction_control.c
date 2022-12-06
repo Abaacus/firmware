@@ -23,14 +23,6 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define TRACTION_CONTROL_TASK_PERIOD_MS 200
 #define RPM_TO_RADS(rpm) ((rpm)*2*PI/60.0f)
 
-// Macros for converting RPM to KPH
-#define GEAR_RATIO 15.0/52.0
-#define M_TO_KM 1.0/1000.0f
-#define WHEEL_DIAMETER_M 0.52
-#define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
-#define HOUR_TO_MIN 60
-#define RPM_TO_KPH(rpm) ((rpm)*HOUR_TO_MIN*WHEEL_CIRCUMFERENCE*M_TO_KM*GEAR_RATIO)
-
 // For every 1rad/s, decrease torque by kP
 #define kP_DEFAULT (0.1f)
 
@@ -65,13 +57,13 @@ static float get_FL_speed()
 static float get_RR_speed()
 {
 	//Value comes from MC
-	return RPM_TO_RADS(ScaledMotorSpeedRight);
+	return speedMotorRightRPM;
 }
 
 static float get_RL_speed()
 {
 	//Value comes from MC
-	return RPM_TO_RADS(ScaledMotorSpeedLeft);
+	return speedMotorLeftRPM;
 }
 
 float kP = kP_DEFAULT;
@@ -96,10 +88,6 @@ void tractionControlTask(void *pvParameters)
 	float error_right = 0.0f; //error between right rear and front
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 
-	//initialized variables so that speed is 0 on startup 
-	VCU_wheelSpeed_RR = MC_ENCODER_OFFSET;
-	VCU_wheelSpeed_RL = MC_ENCODER_OFFSET; 
-
 	while(1)
 	{
 		torque_max = MAX_TORQUE_DEMAND_DEFAULT;
@@ -114,10 +102,6 @@ void tractionControlTask(void *pvParameters)
 
 		VCU_wheelSpeed_RL = RL_speed;
 		sendCAN_TC_wheelSpeed_left();
-
-		SpeedMotorRightKPH = RPM_TO_KPH(((int64_t)SpeedMotorRight) - MC_ENCODER_OFFSET);
-		SpeedMotorLeftKPH = RPM_TO_KPH(((int64_t)SpeedMotorLeft) - MC_ENCODER_OFFSET);
-		sendCAN_SpeedMotorKPH();
 
 		if(tc_on)
 		{

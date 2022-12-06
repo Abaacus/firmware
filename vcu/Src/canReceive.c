@@ -16,6 +16,14 @@
 #include "endurance_mode.h"
 #include "traction_control.h"
 
+// Macros for converting RPM to KPH
+#define GEAR_RATIO 15.0/52.0
+#define M_TO_KM 1.0/1000.0f
+#define WHEEL_DIAMETER_M 0.52
+#define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
+#define HOUR_TO_MIN 60
+#define RPM_TO_KPH(rpm) ((rpm)*HOUR_TO_MIN*WHEEL_CIRCUMFERENCE*M_TO_KM*GEAR_RATIO)
+
 /*
  * External Board Statuses:
  * Variables for keeping track of external board statuses that get updated by
@@ -23,6 +31,8 @@
  */
 volatile bool motorControllersStatus = false;
 uint32_t lastBrakeValReceiveTimeTicks = 0;
+volatile int16_t speedMotorLeftRPM = 0;
+volatile int16_t speedMotorRightRPM = 0;
 /*
  * Functions to get external board status
  */
@@ -155,11 +165,13 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
 }
 
 void CAN_Msg_SpeedFeedbackRight_Callback(){
-    ScaledMotorSpeedRight = SpeedMotorRight - MC_ENCODER_OFFSET;
-    sendCAN_ScaledSpeedMotorRight();
+    speedMotorRightRPM = ((int32_t)SpeedMotorRight) - MC_ENCODER_OFFSET;
+    SpeedMotorRightKPH = RPM_TO_KPH(speedMotorRightRPM);
+    sendCAN_SpeedMotorRightKPH();
 }
 
 void CAN_Msg_SpeedFeedbackLeft_Callback(){
-    ScaledMotorSpeedLeft = SpeedMotorLeft - MC_ENCODER_OFFSET;
-    sendCAN_ScaledSpeedMotorLeft();
+    speedMotorLeftRPM = ((int32_t)SpeedMotorLeft) - MC_ENCODER_OFFSET;
+    SpeedMotorLeftKPH = RPM_TO_KPH(speedMotorLeftRPM);
+    sendCAN_SpeedMotorLeftKPH();
 }
