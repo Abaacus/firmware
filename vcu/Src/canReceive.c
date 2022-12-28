@@ -134,7 +134,7 @@ void CAN_Msg_TempInverterRight_Callback() {
 	    lastRightInverterDTC = xTaskGetTickCountFromISR();
 	}
 }
- 
+
 
 void CAN_Msg_UartOverCanConfig_Callback()
 {

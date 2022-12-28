@@ -12,7 +12,7 @@ DTC_History LatestDTCs = { .count = 0 };
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
 }
- 
+
 void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
     if (EM_Power_State_Request == EM_Power_State_Request_On) {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_ENABLE);
