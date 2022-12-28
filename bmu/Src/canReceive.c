@@ -57,7 +57,7 @@ void CAN_Msg_ChargeCart_ButtonEvents_Callback()
 {
     if (ButtonChargeStart) {
         fsmSendEventISR(&fsmHandle, EV_Charge_Start);
-    }
+    } 
     if (ButtonChargeStop) {
         fsmSendEventISR(&fsmHandle, EV_Notification_Stop);
     }
