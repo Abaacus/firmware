@@ -36,13 +36,13 @@ void Log_Fatal_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data) {
         DTC_Received newDTC = { DTC_CODE, DTC_Severity, DTC_Data };
 
         if (LatestDTCs.count < DTC_HISTORY_LENGTH) {
-            LatestDTCs.history[LatestDTCs.count] = newDTC;
+            LatestDTCs.dtcs[LatestDTCs.count] = newDTC;
             LatestDTCs.count++;
         } else {
             for (int i = 0; i < DTC_HISTORY_LENGTH - 1; i++) {
-                LatestDTCs.history[i] = LatestDTCs.history[i + 1];
+                LatestDTCs.dtcs[i] = LatestDTCs.dtcs[i + 1];
             }
-            LatestDTCs.history[DTC_HISTORY_LENGTH - 1] = newDTC;
+            LatestDTCs.dtcs[DTC_HISTORY_LENGTH - 1] = newDTC;
         }
     }    
 }
@@ -61,4 +61,8 @@ void CAN_Msg_BMU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
 
 void CAN_Msg_ChargeCart_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
     Log_Fatal_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+}
+
+DTC_History * read_DTC_History() {
+    return &LatestDTCs;
 }

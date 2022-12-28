@@ -2,6 +2,8 @@
 #include "controlStateMachine.h"
 #include "debug.h"
 #include "string.h"
+#include <string.h>
+#include "canReceive.h"
 #include "state_machine.h"
 #include "FreeRTOS_CLI.h"
 #include "sensors.h"
@@ -450,6 +452,30 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
     1 /* Number of parameters */
 };
 
+BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+	DTC_History * history = read_DTC_History();
+    char output_buffer[DTC_HISTORY_LENGTH * 25];
+    int offset = 0;
+
+    for (int i = 0; i < history->count; i++) {
+        offset += sprintf(output_buffer + offset, "DTC: %d, Data: %d\r\n", history->dtcs[i].code, history->dtcs[i].data);
+    }
+
+    strncpy(writeBuffer, output_buffer, writeBufferLength);
+
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t printDTCsCommandDefinition =
+{
+    "printDTCs",
+    "printDTCs:\r\n  Prints the last 10 fatal DTCs received \r\n",
+    printDTCs,
+    0 /* Number of parameters */
+};
+
+
 HAL_StatusTypeDef mockStateMachineInit()
 {
     if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
@@ -500,6 +526,8 @@ HAL_StatusTypeDef mockStateMachineInit()
     if (FreeRTOS_CLIRegisterCommand(&controlFansCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-
+    if (FreeRTOS_CLIRegisterCommand(&printDTCsCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
     return HAL_OK;
 }
