@@ -7,7 +7,7 @@
 #include "boardTypes.h"
 #include "canReceive.h"
 
-DTC_History LatestDTCs = { .count = 0 };
+DTC_History LatestDTCs = { .tail = 0, .total = 0 };
 
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
@@ -31,38 +31,36 @@ void DTC_Fatal_Callback(BoardIDs board) {
 // DTC Logging
 //
 
-void Log_Fatal_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    if (DTC_Severity == 1) {
-        DTC_Received newDTC = { DTC_CODE, DTC_Severity, DTC_Data };
+void Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data) {
+    if (DTC_Severity == DTC_Severity_FATAL 
+        || DTC_Severity == DTC_Severity_CRITICAL) {
+    
+        DTC_Received newDTC = { .code = DTC_CODE, 
+                                .severity = DTC_Severity, 
+                                .data = DTC_Data };
 
-        if (LatestDTCs.count < DTC_HISTORY_LENGTH) {
-            LatestDTCs.dtcs[LatestDTCs.count] = newDTC;
-            LatestDTCs.count++;
-        } else {
-            for (int i = 0; i < DTC_HISTORY_LENGTH - 1; i++) {
-                LatestDTCs.dtcs[i] = LatestDTCs.dtcs[i + 1];
-            }
-            LatestDTCs.dtcs[DTC_HISTORY_LENGTH - 1] = newDTC;
+        LatestDTCs.dtcs[LatestDTCs.tail] = newDTC;
+
+        LatestDTCs.tail = (LatestDTCs.tail + 1) % DTC_HISTORY_LENGTH;
+
+        if (LatestDTCs.total < DTC_HISTORY_LENGTH) {
+            LatestDTCs.total++;
         }
     }    
 }
 
 void CAN_Msg_DCU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_Fatal_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }
 
 void CAN_Msg_VCU_F7_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_Fatal_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }
 
 void CAN_Msg_BMU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_Fatal_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }
 
 void CAN_Msg_ChargeCart_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_Fatal_DTC(DTC_CODE, DTC_Severity, DTC_Data);
-}
-
-DTC_History * read_DTC_History() {
-    return &LatestDTCs;
+    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }

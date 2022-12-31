@@ -455,22 +455,29 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
 BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-	DTC_History * history = read_DTC_History();
-    char output_buffer[DTC_HISTORY_LENGTH * 25];
-    int offset = 0;
+    static int DTCs_to_print = LatestDTCs.total;
+    static int index_latest = LatestDTCS.tail - 1;
 
-    for (int i = 0; i < history->count; i++) {
-        offset += sprintf(output_buffer + offset, "DTC: %d, Data: %d\r\n", history->dtcs[i].code, history->dtcs[i].data);
+    if (DTCs_to_print > 0) {
+
+        if (index_latest < 0) {
+            index_latest = DTC_HISTORY_LENGTH - 1;
+        }
+
+        COMMAND_OUTPUT("DTC: %d, Data: %d\r\n", LatestDTCs.dtcs[index_latest].code, LatestDTCs.dtcs[index_latest].data);
+        DTCs_to_print -= 1;
+        index_latest -= 1;
+        
+        return pdTRUE;
+    } else {
+        return pdFALSE;
     }
-
-    strncpy(writeBuffer, output_buffer, writeBufferLength);
-
-    return pdFALSE;
+    
 }
 static const CLI_Command_Definition_t printDTCsCommandDefinition =
 {
     "printDTCs",
-    "printDTCs:\r\n  Prints the last 10 fatal DTCs received \r\n",
+    "printDTCs:\r\n  Prints the 10 most recent fatal or critical DTCs received \r\n",
     printDTCs,
     0 /* Number of parameters */
 };
