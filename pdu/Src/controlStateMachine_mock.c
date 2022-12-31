@@ -455,8 +455,14 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
 BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    static int DTCs_to_print = LatestDTCs.total;
-    static int index_latest = LatestDTCS.tail - 1;
+    static int DTCs_to_print = 0;
+    if (DTCs_to_print == 0) {
+        DTCs_to_print = LatestDTCs.total;
+    }
+    static int index_latest = 0;
+    if (index_latest == 0) {
+        index_latest = LatestDTCs.tail - 1;
+    }
 
     if (DTCs_to_print > 0) {
 
@@ -467,7 +473,7 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
         COMMAND_OUTPUT("DTC: %d, Data: %d\r\n", LatestDTCs.dtcs[index_latest].code, LatestDTCs.dtcs[index_latest].data);
         DTCs_to_print -= 1;
         index_latest -= 1;
-        
+
         return pdTRUE;
     } else {
         return pdFALSE;
