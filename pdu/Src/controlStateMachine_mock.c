@@ -459,8 +459,8 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
     if (DTCs_to_print == 0) {
         DTCs_to_print = LatestDTCs.total;
     }
-    static int index_latest = 0;
-    if (index_latest == 0) {
+    static int index_latest = -2;
+    if (index_latest == -2) {
         index_latest = LatestDTCs.tail - 1;
     }
 
