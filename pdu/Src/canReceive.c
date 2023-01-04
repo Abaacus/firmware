@@ -7,7 +7,18 @@
 #include "boardTypes.h"
 #include "canReceive.h"
 
-DTC_History LatestDTCs = { .tail = 0, .total = 0 };
+static DTC_History_t LatestDTCs;
+
+void DTC_History_init() {
+    LatestDTCs.tail = 0;
+    for (int i = 0; i < DTC_HISTORY_LENGTH; i++) {
+        LatestDTCs.dtcs[i].code = -1;
+    }
+}
+
+DTC_History_t * get_DTC_History() {
+    return &LatestDTCs;
+}
 
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
@@ -35,17 +46,11 @@ void Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data) {
     if (DTC_Severity == DTC_Severity_FATAL 
         || DTC_Severity == DTC_Severity_CRITICAL) {
     
-        DTC_Received newDTC = { .code = DTC_CODE, 
-                                .severity = DTC_Severity, 
-                                .data = DTC_Data };
-
-        LatestDTCs.dtcs[LatestDTCs.tail] = newDTC;
+        LatestDTCs.dtcs[LatestDTCs.tail].code = DTC_CODE;
+        LatestDTCs.dtcs[LatestDTCs.tail].severity = DTC_Severity;
+        LatestDTCs.dtcs[LatestDTCs.tail].data = DTC_Data;
 
         LatestDTCs.tail = (LatestDTCs.tail + 1) % DTC_HISTORY_LENGTH;
-
-        if (LatestDTCs.total < DTC_HISTORY_LENGTH) {
-            LatestDTCs.total++;
-        }
     }    
 }
 

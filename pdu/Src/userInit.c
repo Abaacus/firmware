@@ -7,6 +7,7 @@
 #include "userCan.h"
 #include "controlStateMachine_mock.h"
 #include "LTC4110.h"
+#include "canReceive.h"
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                     signed char *pcTaskName )
@@ -40,5 +41,6 @@ void userInit()
     }
 
     uartStartReceiving(&DEBUG_UART_HANDLE);
+    DTC_History_init();
 }
 

@@ -3,18 +3,18 @@
 
 #include "debug.h"
 
-typedef struct DTC_Received{
+typedef struct DTC_Received {
     int code;
     int severity;
     int data;
-} DTC_Received;
+} DTC_Received_t;
 
-typedef struct DTC_History{
-    DTC_Received dtcs[DTC_HISTORY_LENGTH];
+typedef struct DTC_History {
+    DTC_Received_t dtcs[DTC_HISTORY_LENGTH];
     int tail;
-    int total;
-} DTC_History;
+} DTC_History_t;
 
-extern DTC_History LatestDTCs;
+void DTC_History_init();
+DTC_History_t * get_DTC_History();
 
 #endif /* end of include guard: CANRECEIVE_H */

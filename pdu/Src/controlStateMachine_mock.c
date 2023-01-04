@@ -455,30 +455,33 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
 BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    static int DTCs_to_print = 0;
-    if (DTCs_to_print == 0) {
-        DTCs_to_print = LatestDTCs.total;
-    }
-    static int index_latest = -2;
-    if (index_latest == -2) {
-        index_latest = LatestDTCs.tail - 1;
+    DTC_History_t * DTC_Log = get_DTC_History();
+
+    const int tail_index = DTC_Log->tail - 1;
+    static int DTCs_index = DTC_HISTORY_LENGTH;
+
+    if (DTCs_index == DTC_HISTORY_LENGTH) {
+        DTCs_index = tail_index;
     }
 
-    if (DTCs_to_print > 0) {
+    if (DTCs_index == -1) {
+        DTCs_index = DTC_HISTORY_LENGTH - 1;
+    }
 
-        if (index_latest < 0) {
-            index_latest = DTC_HISTORY_LENGTH - 1;
+    if (DTC_Log->dtcs[DTCs_index].code != -1) {
+        COMMAND_OUTPUT("DTC: %d, Data: %d\r\n", DTC_Log->dtcs[DTCs_index].code, DTC_Log->dtcs[DTCs_index].data);
+        // If the tail is the next index, we have reached the end of the log
+        if (DTCs_index == tail_index + 1) {
+            DTCs_index = tail_index;
+            return pdFALSE;
+        } else {
+            DTCs_index -= 1;
+            return pdTRUE;
         }
-
-        COMMAND_OUTPUT("DTC: %d, Data: %d\r\n", LatestDTCs.dtcs[index_latest].code, LatestDTCs.dtcs[index_latest].data);
-        DTCs_to_print -= 1;
-        index_latest -= 1;
-
-        return pdTRUE;
-    } else {
+    } else { // If we have an entry with a code of -1, we have reached the end of the log
+        DTCs_index = tail_index;
         return pdFALSE;
     }
-    
 }
 static const CLI_Command_Definition_t printDTCsCommandDefinition =
 {

@@ -42,7 +42,7 @@
 #define PRINT_QUEUE_STRING_SIZE 100
 #define PRINT_QUEUE_SEND_TIMEOUT_TICKS  10
 
-// Constant for DTCs received length
+// Length of the DTC history stored, viewed with the command printDTCs
 #define DTC_HISTORY_LENGTH 10
 
 /**
