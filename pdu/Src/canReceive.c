@@ -39,34 +39,19 @@ void DTC_Fatal_Callback(BoardIDs board) {
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
 }
 
-//
-// DTC Logging for the printDTCs CLI command
-//
-
-void Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    if (DTC_Severity == DTC_Severity_FATAL 
-        || DTC_Severity == DTC_Severity_CRITICAL) {
-    
-        LatestDTCs.dtcs[LatestDTCs.tail].code = DTC_CODE;
-        LatestDTCs.dtcs[LatestDTCs.tail].severity = DTC_Severity;
-        LatestDTCs.dtcs[LatestDTCs.tail].data = DTC_Data;
-
-        LatestDTCs.tail = (LatestDTCs.tail + 1) % DTC_HISTORY_LENGTH;
-    }    
-}
 
 void CAN_Msg_DCU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    Can_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
 }
 
 void CAN_Msg_VCU_F7_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    Can_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
 }
 
 void CAN_Msg_BMU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    Can_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
 }
 
 void CAN_Msg_ChargeCart_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    Can_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
 }
