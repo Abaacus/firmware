@@ -16,6 +16,22 @@
 #include "endurance_mode.h"
 #include "traction_control.h"
 
+#include "canReceive.h"
+#include "canReceiveCommon.h"
+
+static DTC_History_t LatestDTCs;
+
+void DTC_History_init() {
+    LatestDTCs.tail = 0;
+    for (uint8_t i = 0; i < DTC_HISTORY_LENGTH; i++) {
+        LatestDTCs.dtcs[i].code = EMPTY_DTC_ENTRY;
+    }
+}
+
+DTC_History_t * get_DTC_History() {
+    return &LatestDTCs;
+}
+
 /*
  * External Board Statuses:
  * Variables for keeping track of external board statuses that get updated by
@@ -99,6 +115,8 @@ void CAN_Msg_BMU_BrakePedalValue_Callback()
 }
 
 void CAN_Msg_BMU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
+    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
+
     switch (DTC_CODE) {
         case WARNING_CONTACTOR_OPEN_IMPENDING:
             fsmSendEventISR(&fsmHandle, EV_Hv_Disable);
@@ -142,6 +160,8 @@ void CAN_Msg_UartOverCanConfig_Callback()
 }
 
 void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
+    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
+
     switch (DTC_CODE)
     {
         case ERROR_DCDC_Shutoff:
@@ -152,4 +172,12 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
             // Do nothing, other events handled by fatal callback
             break;
     }
+}
+
+void CAN_Msg_DCU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
+    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
+}
+
+void CAN_Msg_ChargeCart_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
+    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
 }

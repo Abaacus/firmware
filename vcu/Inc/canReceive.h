@@ -4,6 +4,11 @@
 #include "stdbool.h"
 #include "bsp.h"
 
+#include "canReceiveCommon.h"
+
+void DTC_History_init();
+DTC_History_t * get_DTC_History();
+
 bool getHvEnableState();
 bool getMotorControllersStatus();
 uint32_t lastBrakeValReceiveTimeTicks;

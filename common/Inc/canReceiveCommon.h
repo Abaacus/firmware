@@ -25,5 +25,5 @@ typedef struct DTC_History {
 } DTC_History_t;
 
 void CAN_Msg_UartOverCanTx_Callback();
-void Can_Receive_Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data, DTC_History_t * DTC_Log);
+void CAN_Receive_Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data, DTC_History_t * DTC_Log);
 #endif /* end of include guard: CAN_RECEIVE_COMMON_H */

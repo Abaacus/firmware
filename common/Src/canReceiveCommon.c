@@ -53,7 +53,7 @@ void CAN_Msg_UartOverCanTx_Callback()
 }
 
 // DTC Logging for the printDTCs CLI command
-void Can_Receive_Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data, DTC_History_t * DTC_Log) {
+void CAN_Receive_Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data, DTC_History_t * DTC_Log) {
     if (DTC_Severity == DTC_Severity_FATAL 
         || DTC_Severity == DTC_Severity_CRITICAL) {
     
