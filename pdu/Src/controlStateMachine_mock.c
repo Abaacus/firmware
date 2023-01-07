@@ -7,6 +7,7 @@
 #include "state_machine.h"
 #include "FreeRTOS_CLI.h"
 #include "sensors.h"
+#include "canReceiveCommon.h"
 
 extern uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 
@@ -457,30 +458,28 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
 {
     DTC_History_t * DTC_Log = get_DTC_History();
 
-    const int tail_index = DTC_Log->tail - 1;
-    static int DTCs_index = DTC_HISTORY_LENGTH;
+    static uint8_t DTCs_index = DTC_HISTORY_LENGTH;
 
     if (DTCs_index == DTC_HISTORY_LENGTH) {
-        DTCs_index = tail_index;
-    }
-
-    if (DTCs_index == -1) {
+        DTCs_index = DTC_Log->tail - 1;
+    } else if (DTCs_index == -1) {
         DTCs_index = DTC_HISTORY_LENGTH - 1;
     }
 
-    if (DTC_Log->dtcs[DTCs_index].code != -1) {
-        COMMAND_OUTPUT("DTC: %d, Data: %d\r\n", DTC_Log->dtcs[DTCs_index].code, DTC_Log->dtcs[DTCs_index].data);
-        // If the tail is the next index, we have reached the end of the log
-        if (DTCs_index == tail_index + 1) {
-            DTCs_index = tail_index;
+    // If we find an empty DTC entry, we have iterated the entire log
+    if (DTC_Log->dtcs[DTCs_index].code == EMPTY_DTC_ENTRY) {
+        DTCs_index = DTC_HISTORY_LENGTH;
+        return pdFALSE;
+    } else {
+        COMMAND_OUTPUT("DTC: %u, Data: %llu\r\n", DTC_Log->dtcs[DTCs_index].code, DTC_Log->dtcs[DTCs_index].data);
+        // If the tail is the next index, we have iterated the entire log
+        if (DTCs_index == DTC_Log->tail) {
+            DTCs_index = DTC_HISTORY_LENGTH;
             return pdFALSE;
         } else {
-            DTCs_index -= 1;
+            DTCs_index--;
             return pdTRUE;
         }
-    } else { // If we have an entry with a code of -1, we have reached the end of the log
-        DTCs_index = tail_index;
-        return pdFALSE;
     }
 }
 static const CLI_Command_Definition_t printDTCsCommandDefinition =

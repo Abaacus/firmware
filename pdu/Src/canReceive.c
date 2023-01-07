@@ -6,13 +6,14 @@
 #include "debug.h"
 #include "boardTypes.h"
 #include "canReceive.h"
+#include "canReceiveCommon.h"
 
 static DTC_History_t LatestDTCs;
 
 void DTC_History_init() {
     LatestDTCs.tail = 0;
-    for (int i = 0; i < DTC_HISTORY_LENGTH; i++) {
-        LatestDTCs.dtcs[i].code = -1;
+    for (uint8_t i = 0; i < DTC_HISTORY_LENGTH; i++) {
+        LatestDTCs.dtcs[i].code = EMPTY_DTC_ENTRY;
     }
 }
 
@@ -39,7 +40,7 @@ void DTC_Fatal_Callback(BoardIDs board) {
 }
 
 //
-// DTC Logging
+// DTC Logging for the printDTCs CLI command
 //
 
 void Log_DTC(int DTC_CODE, int DTC_Severity, int DTC_Data) {
