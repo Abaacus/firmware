@@ -25,6 +25,7 @@
 #include "batteries.h"
 #include "faultMonitor.h"
 #include "ltc_chip.h"
+#include "state_of_charge.c"
 
 #if IS_BOARD_F7
 #include "imdDriver.h"
@@ -34,6 +35,34 @@ extern bool HITL_Precharge_Mode;
 extern float HITL_VPACK;
 extern uint32_t brakeAndHVILVals[2];
 
+BaseType_t getIBus_integrated(char *writeBuffer, size_t writeBufferLength, const char *commandString) {
+    COMMAND_OUTPUT("IBus integrated %f", IBus_integrated);
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t getIBus_integratedCommandDefinition = {
+    "getIBus_integrated",
+    "getIBus_integrated:\r\n Get IBus_integrated\r\n",
+    getIBus_integrated,
+    0
+};
+BaseType_t setIBus_integrated(char *writeBuffer, size_t writeBufferLength, const char *commandString) {
+    BaseType_t paramLen;
+    float IBus_integrated_temp;
+    const char* param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    scanf (param, "%f", &IBus_integrated_temp);
+    if (IBus_integrated_temp < 0.0f) COMMAND_OUTPUT("Invalid Input: Minimum value of 0.0f required");
+    else {
+        IBus_integrated = IBus_integrated_temp;
+        COMMAND_OUTPUT("IBus_integrated set to %f", IBus_integrated_temp);
+    }
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t setIBus_integratedCommandDefinition = {
+    "setIBus_integrated",
+    "setIBus_integrated:\r\n Set IBus_integrated\r\n",
+    setIBus_integrated,
+    1
+};
 BaseType_t getBrakePressure(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -997,6 +1026,12 @@ HAL_StatusTypeDef stateMachineMockInit()
     cliSetVBus(0);
     cliSetIBus(0);
 
+    if (FreeRTOS_CLIRegisterCommand(&getIBus_integratedCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&setIBus_integratedCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
     if (FreeRTOS_CLIRegisterCommand(&printHVMeasurementsCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
