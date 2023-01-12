@@ -8,6 +8,7 @@
 #include "drive_by_wire.h"
 #include "state_machine.h"
 #include "drive_by_wire.h"
+#include "vcu_errorHandler.h"
 
 #if IS_BOARD_NUCLEO_F7
 #define MOCK_ADC_READINGS
@@ -23,12 +24,14 @@ HAL_StatusTypeDef startADCConversions()
     if (HAL_ADC_Start_DMA(&ADC_HANDLE, brakeThrottleSteeringADCVals, NUM_ADC_CHANNELS) != HAL_OK)
     {
         ERROR_PRINT("Failed to start ADC DMA conversions\n");
-        Error_Handler();
+        // Error_Handler();
+        error(1);
         return HAL_ERROR;
     }
     if (HAL_TIM_Base_Start(&BRAKE_ADC_TIM_HANDLE) != HAL_OK) {
       ERROR_PRINT("Failed to start brake and throttle adc timer\n");
-      Error_Handler();
+      // Error_Handler();
+      error(2);
       return HAL_ERROR;
     }
 #else
