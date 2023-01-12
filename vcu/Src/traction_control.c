@@ -79,7 +79,7 @@ static float get_RL_speed()
 float kP = kP_DEFAULT;
 float error_floor = ERROR_FLOOR_RADS_DEFAULT;
 float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
-traction_control_task_period = TRACTION_CONTROL_TASK_PERIOD_MS;
+uint16_t traction_control_task_period = TRACTION_CONTROL_TASK_PERIOD_MS;
 
 void tractionControlTask(void *pvParameters)
 {
