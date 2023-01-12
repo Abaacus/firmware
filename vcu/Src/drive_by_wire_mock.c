@@ -22,13 +22,6 @@ BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
-{
-    "isUartOverCanEnabled",
-    "isUartOverCanEnabled help string",
-    debugUartOverCan,
-    0 /* Number of parameters */
-};
 
 BaseType_t setBrakePosition(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -43,13 +36,6 @@ BaseType_t setBrakePosition(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t brakePositionCommandDefinition =
-{
-    "brake",
-    "brake <val>:\r\n Set brake Position to val %\r\n",
-    setBrakePosition,
-    1 /* Number of parameters */
-};
 
 BaseType_t pduMCsOnOffMock(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -72,13 +58,6 @@ BaseType_t pduMCsOnOffMock(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t mcOnOffCommandDefinition =
-{
-    "mc",
-    "mc <on|off>:\r\n Send notify that MCs are on|off (normal sent by PDU)\r\n",
-    pduMCsOnOffMock,
-    1 /* Number of parameters */
-};
 
 BaseType_t setFakeThrottle(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -94,13 +73,6 @@ BaseType_t setFakeThrottle(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t throttleCommandDefinition =
-{
-    "throttle",
-    "throttle <val>:\r\n Set throttle to val (sets both throttle pots to same val)\r\n",
-    setFakeThrottle,
-    1 /* Number of parameters */
-};
 
 BaseType_t setFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -121,13 +93,6 @@ BaseType_t setFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t throttleABCommandDefinition =
-{
-    "throttleAB",
-    "throttleAB <A Val> <B Val>:\r\n Set throttle pots A and B seperately\r\n",
-    setFakeThrottleAB,
-    2 /* Number of parameters */
-};
 
 BaseType_t getThrottle(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -141,13 +106,6 @@ BaseType_t getThrottle(char *writeBuffer, size_t writeBufferLength,
                    /*brakeThrottleSteeringADCVals[3], brakeThrottleSteeringADCVals[4]);*/
     return pdFALSE;
 }
-static const CLI_Command_Definition_t getThrottleCommandDefinition =
-{
-    "getThrottle",
-    "getThrottle:\r\n Get throttle and throttle state\r\n",
-    getThrottle,
-    0 /* Number of parameters */
-};
 
 BaseType_t getSteering(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -157,13 +115,6 @@ BaseType_t getSteering(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t getSteeringCommandDefinition =
-{
-    "getSteering",
-    "getSteering:\r\n Get steering angle in degrees\r\n",
-    getSteering,
-    0 /* Number of parameters */
-};
 
 BaseType_t getBrake(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -176,13 +127,6 @@ BaseType_t getBrake(char *writeBuffer, size_t writeBufferLength,
                    /*brakeThrottleSteeringADCVals[3], brakeThrottleSteeringADCVals[4]);*/
     return pdFALSE;
 }
-static const CLI_Command_Definition_t getBrakeCommandDefinition =
-{
-    "getBrake",
-    "getBrake:\r\n Get brake position\r\n",
-    getBrake,
-    0 /* Number of parameters */
-};
 
 BaseType_t getFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -198,14 +142,6 @@ BaseType_t getFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
                    /*brakeThrottleSteeringADCVals[3], brakeThrottleSteeringADCVals[4]);*/
     return pdFALSE;
 }
-
-static const CLI_Command_Definition_t getThrottleABCommandDefinition =
-{
-    "getThrottleAB",
-    "getThrottleAB:\r\n Get throttle pots A and B\r\n",
-    getFakeThrottleAB,
-    0 /* Number of parameters */
-};
 
 BaseType_t getADCInputs(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -225,13 +161,6 @@ BaseType_t getADCInputs(char *writeBuffer, size_t writeBufferLength,
                    /*brakeThrottleSteeringADCVals[3], brakeThrottleSteeringADCVals[4]);*/
     return pdFALSE;
 }
-static const CLI_Command_Definition_t getADCInputsCommandDefinition =
-{
-    "adcInputs",
-    "adcInputs:\r\n Get adc input values\r\n",
-    getADCInputs,
-    0 /* Number of parameters */
-};
 
 BaseType_t setFakeBrakePressure(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -250,13 +179,6 @@ BaseType_t setFakeBrakePressure(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t brakePressureCommandDefinition =
-{
-    "brakePressure",
-    "brakePressure <val>:\r\n Set brake pressure to val\r\n",
-    setFakeBrakePressure,
-    1 /* Number of parameters */
-};
 
 BaseType_t setFakeDCUCanTimeout(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -264,13 +186,6 @@ BaseType_t setFakeDCUCanTimeout(char *writeBuffer, size_t writeBufferLength,
     fsmSendEventISR(&fsmHandle, EV_DCU_Can_Timeout);
     return pdFALSE;
 }
-static const CLI_Command_Definition_t dcuTimeoutCommandDefinition =
-{
-    "dcuTimeout",
-    "dcuTimeout:\r\n Send dcu timeout event\r\n",
-    setFakeDCUCanTimeout,
-    0 /* Number of parameters */
-};
 
 BaseType_t fakeEM_ToggleDCU(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -278,13 +193,6 @@ BaseType_t fakeEM_ToggleDCU(char *writeBuffer, size_t writeBufferLength,
     fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
     return pdFALSE;
 }
-static const CLI_Command_Definition_t emToggleCommandDefinition =
-{
-    "emToggle",
-    "emToggle:\r\n Send em toggle event\r\n",
-    fakeEM_ToggleDCU,
-    0 /* Number of parameters */
-};
 
 extern float tc_kP;
 extern float error_floor;
@@ -303,13 +211,6 @@ BaseType_t setTcKp(char *writeBuffer, size_t writeBufferLength,
     COMMAND_OUTPUT("Setting kP %f\n", tc_kP);
     return pdFALSE;
 }
-static const CLI_Command_Definition_t setKpCommandDefinition =
-{
-    "setTcKp",
-    "setTcKp <kP>:\r\n set TC kP value\r\n",
-    setTcKp,
-    1 /* Number of parameters */
-};
 
 BaseType_t setErrorFloor(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -322,13 +223,6 @@ BaseType_t setErrorFloor(char *writeBuffer, size_t writeBufferLength,
     COMMAND_OUTPUT("setting error floor %f\n", adjustment_torque_floor);
     return pdFALSE;
 }
-static const CLI_Command_Definition_t setErrorFloorCommandDefinition =
-{
-    "setErrorFloor",
-    "setErrorFloor <errorFloor>:\r\n set TC error floor value\r\n",
-    setErrorFloor,
-    1 /* Number of parameters */
-};
 
 BaseType_t setAdjustmentFloor(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -341,13 +235,6 @@ BaseType_t setAdjustmentFloor(char *writeBuffer, size_t writeBufferLength,
     COMMAND_OUTPUT("setting error floor %f\n", error_floor);
     return pdFALSE;
 }
-static const CLI_Command_Definition_t setAdjustmentFloorCommandDefinition =
-{
-    "setAdjustmentFloor",
-    "setAdjustmentFloor <adjFloor>:\r\n set TC adjustment floor value\r\n",
-    setAdjustmentFloor,
-    1 /* Number of parameters */
-};
 
 BaseType_t fakeHVStateChange(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -377,13 +264,7 @@ BaseType_t fakeHVStateChange(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t hvStateCommandDefinition =
-{
-    "hv",
-    "hv <enable|disable>:\r\n Send hv state change event, and set hv state\r\n",
-    fakeHVStateChange,
-    1 /* Number of parameters */
-};
+
 BaseType_t printState(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -396,13 +277,6 @@ BaseType_t printState(char *writeBuffer, size_t writeBufferLength,
     return pdFALSE;
 }
 
-static const CLI_Command_Definition_t printStateCommandDefinition =
-{
-    "state",
-    "state:\r\n  Output current state of state machine\r\n",
-    printState,
-    0/* Number of parameters */
-};
 BaseType_t beagleBonePower(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -424,13 +298,6 @@ BaseType_t beagleBonePower(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t beagleBonePowerCommandDefinition =
-{
-    "BB",
-    "BB <on|off>:\r\n  sets the power state for the BeagleBone\r\n",
-    beagleBonePower,
-    1 /* Number of parameters */
-};
 
 BaseType_t torqueDemandMaxCommand(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -449,13 +316,6 @@ BaseType_t torqueDemandMaxCommand(char *writeBuffer, size_t writeBufferLength,
     }
     return pdFALSE;
 }
-static const CLI_Command_Definition_t torqueDemandMaxCommandDefinition =
-{
-    "maxTorque",
-    "maxTorque <maxTorque>:\r\n  Set max torque demand (Nm)\r\n",
-    torqueDemandMaxCommand,
-    1 /* Number of parameters */
-};
 
 BaseType_t speedLimitCommand(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -472,13 +332,6 @@ BaseType_t speedLimitCommand(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t speedLimitCommandDefinition =
-{
-    "speedLimit",
-    "speedLimit <maxSpeed>:\r\n  Set max speed (rpm)\r\n",
-    speedLimitCommand,
-    1 /* Number of parameters */
-};
 
 BaseType_t mcInitCommand(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -493,16 +346,185 @@ BaseType_t mcInitCommand(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
-static const CLI_Command_Definition_t mcInitCommandDefinition =
-{
-    "mcInit",
-    "mcInit :\r\n  Set max speed (rpm)\r\n",
-    mcInitCommand,
-    0 /* Number of parameters */
-};
 
 HAL_StatusTypeDef stateMachineMockInit()
 {
+    static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
+    {
+        "isUartOverCanEnabled",
+        "isUartOverCanEnabled help string",
+        debugUartOverCan,
+        0 /* Number of parameters */
+    };  
+
+    static const CLI_Command_Definition_t brakePositionCommandDefinition =
+    {
+        "brake",
+        "brake <val>:\r\n Set brake Position to val %\r\n",
+        setBrakePosition,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t mcOnOffCommandDefinition =
+    {
+        "mc",
+        "mc <on|off>:\r\n Send notify that MCs are on|off (normal sent by PDU)\r\n",
+        pduMCsOnOffMock,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t throttleCommandDefinition =
+    {
+        "throttle",
+        "throttle <val>:\r\n Set throttle to val (sets both throttle pots to same val)\r\n",
+        setFakeThrottle,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t throttleABCommandDefinition =
+    {
+        "throttleAB",
+        "throttleAB <A Val> <B Val>:\r\n Set throttle pots A and B seperately\r\n",
+        setFakeThrottleAB,
+        2 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t getThrottleCommandDefinition =
+    {
+        "getThrottle",
+        "getThrottle:\r\n Get throttle and throttle state\r\n",
+        getThrottle,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t getSteeringCommandDefinition =
+    {
+        "getSteering",
+        "getSteering:\r\n Get steering angle in degrees\r\n",
+        getSteering,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t getBrakeCommandDefinition =
+    {
+        "getBrake",
+        "getBrake:\r\n Get brake position\r\n",
+        getBrake,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t getThrottleABCommandDefinition =
+    {
+        "getThrottleAB",
+        "getThrottleAB:\r\n Get throttle pots A and B\r\n",
+        getFakeThrottleAB,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t getADCInputsCommandDefinition =
+    {
+        "adcInputs",
+        "adcInputs:\r\n Get adc input values\r\n",
+        getADCInputs,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t brakePressureCommandDefinition =
+    {
+        "brakePressure",
+        "brakePressure <val>:\r\n Set brake pressure to val\r\n",
+        setFakeBrakePressure,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t dcuTimeoutCommandDefinition =
+    {
+        "dcuTimeout",
+        "dcuTimeout:\r\n Send dcu timeout event\r\n",
+        setFakeDCUCanTimeout,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t emToggleCommandDefinition =
+    {
+        "emToggle",
+        "emToggle:\r\n Send em toggle event\r\n",
+        fakeEM_ToggleDCU,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t setKpCommandDefinition =
+    {
+        "setTcKp",
+        "setTcKp <kP>:\r\n set TC kP value\r\n",
+        setTcKp,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t setErrorFloorCommandDefinition =
+    {
+        "setErrorFloor",
+        "setErrorFloor <errorFloor>:\r\n set TC error floor value\r\n",
+        setErrorFloor,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t setAdjustmentFloorCommandDefinition =
+    {
+        "setAdjustmentFloor",
+        "setAdjustmentFloor <adjFloor>:\r\n set TC adjustment floor value\r\n",
+        setAdjustmentFloor,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t hvStateCommandDefinition =
+    {
+        "hv",
+        "hv <enable|disable>:\r\n Send hv state change event, and set hv state\r\n",
+        fakeHVStateChange,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t printStateCommandDefinition =
+    {
+        "state",
+        "state:\r\n  Output current state of state machine\r\n",
+        printState,
+        0/* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t torqueDemandMaxCommandDefinition =
+    {
+        "maxTorque",
+        "maxTorque <maxTorque>:\r\n  Set max torque demand (Nm)\r\n",
+        torqueDemandMaxCommand,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t speedLimitCommandDefinition =
+    {
+        "speedLimit",
+        "speedLimit <maxSpeed>:\r\n  Set max speed (rpm)\r\n",
+        speedLimitCommand,
+        1 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t mcInitCommandDefinition =
+    {
+        "mcInit",
+        "mcInit :\r\n  Set max speed (rpm)\r\n",
+        mcInitCommand,
+        0 /* Number of parameters */
+    };
+
+    static const CLI_Command_Definition_t beagleBonePowerCommandDefinition =
+    {
+        "BB",
+        "BB <on|off>:\r\n  sets the power state for the BeagleBone\r\n",
+        beagleBonePower,
+        1 /* Number of parameters */
+    };
+
     if (FreeRTOS_CLIRegisterCommand(&throttleABCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
