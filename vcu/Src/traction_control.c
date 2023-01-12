@@ -79,10 +79,11 @@ static float get_RL_speed()
 float kP = kP_DEFAULT;
 float error_floor = ERROR_FLOOR_RADS_DEFAULT;
 float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
+traction_control_task_period = TRACTION_CONTROL_TASK_PERIOD_MS;
 
 void tractionControlTask(void *pvParameters)
 {
-	if (registerTaskToWatch(TRACTION_CONTROL_TASK_ID, 2*pdMS_TO_TICKS(TRACTION_CONTROL_TASK_PERIOD_MS), false, NULL) != HAL_OK)
+	if (registerTaskToWatch(TRACTION_CONTROL_TASK_ID, 2*pdMS_TO_TICKS(traction_control_task_period), false, NULL) != HAL_OK)
 	{
 		ERROR_PRINT("ERROR: Failed to init traction control task, suspending traction control task\n");
 		while(1);
@@ -165,7 +166,7 @@ void tractionControlTask(void *pvParameters)
 
 		// Always poll at almost exactly PERIOD
         watchdogTaskCheckIn(TRACTION_CONTROL_TASK_ID);
-		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(TRACTION_CONTROL_TASK_PERIOD_MS));
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(traction_control_task_period));
 	}
 
 }

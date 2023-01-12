@@ -11,6 +11,7 @@
 #include "bsp.h"
 #include "motorController.h"
 #include "beaglebone.h"
+#include "traction_control.h"
 
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
@@ -330,6 +331,26 @@ static const CLI_Command_Definition_t setErrorFloorCommandDefinition =
     1 /* Number of parameters */
 };
 
+BaseType_t setTractionControlTaskPeriod(char *writeBuffer, size_t writeBufferLength,
+                                        const char *commandString)
+{
+    BaseType_t paramLen;
+    const char *tractionControlTaskPeriodString = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+
+    sscanf(tractionControlTaskPeriodString, "%hu", &traction_control_task_period);
+
+    COMMAND_OUTPUT("Setting traction control task period to %hu (ms)\n", traction_control_task_period);
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setTractionControlTaskPeriodCommandDefinition = {
+    "setTractionControlTaskPeriod",
+    "setTractionControlTaskPeriod <tractionControlTaskPeriod>:\r\n set traction control task period (ms)\r\n",
+    setTractionControlTaskPeriod,
+    1
+};
+
 BaseType_t setAdjustmentFloor(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -522,6 +543,9 @@ HAL_StatusTypeDef stateMachineMockInit()
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&setErrorFloorCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&setTractionControlTaskPeriodCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&setAdjustmentFloorCommandDefinition) != pdPASS) {
