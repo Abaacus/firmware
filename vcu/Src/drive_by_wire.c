@@ -287,7 +287,7 @@ HAL_StatusTypeDef turnOnMotorControllers() {
     if (rc == pdFALSE) {
         DEBUG_PRINT("Timed out waiting for mc on\n");
         return HAL_TIMEOUT;
-    } else if (dbwTaskNotifications & (1<<NTFY_MCs_ON)) {
+    } else if (dbwTaskNotifications & (1U<<NTFY_MCs_ON)) {
         DEBUG_PRINT("PDU has turned on MCs\n");
     } else {
         ERROR_PRINT("Got unexpected notification 0x%lX\n", dbwTaskNotifications);
@@ -314,7 +314,7 @@ HAL_StatusTypeDef turnOffMotorControllers() {
     if (rc == pdFALSE) {
         DEBUG_PRINT("Timed out waiting for mc off\n");
         return HAL_TIMEOUT;
-    } else if (dbwTaskNotifications & (1<<NTFY_MCs_OFF)) {
+    } else if (dbwTaskNotifications & (1U<<NTFY_MCs_OFF)) {
         DEBUG_PRINT("PDU has turned off MCs\n");
     } else {
         ERROR_PRINT("Got unexpected notification 0x%lX\n", dbwTaskNotifications);

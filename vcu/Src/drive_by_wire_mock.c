@@ -59,11 +59,11 @@ BaseType_t pduMCsOnOffMock(char *writeBuffer, size_t writeBufferLength,
 
     if (STR_EQ(param, "on", paramLen)) {
         xTaskNotify( driveByWireHandle,
-                            (1<<NTFY_MCs_ON),
+                            (1U<<NTFY_MCs_ON),
                             eSetBits );
     } else if (STR_EQ(param, "off", paramLen)) {
         xTaskNotify( driveByWireHandle,
-                            (1<<NTFY_MCs_OFF),
+                            (1U<<NTFY_MCs_OFF),
                             eSetBits );
     } else {
         COMMAND_OUTPUT("Unknown parameter\n");
