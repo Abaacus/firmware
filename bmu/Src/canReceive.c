@@ -24,18 +24,6 @@
 #include "task.h"
 #include "cmsis_os.h"
 
-static DTC_History_t LatestDTCs;
-
-void DTC_History_init() {
-    LatestDTCs.tail = 0;
-    for (uint8_t i = 0; i < DTC_HISTORY_LENGTH; i++) {
-        LatestDTCs.dtcs[i].code = EMPTY_DTC_ENTRY;
-    }
-}
-
-DTC_History_t * get_DTC_History() {
-    return &LatestDTCs;
-}
 
 void CAN_Msg_DCU_buttonEvents_Callback()
 {
@@ -84,18 +72,6 @@ void CAN_Msg_UartOverCanConfig_Callback()
 	isUartOverCanEnabled = UartOverCanConfigSignal & 0x2;	
 }
 
-void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
-}
-
-void CAN_Msg_DCU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
-}
-
-void CAN_Msg_VCU_F7_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
-}
-
-void CAN_Msg_ChargeCart_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
+void CAN_Msg_PDU_DTC_Callback(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data) {
+    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }

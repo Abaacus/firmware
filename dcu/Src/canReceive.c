@@ -59,7 +59,7 @@ void CAN_Msg_VCU_EM_State_Callback()
  * BMU DTC callback.
  * Used to turn on IMD and AMS fault lights when AMS or IMD fault is received
  */
-void CAN_Msg_BMU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data)
+void CAN_Msg_BMU_DTC_Callback(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data)
 {
     if (DTC_CODE == FATAL_IMD_Failure) 
     {

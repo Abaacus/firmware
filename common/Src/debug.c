@@ -6,6 +6,7 @@
 #include "task.h"
 #include "userCan.h"
 #include "canHeartbeat.h"
+#include "canReceiveCommon.h"
 
 // Send a CLI string to the uart to be printed. Only for use by the CLI
 // buf must be of length PRINT_QUEUE_STRING_SIZE (this is always true for CLI
@@ -437,6 +438,45 @@ static const CLI_Command_Definition_t versionCLICommandDefinition =
 };
 
 
+#if IS_BOARD_F7
+BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    DTC_History_t * DTC_Log = get_DTC_History();
+
+    static uint8_t DTCs_index = DTC_HISTORY_LENGTH;
+
+    if (DTCs_index == DTC_HISTORY_LENGTH) {
+        DTCs_index = DTC_Log->tail - 1;
+    }
+
+    // If we find an empty DTC entry, we have iterated the entire log
+    if (DTC_Log->dtcs[DTCs_index].code == EMPTY_DTC_ENTRY) {
+        DTCs_index = DTC_HISTORY_LENGTH;
+        return pdFALSE;
+    } else {
+        COMMAND_OUTPUT("DTC: %u, Data: %llu\r\n", DTC_Log->dtcs[DTCs_index].code, DTC_Log->dtcs[DTCs_index].data);
+        // If the tail is the next index, we have iterated the entire log
+        if (DTCs_index == DTC_Log->tail) {
+            DTCs_index = DTC_HISTORY_LENGTH;
+            return pdFALSE;
+        } else {
+            DTCs_index = (DTCs_index - 1 + DTC_HISTORY_LENGTH) % DTC_HISTORY_LENGTH;
+
+            return pdTRUE;
+        }
+    }
+}
+static const CLI_Command_Definition_t printDTCsCommandDefinition =
+{
+    "printDTCs",
+    "printDTCs:\r\n  Prints the 10 most recent fatal or critical DTCs received \r\n",
+    printDTCs,
+    0 /* Number of parameters */
+};
+#endif
+
+
 HAL_StatusTypeDef debugInit()
 {
     printQueue = xQueueCreate(PRINT_QUEUE_LENGTH, PRINT_QUEUE_STRING_SIZE);
@@ -476,6 +516,11 @@ HAL_StatusTypeDef debugInit()
     if (FreeRTOS_CLIRegisterCommand(&boardHeartbeatInfoCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
+    #if IS_BOARD_F7
+    if (FreeRTOS_CLIRegisterCommand(&printDTCsCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    #endif
     return HAL_OK;
 }
 

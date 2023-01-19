@@ -482,14 +482,6 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
         }
     }
 }
-static const CLI_Command_Definition_t printDTCsCommandDefinition =
-{
-    "printDTCs",
-    "printDTCs:\r\n  Prints the 10 most recent fatal or critical DTCs received \r\n",
-    printDTCs,
-    0 /* Number of parameters */
-};
-
 
 HAL_StatusTypeDef mockStateMachineInit()
 {
@@ -539,9 +531,6 @@ HAL_StatusTypeDef mockStateMachineInit()
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&controlFansCommandDefinition) != pdPASS) {
-        return HAL_ERROR;
-    }
-    if (FreeRTOS_CLIRegisterCommand(&printDTCsCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
     return HAL_OK;

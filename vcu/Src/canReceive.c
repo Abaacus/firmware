@@ -18,20 +18,6 @@
 
 #include "canReceive.h"
 #include "canReceiveCommon.h"
-
-static DTC_History_t LatestDTCs;
-
-void DTC_History_init() {
-    LatestDTCs.tail = 0;
-    for (uint8_t i = 0; i < DTC_HISTORY_LENGTH; i++) {
-        LatestDTCs.dtcs[i].code = EMPTY_DTC_ENTRY;
-    }
-}
-
-DTC_History_t * get_DTC_History() {
-    return &LatestDTCs;
-}
-
 /*
  * External Board Statuses:
  * Variables for keeping track of external board statuses that get updated by
@@ -114,8 +100,8 @@ void CAN_Msg_BMU_BrakePedalValue_Callback()
     lastBrakeValReceiveTimeTicks = xTaskGetTickCount();
 }
 
-void CAN_Msg_BMU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
+void CAN_Msg_BMU_DTC_Callback(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data) {
+    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 
     switch (DTC_CODE) {
         case WARNING_CONTACTOR_OPEN_IMPENDING:
@@ -159,8 +145,8 @@ void CAN_Msg_UartOverCanConfig_Callback()
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x1;
 }
 
-void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
+void CAN_Msg_PDU_DTC_Callback(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data) {
+    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 
     switch (DTC_CODE)
     {
@@ -172,12 +158,4 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
             // Do nothing, other events handled by fatal callback
             break;
     }
-}
-
-void CAN_Msg_DCU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
-}
-
-void CAN_Msg_ChargeCart_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data, &LatestDTCs);
 }

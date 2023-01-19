@@ -8,7 +8,7 @@
 #include "drive_by_wire_mock.h"
 #include "motorController.h"
 #include "beaglebone.h"
-
+#include "canReceiveCommon.h"
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                     signed char *pcTaskName )
@@ -49,5 +49,7 @@ void userInit()
     if (beagleboneOff() != HAL_OK) {
       Error_Handler();
     }
+
+    DTC_History_init();
 }
 
