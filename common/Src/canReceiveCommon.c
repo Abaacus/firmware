@@ -50,10 +50,9 @@ DTC_History_t * get_DTC_History() {
 }
 
 // DTC Logging for the printDTCs CLI command
-void CAN_Receive_Log_DTC(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data) {
-    if (DTC_Severity == DTC_Severity_FATAL 
-        || DTC_Severity == DTC_Severity_CRITICAL) {
-    
+void CAN_Receive_Log_DTC(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Data) {
+    if (DTC_Severity == DTC_Severity_FATAL  ||
+		DTC_Severity == DTC_Severity_CRITICAL) {
         DTC_Log.dtcs[DTC_Log.tail].code = DTC_CODE;
         DTC_Log.dtcs[DTC_Log.tail].severity = DTC_Severity;
         DTC_Log.dtcs[DTC_Log.tail].data = DTC_Data;
@@ -80,17 +79,17 @@ void CAN_Msg_UartOverCanTx_Callback()
 }
 
 #if (BOARD_ID == ID_BMU || BOARD_ID == ID_PDU)
-void CAN_Msg_VCU_F7_DTC_Callback(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data) {
+void CAN_Msg_VCU_F7_DTC_Callback(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Data) {
     CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }
 #endif
 
 #if (BOARD_ID == ID_PDU || BOARD_ID == ID_VCU_F7 || BOARD_ID == ID_BMU)
-void CAN_Msg_DCU_DTC_Callback(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data) {
+void CAN_Msg_DCU_DTC_Callback(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Data) {
     CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }
 
-void CAN_Msg_ChargeCart_DTC_Callback(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data) {
+void CAN_Msg_ChargeCart_DTC_Callback(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Data) {
     CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
 }
 #endif

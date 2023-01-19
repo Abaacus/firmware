@@ -587,7 +587,7 @@ def writeParseCanRxMessageFunction(nodeName, normalRxMessages, dtcRxMessages, mu
         fatalCallbackName = 'DTC_Fatal_Callback'
         fatalCallbackPrototype = 'void {name}(BoardIDs board)'.format(name=fatalCallbackName)
 
-        msgCallbackPrototypes.append('void {callback}(int16_t DTC_CODE, uint8_t DTC_Severity, uint64_t DTC_Data)'.format(callback=callbackName))
+        msgCallbackPrototypes.append('void {callback}(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Data)'.format(callback=callbackName))
 
         # only create one fatal callback
         if not createdFatalCallback:

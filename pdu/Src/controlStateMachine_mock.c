@@ -453,36 +453,6 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
     1 /* Number of parameters */
 };
 
-BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
-                       const char *commandString)
-{
-    DTC_History_t * DTC_Log = get_DTC_History();
-
-    static uint8_t DTCs_index = DTC_HISTORY_LENGTH;
-
-    if (DTCs_index == DTC_HISTORY_LENGTH) {
-        DTCs_index = DTC_Log->tail - 1;
-    } else if (DTCs_index == -1) {
-        DTCs_index = DTC_HISTORY_LENGTH - 1;
-    }
-
-    // If we find an empty DTC entry, we have iterated the entire log
-    if (DTC_Log->dtcs[DTCs_index].code == EMPTY_DTC_ENTRY) {
-        DTCs_index = DTC_HISTORY_LENGTH;
-        return pdFALSE;
-    } else {
-        COMMAND_OUTPUT("DTC: %u, Data: %llu\r\n", DTC_Log->dtcs[DTCs_index].code, DTC_Log->dtcs[DTCs_index].data);
-        // If the tail is the next index, we have iterated the entire log
-        if (DTCs_index == DTC_Log->tail) {
-            DTCs_index = DTC_HISTORY_LENGTH;
-            return pdFALSE;
-        } else {
-            DTCs_index--;
-            return pdTRUE;
-        }
-    }
-}
-
 HAL_StatusTypeDef mockStateMachineInit()
 {
     if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {

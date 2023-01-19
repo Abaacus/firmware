@@ -443,9 +443,7 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     DTC_History_t * DTC_Log = get_DTC_History();
-
     static uint8_t DTCs_index = DTC_HISTORY_LENGTH;
-
     if (DTCs_index == DTC_HISTORY_LENGTH) {
         DTCs_index = DTC_Log->tail - 1;
     }
@@ -462,7 +460,6 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
             return pdFALSE;
         } else {
             DTCs_index = (DTCs_index - 1 + DTC_HISTORY_LENGTH) % DTC_HISTORY_LENGTH;
-
             return pdTRUE;
         }
     }
