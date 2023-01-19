@@ -21,19 +21,13 @@ float32_t lowPassFilter_state[4*NUM_SECTIONS] = {0};
 
 void filtersInit()
 {
-   int k=0;
    for (int i=0; i<NUM_SECTIONS; i++)
    {
-      lowPassFilter_coeffs[k] = b[i][0];
-      k++;
-      lowPassFilter_coeffs[k] = b[i][1];
-      k++;
-      lowPassFilter_coeffs[k] = b[i][2];
-      k++;
-      lowPassFilter_coeffs[k] = -a[i][1];
-      k++;
-      lowPassFilter_coeffs[k] = -a[i][2];
-      k++;
+      lowPassFilter_coeffs[0] = b[i][0];
+      lowPassFilter_coeffs[1] = b[i][1];
+      lowPassFilter_coeffs[2] = b[i][2];
+      lowPassFilter_coeffs[3] = -a[i][1];
+      lowPassFilter_coeffs[4] = -a[i][2];
    }
    lowPassFilterInstance.numStages = NUM_SECTIONS;
    lowPassFilterInstance.pState = lowPassFilter_state;
