@@ -8,6 +8,21 @@
 
 extern uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 
+BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    COMMAND_OUTPUT("isUartOverCanEnabled: %u\n", isUartOverCanEnabled);
+
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
+{
+    "isUartOverCanEnabled",
+    "isUartOverCanEnabled help string",
+    debugUartOverCan,
+    0 /* Number of parameters */
+};
+
 BaseType_t getChannelCurrents(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -352,7 +367,7 @@ BaseType_t printPowerStates(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
 
-    COMMAND_OUTPUT("States:\n DC present:%d\n", IS_DC_DC_ON);
+    COMMAND_OUTPUT("States:\n DC present:%d, BMGR1: %d, BMGR2: %d, BMGR3:%d\n", IS_DC_DC_ON, BMGR_GPIO1_STATE, BMGR_GPIO2_STATE, BMGR_GPIO3_STATE);
     return pdFALSE;
 }
 static const CLI_Command_Definition_t printPowerStatesCommandDefinition =
@@ -437,6 +452,9 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
 
 HAL_StatusTypeDef mockStateMachineInit()
 {
+    if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
     if (FreeRTOS_CLIRegisterCommand(&criticalCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }

@@ -28,7 +28,7 @@ DTC CODE,NAME,ORIGIN,SEVERITY,SUBSCRIBERS,DATA,MESSAGE
 27, BPS_FAIL,VCU_F7,2,"PDU,BMU,VCU_BEAGLEBONE,DCU",NA,Bps sensor detected a failure
 28, Brake_Pressure_FAIL,VCU_F7,2,"PDU,BMU,VCU_BEAGLEBONE,DCU",NA,Brake pressure sensor detected a failure
 29, DCU_CAN_Timeout,VCU_F7,1,"PDU,BMU,VCU_BEAGLEBONE,DCU",NA,DCU CAN Timeout occured
-30, Throtte_Failure,VCU_F7,2,"PDU,BMU,VCU_BEAGLEBONE,DCU",NA,Throttle implausibility occured
+30, Throtte_Failure,VCU_F7,2,"PDU,BMU,VCU_BEAGLEBONE,DCU",ThrottleFailure,Throttle implausibility occured
 31,PrechargeFailed,BMU,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE",Step,Precharge process failed during step #data
 32,DischargeFailed,BMU,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE",Step,Discharge process failed during step #data
 33,IMD_Failure,BMU,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE",Status,IMD detected a fault. Value is of enum IMDStatus in imdDriver.h
@@ -53,3 +53,8 @@ DTC CODE,NAME,ORIGIN,SEVERITY,SUBSCRIBERS,DATA,MESSAGE
 52,CELL_TEMP_LOW,BMU,2,"DCU,VCU_F7,VCU_BEAGLEBONE",CellNumber,Cell #data temp critically low
 53,ERROR_HANDLER,"DCU,VCU_F7,BMU,PDU,WSB",4,VCU_BEAGLEBONE,file_spec,Error_Handler called on specifier
 54,DCDC_Shutoff,PDU,3,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU,ChargeCart,WSBFL,WSBFR,WSBRL,WSBRR",NA,DCDC shutoff
+55,LV_Battery_Low,PDU,4,"VCU_F7,VCU_BEAGLEBONE",NA,LV battery below 10V
+56,MOTOR_CONTROLLERS_FAULT_OFF,VCU_F7,4,"DCU,VCU_F7,VCU_BEAGLEBONE,BMU",MotorLeft,"Motor controllers in fault off state"
+57,VCU_F7_EM_ENABLED_ERROR,VCU_F7,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU",NA,"VCU: Unknown EM Fault"
+58,VCU_F7_EV_FATAL,VCU_F7,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU",NA,"VCU: Got Fatal DTC"
+59, VCU_F7_NoTransition,VCU_F7,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU",NA,VCU: No state machine transition found
