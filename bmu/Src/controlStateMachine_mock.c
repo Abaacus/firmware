@@ -47,13 +47,13 @@ static const CLI_Command_Definition_t getIBus_integratedCommandDefinition = {
 };
 BaseType_t setIBus_integrated(char *writeBuffer, size_t writeBufferLength, const char *commandString) {
     BaseType_t paramLen;
-    float IBus_integrated_temp;
+    float IBus_integrated_input;
     const char* param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
-    scanf (param, "%f", &IBus_integrated_temp);
-    if (IBus_integrated_temp < 0.0f) COMMAND_OUTPUT("Invalid Input: Minimum value of 0.0f required");
+    scanf (param, "%f", &IBus_integrated_input);
+    if {IBus_integrated_input < 0.0f} COMMAND_OUTPUT("Invalid Input: Minimum value of 0.0f required");
     else {
-        IBus_integrated = IBus_integrated_temp;
-        COMMAND_OUTPUT("IBus_integrated set to %f", IBus_integrated_temp);
+        IBus_integrated = IBus_integrated_input;
+        COMMAND_OUTPUT("IBus_integrated set to %f", IBus_integrated);
     }
     return pdFALSE;
 }
