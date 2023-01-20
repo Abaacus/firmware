@@ -26,11 +26,11 @@ static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
 BaseType_t getChannelCurrents(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    for (int i=0; i<NUM_PDU_CHANNELS; i++) {
-        if (i == LV_Voltage) {
+    for (int i=0; i < (int) NUM_PDU_CHANNELS; i++) {
+        if (i == (int) LV_Voltage) {
             DEBUG_PRINT("Bus Voltage: %f V\n", readBusVoltage());
             continue;
-        } else if (i == LV_Current) {
+        } else if (i == (int) LV_Current) {
             DEBUG_PRINT("Bus current: %f A\n", readBusCurrent());
             continue;
         }
@@ -73,7 +73,7 @@ BaseType_t setChannelCurrent(char *writeBuffer, size_t writeBufferLength,
 
     sscanf(idxParam, "%u", &channelIdx);
 
-    if ((channelIdx < 0) || (channelIdx >= NUM_PDU_CHANNELS)) {
+    if ((channelIdx < 0) || (channelIdx >= (int) NUM_PDU_CHANNELS)) {
         COMMAND_OUTPUT("channelIdx Index must be between 0 and %d\n", NUM_PDU_CHANNELS);
         return pdFALSE;
     }
@@ -287,7 +287,7 @@ BaseType_t printStates(char *writeBuffer, size_t writeBufferLength,
     if(count == 0){
         uint8_t cool_index;
         cool_index = fsmGetState(&coolingFsmHandle);
-        if (cool_index >= 0 && cool_index < COOL_STATE_ANY){
+        if (cool_index >= (uint8_t) 0 && cool_index < (uint8_t) COOL_STATE_ANY){
             COMMAND_OUTPUT("States:\nCooling: %s\n", PDU_Cool_States_String[cool_index]);
         }else{
             COMMAND_OUTPUT("States:\nError: cool state index out of range. Cool State Index: %u\n", cool_index);
@@ -297,7 +297,7 @@ BaseType_t printStates(char *writeBuffer, size_t writeBufferLength,
     }else if(count == 1){
         uint8_t motor_index;
         motor_index = fsmGetState(&motorFsmHandle);
-        if (motor_index >= 0 && motor_index < MTR_STATE_ANY){
+        if (motor_index >= (uint8_t) 0 && motor_index < (uint8_t) MTR_STATE_ANY){
             COMMAND_OUTPUT("Motor: %s\n", PDU_Motor_States_String[motor_index]);
         }else{
             COMMAND_OUTPUT("Error: motor state index out of range. Motor State Index: %u\n", motor_index);
@@ -307,7 +307,7 @@ BaseType_t printStates(char *writeBuffer, size_t writeBufferLength,
     }else if(count == 2){
         uint8_t main_index;
         main_index = fsmGetState(&mainFsmHandle);
-        if (main_index >= 0 && main_index < MN_STATE_ANY){
+        if (main_index >= (uint8_t) 0 && main_index < (uint8_t) MN_STATE_ANY){
             COMMAND_OUTPUT("Main: %s\n", PDU_Main_States_String[main_index]);
         }else{
             COMMAND_OUTPUT("Error: main state index out of range. Main State Index: %u\n", main_index);
@@ -388,7 +388,7 @@ BaseType_t controlFans(char *writeBuffer, size_t writeBufferLength,
     const char *selectionParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(selectionParam, "%u", &selection);
-    if (selection & 0x1)
+    if (selection & 0x1u)
 	{
 		FAN_RIGHT_ENABLE;
 	}
@@ -396,7 +396,7 @@ BaseType_t controlFans(char *writeBuffer, size_t writeBufferLength,
 	{
 		FAN_RIGHT_DISABLE;
 	}
-	if (selection & 0x2)
+	if (selection & 0x2u)
 	{
 		FAN_LEFT_ENABLE;
 	}
@@ -424,7 +424,7 @@ BaseType_t controlPumps(char *writeBuffer, size_t writeBufferLength,
     const char *selectionParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(selectionParam, "%u", &selection);
-    if (selection & 0x1)
+    if (selection & 0x1u)
 	{
 		PUMP_RIGHT_ENABLE;
 	}
@@ -432,7 +432,7 @@ BaseType_t controlPumps(char *writeBuffer, size_t writeBufferLength,
 	{
 		PUMP_RIGHT_DISABLE;
 	}
-	if (selection & 0x2)
+	if (selection & 0x2u)
 	{
 		PUMP_LEFT_ENABLE;
 	}

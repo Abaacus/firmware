@@ -60,10 +60,10 @@ HAL_StatusTypeDef startADCConversions()
 }
 
 void printRawADCVals() {
-    for (int i=0; i < NUM_PDU_CHANNELS; i++) {
-        if (i == LV_Voltage) {
+    for (int i=0; i < (int) NUM_PDU_CHANNELS; i++) {
+        if (i == (int) LV_Voltage) {
             DEBUG_PRINT("Bus Voltage: %lu\n", ADC_Buffer[i]);
-        } else if (i == LV_Current) {
+        } else if (i == (int) LV_Current) {
             DEBUG_PRINT("Bus current: %lu\n", ADC_Buffer[i]);
         } else {
             DEBUG_PRINT("Channel %d, %s: %lu\n", i,channelNames[i], ADC_Buffer[i]);
