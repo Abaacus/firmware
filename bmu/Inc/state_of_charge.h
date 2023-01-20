@@ -5,5 +5,6 @@
 
 void integrate_bus_current(float IBus, float period_ms);
 HAL_StatusTypeDef socInit(void);
+static volatile float IBus_integrated;
 
 #endif

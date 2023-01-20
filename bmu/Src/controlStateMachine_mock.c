@@ -25,7 +25,7 @@
 #include "batteries.h"
 #include "faultMonitor.h"
 #include "ltc_chip.h"
-#include "state_of_charge.c"
+#include "state_of_charge.h"
 
 #if IS_BOARD_F7
 #include "imdDriver.h"
@@ -66,7 +66,9 @@ BaseType_t setIBus_integrated(char *writeBuffer, size_t writeBufferLength, const
     float IBus_integrated_input;
     const char* param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
     scanf (param, "%f", &IBus_integrated_input);
-    if {IBus_integrated_input < 0.0f} COMMAND_OUTPUT("Invalid Input: Minimum value of 0.0f required");
+    if (IBus_integrated_input < 0.0f) {
+        COMMAND_OUTPUT("Invalid Input: Minimum value of 0.0f required");
+    }
     else {
         IBus_integrated = IBus_integrated_input;
         COMMAND_OUTPUT("IBus_integrated set to %f", IBus_integrated);
@@ -75,7 +77,7 @@ BaseType_t setIBus_integrated(char *writeBuffer, size_t writeBufferLength, const
 }
 static const CLI_Command_Definition_t setIBus_integratedCommandDefinition = {
     "setIBus_integrated",
-    "setIBus_integrated:\r\n Set IBus_integrated\r\n",
+    "setIBus_integrated <val>:\r\n Set IBus_integrated\r\n",
     setIBus_integrated,
     1
 };
