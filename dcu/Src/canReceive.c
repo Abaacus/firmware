@@ -61,14 +61,14 @@ void CAN_Msg_VCU_EM_State_Callback()
  */
 void CAN_Msg_BMU_DTC_Callback(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Data)
 {
-    if (DTC_CODE == FATAL_IMD_Failure) 
+    if (DTC_Code == FATAL_IMD_Failure) 
     {
         ERROR_PRINT_ISR("Got IMD failure\n");
         IMD_FAIL_LED_ON
-    } else if ((DTC_CODE == CRITICAL_CELL_VOLTAGE_LOW)
-               || (DTC_CODE == CRITICAL_CELL_VOLTAGE_HIGH)
-               || (DTC_CODE == CRITICAL_CELL_TEMP_HIGH)
-               || (DTC_CODE == CRITICAL_CELL_TEMP_LOW)) {
+    } else if ((DTC_Code == CRITICAL_CELL_VOLTAGE_LOW)
+               || (DTC_Code == CRITICAL_CELL_VOLTAGE_HIGH)
+               || (DTC_Code == CRITICAL_CELL_TEMP_HIGH)
+               || (DTC_Code == CRITICAL_CELL_TEMP_LOW)) {
         ERROR_PRINT_ISR("Got AMS failure\n");
         AMS_FAIL_LED_ON
     }
