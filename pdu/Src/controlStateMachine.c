@@ -406,7 +406,8 @@ uint32_t motorsOff(uint32_t event)
         ERROR_PRINT("Failed to send pdu channel status CAN message\n");
     }
 
-    if (event == static_cast<uint32_t>(MTR_EV_EM_DISABLE)) {
+    // cppcheck-suppress misra-c2012-10.4
+    if (event == MTR_EV_EM_DISABLE) {
         return MTR_STATE_Motors_Off;
     } else {
         return MTR_STATE_Critical;
