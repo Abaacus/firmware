@@ -388,7 +388,7 @@ BaseType_t controlFans(char *writeBuffer, size_t writeBufferLength,
     const char *selectionParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(selectionParam, "%u", &selection);
-    if (selection & 0x1u)
+    if (selection & 0x1U)
 	{
 		FAN_RIGHT_ENABLE;
 	}
@@ -396,7 +396,7 @@ BaseType_t controlFans(char *writeBuffer, size_t writeBufferLength,
 	{
 		FAN_RIGHT_DISABLE;
 	}
-	if (selection & 0x2u)
+	if (selection & 0x2U)
 	{
 		FAN_LEFT_ENABLE;
 	}
@@ -424,7 +424,7 @@ BaseType_t controlPumps(char *writeBuffer, size_t writeBufferLength,
     const char *selectionParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(selectionParam, "%u", &selection);
-    if (selection & 0x1u)
+    if (selection & 0x1U)
 	{
 		PUMP_RIGHT_ENABLE;
 	}
@@ -432,7 +432,7 @@ BaseType_t controlPumps(char *writeBuffer, size_t writeBufferLength,
 	{
 		PUMP_RIGHT_DISABLE;
 	}
-	if (selection & 0x2u)
+	if (selection & 0x2U)
 	{
 		PUMP_LEFT_ENABLE;
 	}
