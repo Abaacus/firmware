@@ -45,15 +45,15 @@ void CAN_Msg_DCU_buttonEvents_Callback()
 
         fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
     }
-    else if(ButtonEnduranceToggleEnabled) 
+    else if(ButtonEnduranceToggleEnabled != 0) 
     {
 		toggle_endurance_mode();
 	}
-	else if(ButtonEnduranceLapEnabled)
+	else if(ButtonEnduranceLapEnabled != 0)
 	{
 		trigger_lap();
 	}
-	else if(ButtonTCEnabled)
+	else if(ButtonTCEnabled != 0)
 	{
 		toggle_TC();
 	}

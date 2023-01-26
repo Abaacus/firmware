@@ -97,7 +97,7 @@ void enduranceModeTask(void *pvParameters)
 	while(1)
 	{
 		uint32_t wait_flag = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(ENDURANCE_MODE_TASK_PERIOD/2));
-		if(wait_flag & (1U << ENDURANCE_MODE_FLAG_BIT))
+		if((wait_flag & (1U << ENDURANCE_MODE_FLAG_BIT)) != 0)
 		{
 			float current_limit = 0.0f;
 			// We are in endurance mode

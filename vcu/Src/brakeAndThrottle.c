@@ -319,7 +319,7 @@ void throttlePollingTask(void)
     {
         uint32_t wait_flag = ulTaskNotifyTake( pdTRUE, pdMS_TO_TICKS(THROTTLE_POLLING_TASK_PERIOD_MS/2));
 
-        if (wait_flag & (1U << THROTTLE_POLLING_FLAG_BIT))
+        if ((wait_flag & (1U << THROTTLE_POLLING_FLAG_BIT)) != 0)
         {
             //Start polling throttle and send to MC
             watchdogTaskChangeTimeout(THROTTLE_POLLING_TASK_ID, pdMS_TO_TICKS(2*THROTTLE_POLLING_PERIOD_MS));
