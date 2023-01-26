@@ -134,7 +134,7 @@ BaseType_t getThrottle(char *writeBuffer, size_t writeBufferLength,
 {
     float throttle = 0;
     ThrottleStatus_t rc = getNewThrottle(&throttle);
-    COMMAND_OUTPUT("Throttle %f, status (%s)\n", throttle, rc==THROTTLE_OK?"OK":"FAIL");
+    COMMAND_OUTPUT("Throttle %f, status (%s)\n", throttle, (rc==THROTTLE_OK)?"OK":"FAIL");
 
     /*COMMAND_OUTPUT("Vals: %lu, %lu, %lu, %lu, %lu\n", brakeThrottleSteeringADCVals[0],*/
                    /*brakeThrottleSteeringADCVals[1], brakeThrottleSteeringADCVals[2],*/
@@ -365,7 +365,7 @@ BaseType_t fakeHVStateChange(char *writeBuffer, size_t writeBufferLength,
         COMMAND_OUTPUT("Unknown parameter\n");
         return pdFALSE;
     }
-    if (HV_Power_State == HV_Power_State_On && !newHVState) {
+    if ((HV_Power_State == HV_Power_State_On) && !newHVState) {
         fsmSendEventISR(&fsmHandle, EV_Hv_Disable);
     }
 
@@ -388,7 +388,7 @@ BaseType_t printState(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     uint8_t index = fsmGetState(&fsmHandle);
-    if (index >= 0 && index < STATE_ANY){
+    if ((index >= 0) && (index < STATE_ANY)){
         COMMAND_OUTPUT("State: %s\n", VCU_States_String[index]);
     } else {
         COMMAND_OUTPUT("Error: state index out of range. Index: %u\n", index);

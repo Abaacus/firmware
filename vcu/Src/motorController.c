@@ -154,7 +154,7 @@ HAL_StatusTypeDef mcInit()
     DEBUG_PRINT("Starting MC Left...\n");
 
     uint32_t startTick = xTaskGetTickCount();
-    while ((xTaskGetTickCount() - startTick < (INVERTER_ON_TIMEOUT_MS)) &&
+    while (((xTaskGetTickCount() - startTick) < (INVERTER_ON_TIMEOUT_MS)) &&
            ((StateInverterLeft & INVERTER_STATE_MASK) != INVERTER_BRIDGE_DISABLED))
     {
         sendThrottleValueToMCs(0, 0);
@@ -172,7 +172,7 @@ HAL_StatusTypeDef mcInit()
     DEBUG_PRINT("Starting MC Right...\n");
 
     startTick = xTaskGetTickCount();
-    while ((xTaskGetTickCount() - startTick < (INVERTER_ON_TIMEOUT_MS)) &&
+    while (((xTaskGetTickCount() - startTick) < (INVERTER_ON_TIMEOUT_MS)) &&
            ((StateInverterRight & INVERTER_STATE_MASK) != INVERTER_BRIDGE_DISABLED))
     {
         sendThrottleValueToMCs(0, 0);
@@ -227,7 +227,7 @@ float map_range_float(float in, float low, float high, float low_out, float high
     float in_range = high - low;
     float out_range = high_out - low_out;
 
-    return (in - low) * out_range / in_range + low_out;
+    return (((in - low) * out_range) / in_range) + low_out;
 }
 
 float limit(float in, float min, float max)
@@ -242,8 +242,8 @@ float limit(float in, float min, float max)
 }
 
 bool is_wheel_within_deadzone(int steeringAngle) {
-    if (steeringAngle >= TV_DEADZONE_END_LEFT && 
-        steeringAngle <= TV_DEADZONE_END_RIGHT) {
+    if ((steeringAngle >= TV_DEADZONE_END_LEFT) && 
+        (steeringAngle <= TV_DEADZONE_END_RIGHT)) {
             return true;
     }
     return false;

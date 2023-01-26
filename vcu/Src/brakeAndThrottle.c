@@ -59,7 +59,7 @@ int map_range(int in, int low, int high, int low_out, int high_out) {
     int in_range = high - low;
     int out_range = high_out - low_out;
 
-    return (in - low) * out_range / in_range + low_out;
+    return ((in - low) * out_range) / (in_range + low_out);
 }
 
 float getBrakePositionPercent()
@@ -69,11 +69,11 @@ float getBrakePositionPercent()
 }
 
 bool is_throttle1_in_range(uint32_t throttle) {
-  return throttle <= THROTT_A_HIGH+MAX_THROTTLE_A_DEADZONE && throttle >= THROTT_A_LOW-MAX_THROTTLE_A_DEADZONE;
+  return (throttle <= (THROTT_A_HIGH + MAX_THROTTLE_A_DEADZONE)) && (throttle >= (THROTT_A_LOW - MAX_THROTTLE_A_DEADZONE));
 }
 
 bool is_throttle2_in_range(uint32_t throttle) {
-  return throttle <= THROTT_B_HIGH+MAX_THROTTLE_B_DEADZONE && throttle >= THROTT_B_LOW - MAX_THROTTLE_B_DEADZONE;
+  return (throttle <= (THROTT_B_HIGH + MAX_THROTTLE_B_DEADZONE)) && (throttle >= (THROTT_B_LOW - MAX_THROTTLE_B_DEADZONE));
 }
 
 uint16_t calculate_throttle_percent1(uint16_t tps_value)
@@ -101,7 +101,7 @@ uint16_t calculate_throttle_adc_from_percent2(uint16_t percent)
 
 bool is_tps_within_tolerance(uint16_t throttle1_percent, uint16_t throttle2_percent)
 {
-    if (throttle1_percent == throttle2_percent
+    if ((throttle1_percent == throttle2_percent)
         || ((throttle1_percent > throttle2_percent) && ((throttle1_percent - throttle2_percent) < TPS_TOLERANCE_PERCENT))
         || ((throttle2_percent > throttle1_percent) && ((throttle2_percent - throttle1_percent) < TPS_TOLERANCE_PERCENT)))
     {
@@ -175,7 +175,7 @@ ThrottleStatus_t getNewThrottle(float *throttleOut)
     }
 
     // check if both throttle and brake are pressed
-    if (isBrakePressedHard() && throttle > TPS_MAX_WHILE_BRAKE_PRESSED_PERCENT) {
+    if (isBrakePressedHard() && (throttle > TPS_MAX_WHILE_BRAKE_PRESSED_PERCENT)) {
         (*throttleOut) = 0;
         throttleAndBrakePressedError = true;
         sendDTC_WARNING_BrakeWhileThrottleError_Disabled();

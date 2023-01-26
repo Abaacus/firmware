@@ -74,14 +74,14 @@ static HAL_StatusTypeDef compute_discharge_limit(float * current_limit)
 	float error = expected_soc - soc;
 	
 	// We want to prevent integral windup when in saturation region
-	if(last_output_current < DISCHARGE_CURRENT_MAX_A - SATURATION_INTEGRAL_BUFFER
-			&& last_output_current > DISCHARGE_CURRENT_MIN_A + SATURATION_INTEGRAL_BUFFER)
+	if(last_output_current < (DISCHARGE_CURRENT_MAX_A - SATURATION_INTEGRAL_BUFFER)
+			&& (last_output_current > (DISCHARGE_CURRENT_MIN_A + SATURATION_INTEGRAL_BUFFER)))
 	{
 		// integral error, dt = 1 as our time is 1 lap
 		error_accum += error;
 	}
 	
-	float output_current = last_output_current - (error*em_kP + error_accum*em_kI);
+	float output_current = last_output_current - ((error*em_kP) + (error_accum*em_kI));
 	*current_limit = clamp_motor_current(output_current);	
 	last_output_current = *current_limit;
 	return HAL_OK;

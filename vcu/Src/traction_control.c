@@ -129,7 +129,7 @@ void tractionControlTask(void *pvParameters)
 			error_right = RR_speed - FR_speed;
 
 			//calculate error. This is a P-controller
-			if(error_left > error_floor || error_right > error_floor)
+			if((error_left > error_floor) || (error_right > error_floor))
 			{
 				if (error_left > error_right)
 				{

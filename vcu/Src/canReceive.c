@@ -63,8 +63,8 @@ void CAN_Msg_PDU_ChannelStatus_Callback()
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     
-    if (!motorControllersStatus && StatusPowerMCLeft == StatusPowerMCLeft_CHANNEL_ON &&
-        StatusPowerMCRight == StatusPowerMCRight_CHANNEL_ON) {
+    if (!motorControllersStatus && (StatusPowerMCLeft == StatusPowerMCLeft_CHANNEL_ON) &&
+        (StatusPowerMCRight == StatusPowerMCRight_CHANNEL_ON)) {
         xTaskNotifyFromISR( driveByWireHandle,
                             (1<<NTFY_MCs_ON),
                             eSetBits,
