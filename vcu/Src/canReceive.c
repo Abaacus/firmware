@@ -39,7 +39,7 @@ extern osThreadId driveByWireHandle;
 void CAN_Msg_DCU_buttonEvents_Callback()
 {
 	DEBUG_PRINT_ISR("Received DCU button Event\n");
-    if (ButtonEMEnabled) {
+    if (ButtonEMEnabled == 1) {
 		DEBUG_PRINT_ISR("Received ButtonEMEnabled CAN signal\n");
         fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
     }
