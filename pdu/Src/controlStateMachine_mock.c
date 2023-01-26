@@ -8,6 +8,21 @@
 
 extern uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 
+BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    COMMAND_OUTPUT("isUartOverCanEnabled: %u\n", isUartOverCanEnabled);
+
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
+{
+    "isUartOverCanEnabled",
+    "isUartOverCanEnabled help string",
+    debugUartOverCan,
+    0 /* Number of parameters */
+};
+
 BaseType_t getChannelCurrents(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -58,7 +73,7 @@ BaseType_t setChannelCurrent(char *writeBuffer, size_t writeBufferLength,
 
     sscanf(idxParam, "%u", &channelIdx);
 
-    if (channelIdx < 0 || channelIdx >= NUM_PDU_CHANNELS) {
+    if ((channelIdx < 0) || (channelIdx >= NUM_PDU_CHANNELS)) {
         COMMAND_OUTPUT("channelIdx Index must be between 0 and %d\n", NUM_PDU_CHANNELS);
         return pdFALSE;
     }
@@ -267,8 +282,41 @@ static const CLI_Command_Definition_t mockOverTempCommandDefinition =
 BaseType_t printStates(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    COMMAND_OUTPUT("States:\nCooling: %ld\nMotors: %ld\nMain: %ld\n", fsmGetState(&coolingFsmHandle), fsmGetState(&motorFsmHandle), fsmGetState(&mainFsmHandle));
-    return pdFALSE;
+    static int count = 0;
+
+    if(count == 0){
+        uint8_t cool_index;
+        cool_index = fsmGetState(&coolingFsmHandle);
+        if (cool_index >= 0 && cool_index < COOL_STATE_ANY){
+            COMMAND_OUTPUT("States:\nCooling: %s\n", PDU_Cool_States_String[cool_index]);
+        }else{
+            COMMAND_OUTPUT("States:\nError: cool state index out of range. Cool State Index: %u\n", cool_index);
+        }
+        count++;
+        return pdTRUE;
+    }else if(count == 1){
+        uint8_t motor_index;
+        motor_index = fsmGetState(&motorFsmHandle);
+        if (motor_index >= 0 && motor_index < MTR_STATE_ANY){
+            COMMAND_OUTPUT("Motor: %s\n", PDU_Motor_States_String[motor_index]);
+        }else{
+            COMMAND_OUTPUT("Error: motor state index out of range. Motor State Index: %u\n", motor_index);
+        }
+        count++;
+        return pdTRUE;
+    }else if(count == 2){
+        uint8_t main_index;
+        main_index = fsmGetState(&mainFsmHandle);
+        if (main_index >= 0 && main_index < MN_STATE_ANY){
+            COMMAND_OUTPUT("Main: %s\n", PDU_Main_States_String[main_index]);
+        }else{
+            COMMAND_OUTPUT("Error: main state index out of range. Main State Index: %u\n", main_index);
+        }
+        return pdFALSE;
+    }else{
+        COMMAND_OUTPUT("\nError: count out of range. count: %d\n", count);
+        return pdFALSE;
+    }
 }
 static const CLI_Command_Definition_t printStateCommandDefinition =
 {
@@ -319,7 +367,7 @@ BaseType_t printPowerStates(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
 
-    COMMAND_OUTPUT("States:\n DC present:%d\n", IS_DC_DC_ON);
+    COMMAND_OUTPUT("States:\n DC present:%d, BMGR1: %d, BMGR2: %d, BMGR3:%d\n", IS_DC_DC_ON, BMGR_GPIO1_STATE, BMGR_GPIO2_STATE, BMGR_GPIO3_STATE);
     return pdFALSE;
 }
 static const CLI_Command_Definition_t printPowerStatesCommandDefinition =
@@ -404,6 +452,9 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
 
 HAL_StatusTypeDef mockStateMachineInit()
 {
+    if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
     if (FreeRTOS_CLIRegisterCommand(&criticalCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }

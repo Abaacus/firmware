@@ -18,6 +18,7 @@
 #include "userCan.h"
 #include "dcu_can.h"
 #include "controlStateMachine.h"
+#include "controlStateMachine_mock.h"
 /**
  * Called by FreeRTOS on stack overflow
  */
@@ -37,20 +38,28 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 void userInit()
 {
     /* Should be the first thing initialized, otherwise print will fail */
-    if (debugInit() != HAL_OK) {
-        Error_Handler();
-    }
-
-    if (uartStartReceiving(&DEBUG_UART_HANDLE) != HAL_OK)
+    if (debugInit() != HAL_OK) 
     {
         Error_Handler();
     }
 
-    if (canInit(&CAN_HANDLE) != HAL_OK) {
+    if (uartStartReceiving(&DEBUG_UART_HANDLE) != HAL_OK) 
+    {
         Error_Handler();
     }
-    if(dcuFsmInit() != HAL_OK){
+
+    if (canInit(&CAN_HANDLE) != HAL_OK) 
+    {
         Error_Handler();
+    }
+    
+    if (dcuFsmInit() != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    if (stateMachineMockInit() != HAL_OK) {
+      Error_Handler();
     }
 
     HV_Power_State = 0;

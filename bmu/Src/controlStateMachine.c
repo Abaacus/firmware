@@ -48,6 +48,10 @@ uint32_t systemUpCheck(uint32_t event);
 uint32_t systemNotReady(uint32_t event);
 uint32_t cockpitBRBPressed(uint32_t event);
 uint32_t cockpitBRBReleased(uint32_t event);
+uint32_t startBalance(uint32_t event);
+uint32_t balanceStopRequest(uint32_t event);
+uint32_t stopBalance(uint32_t event);
+uint32_t balanceDone(uint32_t event);
 
 Transition_t transitions[] = {
     { STATE_Self_Check, EV_Init, &runSelftTests },
@@ -55,12 +59,18 @@ Transition_t transitions[] = {
     { STATE_Wait_System_Up, EV_FaultMonitorReady, &systemUpCheck },
     { STATE_Wait_System_Up, EV_ANY, &systemNotReady },
 
+    //Balance
+    { STATE_HV_Disable, EV_Balance_Start, &startBalance }, // A request was made via the CLI to start cell balancing
+    { STATE_Balancing,  EV_Balance_Stop, &balanceStopRequest }, //A request was made via the CLI to request stop. Once the battery task exits the balancing loop it will send an EV_Notification_Stop
+    { STATE_Balancing,  EV_Notification_Stop, &stopBalance }, // Cell balancing was stopped and battery task is back to normal
+    { STATE_Balancing, EV_Notification_Done, &balanceDone }, // Cell balancing is done and battery task is back to normal
+
     // Charge
     { STATE_HV_Disable, EV_Enter_Charge_Mode, &enterChargeMode },
     { STATE_HV_Enable, EV_Charge_Start, &startCharge },
-    { STATE_Charging, EV_Charge_Stop, &stopCharge },
-    { STATE_Charging, EV_Charge_Done, &chargeDone }, // Takes precedence over next transition
-    { STATE_ANY, EV_Charge_Stop, &controlDoNothing }, // Must be after charging charge stop
+    { STATE_Charging, EV_Notification_Stop, &stopCharge },
+    { STATE_Charging, EV_Notification_Done, &chargeDone }, // Takes precedence over next transition
+    { STATE_ANY, EV_Notification_Stop, &controlDoNothing }, // Must be after charging charge stop
 
     // PCDC
     { STATE_HV_Disable, EV_HV_Toggle, &startPrecharge },
@@ -76,8 +86,8 @@ Transition_t transitions[] = {
 	// Cockpit BRB pressed/unpressed
 	{ STATE_ANY, EV_Cockpit_BRB_Pressed, &cockpitBRBPressed },
 	{ STATE_Failure_CBRB_Disabled, EV_Cockpit_BRB_Unpressed, &cockpitBRBReleased},
-	{ STATE_Failure_CBRB_Discharge, EV_Cockpit_BRB_Unpressed, &cockpitBRBReleased},
-    { STATE_Failure_CBRB_Discharge, EV_Discharge_Finished, &dischargeFinished },
+	{ STATE_Failure_CBRB_Enabled, EV_Cockpit_BRB_Unpressed, &startPrecharge},
+    { STATE_Failure_CBRB_Enabled, EV_Discharge_Finished, &dischargeFinished },
 
     // Already in failure, do nothing
     // Takes priority over rest of events
@@ -102,7 +112,7 @@ HAL_StatusTypeDef controlInit()
     init.eventQueueLength = 5;
     init.watchdogTaskId = 1;
     if (fsmInit(STATE_Self_Check, &init, &fsmHandle) != HAL_OK) {
-        ERROR_PRINT("Failed to init control fsm\n");
+        ERROR_PRINT("Control fsm init Failed\n");  //Failed to init control fsm
         return HAL_ERROR;
     }
 
@@ -193,7 +203,7 @@ uint32_t runSelftTests(uint32_t event)
     //   - ADOL to compare ADCs
     //   - AXOW for an auxillary open wire check
 
-    DEBUG_PRINT("Self tests done, waiting for system to come up\n");
+    DEBUG_PRINT("Tests done awaiting system\n");    //Self tests done, wating for system to come up
 
     // On startup, we aren't in charge mode until otherwise notified
     gChargeMode = false;
@@ -208,7 +218,7 @@ uint32_t controlDoNothing(uint32_t event)
 
 uint32_t DefaultTransition(uint32_t event)
 {
-    ERROR_PRINT("No transition function registered for state %lu, event %lu\n",
+    ERROR_PRINT("No trans func - %lu, %lu\n",      //No transition function registered for state %lu, event %lu\n
                 fsmGetState(&fsmHandle), event);
 
     sendDTC_WARNING_BMU_UNKOWN_EVENT_STATE_COMBO(event);
@@ -245,9 +255,9 @@ uint32_t dischargeFinished(uint32_t event)
     sendCAN_BMU_HV_Power_State();
 
     DC_DC_OFF;
-	if(currentState == STATE_Failure_CBRB_Discharge || currentState == STATE_Failure_CBRB_Disabled)
+	if(currentState == STATE_Failure_CBRB_Enabled || currentState == STATE_Failure_CBRB_Disabled)
 	{
-		return STATE_Failure_CBRB_Disabled;
+		return currentState;
 	}
     return STATE_HV_Disable;
 }
@@ -273,14 +283,14 @@ uint32_t stopDischarge()
 
 void sendStopPrecharge()
 {
-    DEBUG_PRINT("send notification to stopPrecharge\n");
+    DEBUG_PRINT("sending stopPrecharge\n");    //send notification to stopPrecharge
     xTaskNotify(PCDCHandle, (1<<STOP_NOTIFICATION), eSetBits);
 }
 
 uint32_t handleFault(uint32_t event)
 {
     sendDTC_FATAL_BMU_ERROR();
-    ERROR_PRINT("State machine received fault\n");
+    ERROR_PRINT("SM received fault\n");      //State machine received fault
 
     uint32_t currentState = fsmGetState(&fsmHandle);
 
@@ -292,12 +302,12 @@ uint32_t handleFault(uint32_t event)
     switch (currentState) {
         case STATE_HV_Disable:
             {
-                DEBUG_PRINT("HV disabled fault, do nothing\n");
+                DEBUG_PRINT("HVdown flt, do nothing\n");     //HV disabled fault, do nothing
             }
             break;
         case STATE_HV_Enable:
             {
-                DEBUG_PRINT("hvEnabledHVFault, starting discharge\n");
+                DEBUG_PRINT("hvEnabledHVFault, discharging\n");      //hvEnabledHVFault, starting discharge
                 xTaskNotify(PCDCHandle, (1<<DISCHARGE_NOTIFICATION), eSetBits);
                 return STATE_Failure_Fatal;
             }
@@ -314,12 +324,12 @@ uint32_t handleFault(uint32_t event)
             break;
         case STATE_Discharge:
             {
-                DEBUG_PRINT("Fault during discharge. Attempting to continue discharge\n");
+                DEBUG_PRINT("Flt, cont discharge\n");      //Fault during discharge. Attempting to continue discharge
             }
             break;
         default:
             {
-                ERROR_PRINT("HV Fault during other state. Starting discharge\n");
+                ERROR_PRINT("Oth State HV flt discharging\n");      //HV Fault during other state. Starting discharge
                 xTaskNotify(PCDCHandle, (1<<DISCHARGE_NOTIFICATION), eSetBits);
             }
             break;
@@ -333,6 +343,37 @@ uint32_t stopPrecharge(uint32_t event)
     DEBUG_PRINT("Stopping precharge\n");
     sendStopPrecharge();
 
+    return STATE_HV_Disable;
+}
+
+//A start balance command was issued from the CLI
+uint32_t startBalance(uint32_t event)
+{
+    DEBUG_PRINT("Starting cell balancing\n");
+    xTaskNotify(BatteryTaskHandle, (1<<BALANCE_START_NOTIFICATION), eSetBits);
+    return STATE_Balancing;
+}
+
+//A request was made via the CLI to request stop. Once the battery task exits the balancing loop it will send an EV_Notification_Stop
+uint32_t balanceStopRequest(uint32_t event)
+{
+    DEBUG_PRINT("Sent request to stop cell balancing\n");
+    xTaskNotify(BatteryTaskHandle, (1<<BATTERY_STOP_NOTIFICATION), eSetBits);
+
+    // Stay in charging state until we receive charge done event
+    return STATE_Balancing;
+}
+
+//Battery Task is out of balancing loop and battery task is back to normal
+uint32_t stopBalance(uint32_t event)
+{
+    DEBUG_PRINT("Cell balancing stopped\n");
+    return STATE_HV_Disable;
+}
+
+uint32_t balanceDone(uint32_t event)
+{
+    DEBUG_PRINT("Done balancing\n");
     return STATE_HV_Disable;
 }
 
@@ -355,7 +396,7 @@ uint32_t enterChargeMode(uint32_t event)
 uint32_t startCharge(uint32_t event)
 {
     if(!gChargeMode){
-        DEBUG_PRINT("Not in charging mode, returning to HV_ENABLE");
+        DEBUG_PRINT("Not chargemode, now HV_ENABLE");       //Not in charging mode, returning to HV_ENABLE
         return STATE_HV_Enable;
     }
     DEBUG_PRINT("Starting charge\n");
@@ -367,7 +408,7 @@ uint32_t startCharge(uint32_t event)
 uint32_t stopCharge(uint32_t event)
 {
     DEBUG_PRINT("Stopping charge\n");
-    xTaskNotify(BatteryTaskHandle, (1<<CHARGE_STOP_NOTIFICATION), eSetBits);
+    xTaskNotify(BatteryTaskHandle, (1<<BATTERY_STOP_NOTIFICATION), eSetBits);
 
     // Stay in charging state until we receive charge done event
     return STATE_Charging;
@@ -381,14 +422,14 @@ uint32_t chargeDone(uint32_t event)
         return STATE_HV_Enable;
     } else {
         // Shouldn't happen
-        ERROR_PRINT("Got charge done event, but wasn't charging\n");
+        ERROR_PRINT("Charg evnt done, no charging\n");        //Got charge done event, but wasn't charging
         return STATE_HV_Disable;
     }
 }
 
 uint32_t systemNotReady(uint32_t event)
 {
-    ERROR_PRINT("Still waiting for system to be ready\n");
+    ERROR_PRINT("Waiting for sys ready\n");      //Still waiting for system to be ready
     sendDTC_WARNING_BMU_SystemNotReady(isSystemReady());
 
     return STATE_Wait_System_Up;
@@ -403,7 +444,7 @@ uint32_t cockpitBRBPressed(uint32_t event)
 {
 
     uint32_t currentState = fsmGetState(&fsmHandle);
-
+    
     HV_Power_State = HV_Power_State_Off;
     sendCAN_BMU_HV_Power_State();
 
@@ -412,51 +453,42 @@ uint32_t cockpitBRBPressed(uint32_t event)
     switch (currentState) {
         case STATE_HV_Disable:
             {
-                DEBUG_PRINT("Cockpit BRB pressed during HV Disable phase, nothing done\n");
+                DEBUG_PRINT("Cockpit BRB at HV Disable\n");     //Cockpit BRB pressed during HV Disable phase, nothing done
                 return STATE_Failure_CBRB_Disabled;
             }
             break;
         case STATE_HV_Enable:
             {
-                DEBUG_PRINT("Cockpit BRB pressed during HV Enable, starting discharge\n");
+                DEBUG_PRINT("HVen CockpitBRB, discharg\n");     //Cockpit BRB pressed during HV Enable, starting discharge
                 xTaskNotify(PCDCHandle, (1<<DISCHARGE_NOTIFICATION), eSetBits);
-                return STATE_Failure_CBRB_Discharge;
+                return STATE_Failure_CBRB_Enabled;
             }
             break;
         case STATE_Precharge:
             {
-                DEBUG_PRINT("Cocpit BRB pressed during precharge\n");
+                DEBUG_PRINT("Precharge CockpitBRB\n");      //Cockpit BRB pressed during precharge
 				sendStopPrecharge();
-				return STATE_Failure_CBRB_Discharge;
+				return STATE_Failure_CBRB_Enabled;
             }
             break;
         case STATE_Discharge:
             {
-                DEBUG_PRINT("Cockpit BRB pressed during discharge. Attempting to continue discharge\n");
-                return STATE_Failure_CBRB_Discharge;
+                DEBUG_PRINT("Discharge CockpitBRB, cont\n");    //Cockpit BRB pressed during discharge. Attempting to continue discharge
+                return STATE_Failure_CBRB_Disabled;
             }
             break;
         default:
             {
-                ERROR_PRINT("Cockpit BRB during other state. Starting discharge\n");
+                ERROR_PRINT("Other CockpitBRB, discharg\n");        //Cockpit BRB during other state. Starting discharge
                 xTaskNotify(PCDCHandle, (1<<DISCHARGE_NOTIFICATION), eSetBits);
-                return STATE_Failure_CBRB_Discharge;
+                return STATE_Failure_CBRB_Disabled;
             }
             break;
     }
-	return STATE_Failure_CBRB_Discharge;
+	return STATE_Failure_CBRB_Disabled;
 }
 
 uint32_t cockpitBRBReleased(uint32_t event)
 {
-	if (fsmGetState(&fsmHandle) == STATE_Failure_CBRB_Disabled)
-	{
-		return STATE_HV_Disable;
-	}
-	else if (fsmGetState(&fsmHandle) == STATE_Failure_CBRB_Discharge)
-	{
-		// If we are discharging put us in the discharge state
-		return STATE_Discharge;
-	}
 	return STATE_HV_Disable;
 }

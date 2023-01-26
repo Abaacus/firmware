@@ -10,10 +10,12 @@
 #include <stdbool.h>
 #include "pdu_can.h"
 #include "watchdog.h"
+#include "pdu_dtc.h"
+
+volatile bool DC_DC_state = false;
 
 void powerTask(void *pvParameters)
 {
-    bool DC_DC_state = false;
     if (registerTaskToWatch(5, 2*POWER_TASK_INTERVAL_MS, false, NULL) != HAL_OK)
     {
         ERROR_PRINT("Failed to register power task with watchdog!\n");
@@ -23,10 +25,10 @@ void powerTask(void *pvParameters)
     // Delay to allow system to turn on
     vTaskDelay(100);
 
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     while (1)
     {
         bool newDCDCState = IS_DC_DC_ON;
-
 
         if (newDCDCState != DC_DC_state) {
             if (newDCDCState)
@@ -35,11 +37,18 @@ void powerTask(void *pvParameters)
             }
             else
             {
+                if(fsmGetState(&coolingFsmHandle) == COOL_STATE_ON){
+                    fsmSendEvent(&motorFsmHandle, COOL_EV_EM_DISABLE, portMAX_DELAY);
+                }
+                if(fsmGetState(&motorFsmHandle) == MTR_STATE_Motors_On){
+                    fsmSendEvent(&motorFsmHandle, MTR_EV_EM_DISABLE, portMAX_DELAY);
+                }
+                sendDTC_ERROR_DCDC_Shutoff();
                 DEBUG_PRINT("Switched to battery\n");
             }
             DC_DC_state = newDCDCState;
         }
         watchdogTaskCheckIn(5);
-        vTaskDelay(POWER_TASK_INTERVAL_MS);
+        vTaskDelayUntil(&xLastWakeTime, POWER_TASK_INTERVAL_MS);
     }
 }
