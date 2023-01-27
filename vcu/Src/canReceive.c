@@ -41,19 +41,19 @@ extern osThreadId driveByWireHandle;
 void CAN_Msg_DCU_buttonEvents_Callback()
 {
     DEBUG_PRINT_ISR("Received DCU button Event\n");
-    if (ButtonEMEnabled == 1) {
+    if (ButtonEMEnabled) {
 
         fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
     }
-    else if(ButtonEnduranceToggleEnabled != 0) 
+    else if(ButtonEnduranceToggleEnabled) 
     {
 		toggle_endurance_mode();
 	}
-	else if(ButtonEnduranceLapEnabled != 0)
+	else if(ButtonEnduranceLapEnabled)
 	{
 		trigger_lap();
 	}
-	else if(ButtonTCEnabled != 0)
+	else if(ButtonTCEnabled)
 	{
 		toggle_TC();
 	}
