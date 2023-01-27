@@ -66,10 +66,10 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
 BO_ 2147483648 BMU_batteryLimits: 8 BMU
- SG_ StateBusHVSendPeriod : 48|16@1+ (1,0) [0|65535] "ms" Vector__XXX
- SG_ MaxChargeVoltage : 32|16@1+ (0.01,0) [0|655.35] "V" Vector__XXX
- SG_ AdjustedCellIR : 16|16@1+ (0.01,0) [0|655.35] "" Vector__XXX
- SG_ MaxChargeCurrent : 0|16@1+ (0.01,0) [0|655.35] "A" Vector__XXX
+ SG_ StateBusHVSendPeriod : 48|16@1+ (1,0) [0|65535] "ms"  VCU_F7,VCU_BeagleBone
+ SG_ MaxChargeVoltage : 32|16@1+ (0.01,0) [0|655.35] "V"  VCU_F7,VCU_BeagleBone
+ SG_ AdjustedCellIR : 16|16@1+ (0.01,0) [0|655.35] ""  VCU_F7,VCU_BeagleBone
+ SG_ MaxChargeCurrent : 0|16@1+ (0.01,0) [0|655.35] "A"  VCU_F7,VCU_BeagleBone
 
 BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
  SG_ SpeedMotorRightKPH : 16|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
