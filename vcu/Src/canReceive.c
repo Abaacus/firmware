@@ -45,7 +45,7 @@ void CAN_Msg_DCU_buttonEvents_Callback()
 
         fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
     }
-    else if(ButtonEnduranceToggleEnabled != 0) 
+    else if(ButtonEnduranceToggleEnabled == 1) 
     {
 		toggle_endurance_mode();
 	}

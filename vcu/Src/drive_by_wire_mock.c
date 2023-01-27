@@ -57,11 +57,11 @@ BaseType_t pduMCsOnOffMock(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    if (STR_EQ(param, "on", paramLen) == 1) {
+    if (STR_EQ(param, "on", paramLen) == true) {
         xTaskNotify( driveByWireHandle,
                             (1<<NTFY_MCs_ON),
                             eSetBits );
-    } else if (STR_EQ(param, "off", paramLen) == 1) {
+    } else if (STR_EQ(param, "off", paramLen) == true) {
         xTaskNotify( driveByWireHandle,
                             (1<<NTFY_MCs_OFF),
                             eSetBits );
@@ -356,9 +356,9 @@ BaseType_t fakeHVStateChange(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    if (STR_EQ(param, "enable", paramLen) == 1) {
+    if (STR_EQ(param, "enable", paramLen) == true) {
         newHVState = true;
-    } else if (STR_EQ(param, "disable", paramLen) == 1) {
+    } else if (STR_EQ(param, "disable", paramLen) == true) {
         newHVState = false;
         fsmSendEventISR(&fsmHandle, EV_Hv_Disable);
     } else {
@@ -410,9 +410,9 @@ BaseType_t beagleBonePower(char *writeBuffer, size_t writeBufferLength,
     const char * onOffParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     bool onOff = false;
-    if (STR_EQ(onOffParam, "on", paramLen) == 1) {
+    if (STR_EQ(onOffParam, "on", paramLen) == true) {
         onOff = true;
-    } else if (STR_EQ(onOffParam, "off", paramLen) == 1) {
+    } else if (STR_EQ(onOffParam, "off", paramLen) == true) {
         onOff = false;
     } else {
         COMMAND_OUTPUT("Unkown parameter\n");
