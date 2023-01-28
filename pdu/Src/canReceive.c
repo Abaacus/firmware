@@ -5,7 +5,6 @@
 #include "controlStateMachine.h"
 #include "debug.h"
 #include "boardTypes.h"
-#include "canReceive.h"
 #include "canReceiveCommon.h"
 
 void CAN_Msg_UartOverCanConfig_Callback() {

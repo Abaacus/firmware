@@ -7,7 +7,6 @@
 #include "state_machine.h"
 #include "FreeRTOS_CLI.h"
 #include "sensors.h"
-#include "canReceiveCommon.h"
 
 extern uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 

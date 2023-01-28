@@ -11,8 +11,7 @@
 #include "bsp.h"
 #include "motorController.h"
 #include "beaglebone.h"
-#include "canReceiveCommon.h"
-#include "canReceive.h"
+
 
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];

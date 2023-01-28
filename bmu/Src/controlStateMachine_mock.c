@@ -25,8 +25,6 @@
 #include "batteries.h"
 #include "faultMonitor.h"
 #include "ltc_chip.h"
-#include "canReceiveCommon.h"
-#include "canReceive.h"
 
 
 #if IS_BOARD_F7
