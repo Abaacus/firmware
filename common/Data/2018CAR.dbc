@@ -73,7 +73,7 @@ BO_ 2217742849 BMU_batteryLimits: 8 VCU_F7
  SG_ StateBusHVSendPeriod : 48|16@1+ (1,0) [0|65535] "ms"  BMU,VCU_BeagleBone
  SG_ MaxChargeVoltage : 32|16@1+ (0.01,0) [0|655.35] "V"  BMU,VCU_BeagleBone
  SG_ AdjustedCellIR : 16|16@1+ (0.01,0) [0|655.35] ""  BMU,VCU_BeagleBone
- SG_ MaxChargeCurrent : 0|16@1+ (0.01,0) [0|655.35] "A"  VCU_BeagleBone
+ SG_ MaxChargeCurrent : 0|16@1+ (0.01,0) [0|655.35] "A"  BMU,VCU_BeagleBone
 
 BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
  SG_ SpeedMotorRightKPH : 16|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
