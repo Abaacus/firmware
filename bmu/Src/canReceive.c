@@ -14,6 +14,7 @@
 #include "bsp.h"
 #include "debug.h"
 #include "boardTypes.h"
+#include "batteries.h"
 
 #include "controlStateMachine.h"
 
@@ -23,6 +24,19 @@
 #include "task.h"
 #include "cmsis_os.h"
 
+void CAN_Msg_BMU_batteryLimits_Callback()
+{
+    // set maxChargeCurrent, maxChargeVoltage
+    setMaxChargeCurrent(MaxChargeCurrent);
+    // set adjustedCellIR
+    cliSetStateBusHVSendPeriod(AdjustedCellIR);
+    //TODO: set maxChargeVoltage, adjustedCellIR (pos soln 1: create setters in batteries.c)
+}
+
+void CAN_Msg_BMU_stateSOC_Callback()
+{
+    // set capacity_startup, and IBus_integrated
+}
 
 void CAN_Msg_DCU_buttonEvents_Callback()
 {
