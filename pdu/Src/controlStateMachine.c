@@ -219,7 +219,7 @@ HAL_StatusTypeDef initStateMachines()
     return HAL_OK;
 }
 
-void coolingControlTask(void *pvParameters)
+void stateMachineTask(void *pvParameters)
 {
     if (canStart(&CAN_HANDLE) != HAL_OK)
     {

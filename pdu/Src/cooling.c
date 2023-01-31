@@ -13,7 +13,7 @@
 #include "canReceive.h"
 #include "pdu_dtc.h"
 
-void coolingTask(void *pvParameters)
+void coolingControlTask(void *pvParameters)
 {
      if (registerTaskToWatch(COOLING_TASK_ID, COOLING_TASK_INTERVAL_MS, false, NULL) != HAL_OK)
     {
@@ -27,8 +27,8 @@ void coolingTask(void *pvParameters)
     TickType_t xLastWakeTime = xTaskGetTickCount();
     while(1)
     {
-        int tempMRight = TempMotorRight;
-        int tempMLeft = TempMotorLeft;
+        uint16_t tempMRight = TempMotorRight;
+        uint16_t tempMLeft = TempMotorLeft;
 
         if(tempMRight>COOLING_THRESHOLD || tempMLeft>COOLING_THRESHOLD){
             if(fsmGetState(&coolingFsmHandle) != COOL_STATE_ON){
@@ -37,7 +37,7 @@ void coolingTask(void *pvParameters)
         }
         else{
             if(fsmGetState(&coolingFsmHandle) == COOL_STATE_ON){
-                fsmSendEvent(&coolingFsmHandle, COOL_EV_OVERTEMP_WARNING, portMAX_DELAY);
+                fsmSendEvent(&coolingFsmHandle, COOL_EV_EM_DISABLE, portMAX_DELAY);
             }
         }
 

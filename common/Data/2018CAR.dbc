@@ -521,7 +521,7 @@ BO_ 2240348018 TempMotorRight: 8 MCRight
  SG_ PRO_CAN_CRC : 56|8@1+ (1,0) [0|255] "" Vector__XXX
  SG_ PRO_CAN_COUNT : 48|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ PRO_CAN_RES : 52|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ TempMotorRight : 0|12@1+ (1,-640) [-640|3455] "C"  VCU_BeagleBone,VCU_F7
+ SG_ TempMotorRight : 0|12@1+ (1,-640) [-640|3455] "C"  VCU_BeagleBone,VCU_F7,PDU
  SG_ TempMotorDeltaRight : 12|12@1+ (1,-640) [-640|3455] "C"  VCU_BeagleBone,VCU_F7
 
 BO_ 2240216946 SpeedFeedbackRight: 8 MCRight
@@ -581,7 +581,7 @@ BO_ 2241396593 TempMotorLeft: 8 MCLeft
  SG_ PRO_CAN_CRC : 56|8@1+ (1,0) [0|255] "" Vector__XXX
  SG_ PRO_CAN_COUNT : 48|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ PRO_CAN_RES : 52|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ TempMotorLeft : 0|12@1+ (1,-640) [-640|3455] "C"  VCU_BeagleBone,VCU_F7
+ SG_ TempMotorLeft : 0|12@1+ (1,-640) [-640|3455] "C"  VCU_BeagleBone,VCU_F7,PDU
  SG_ TempMotorDeltaLeft : 12|12@1+ (1,-640) [-640|3455] "C"  VCU_BeagleBone,VCU_F7
 
 BO_ 2241265521 SpeedFeedbackLeft: 8 MCLeft
