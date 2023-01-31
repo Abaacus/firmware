@@ -49,11 +49,11 @@ void CAN_Msg_DCU_buttonEvents_Callback()
     {
 		toggle_endurance_mode();
 	}
-	else if(ButtonEnduranceLapEnabled != 0)
+	else if(ButtonEnduranceLapEnabled == 1)
 	{
 		trigger_lap();
 	}
-	else if(ButtonTCEnabled != 0)
+	else if(ButtonTCEnabled == 1)
 	{
 		toggle_TC();
 	}
