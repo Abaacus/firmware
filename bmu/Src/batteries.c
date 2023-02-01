@@ -881,13 +881,33 @@ HAL_StatusTypeDef initPackVoltageQueue()
  */
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 {
-  // Range check, arbitrary max that probable will never need to be changed
+  // Range check, arbitrary max that probably will never need to be changed
   if (maxCurrent <= 0 || maxCurrent >= 100)
   {
     return HAL_ERROR;
   }
 
   maxChargeCurrent = maxCurrent;
+
+  return HAL_OK;
+}
+
+/**
+ * @brief Sets the maximum voltage for the charger
+ *
+ * @param maxVoltage The maximum voltage, in volts
+ *
+ * @return HAL_StatusTypeDef
+ */
+HAL_StatusTypeDef setMaxChargeVoltage(float maxVoltage)
+{
+  // Range check, arbitrary max that probably will never need to be changed
+  if (maxVoltage <= 0 || maxVoltage >= (DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS))
+  {
+    return HAL_ERROR;
+  }
+
+  maxChargeVoltage = maxVoltage;
 
   return HAL_OK;
 }

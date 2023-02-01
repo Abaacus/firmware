@@ -143,6 +143,7 @@ HAL_StatusTypeDef getPackVoltage(float *packVoltage);
 HAL_StatusTypeDef initPackVoltageQueue();
 float map_range_float(float in, float low, float high, float low_out, float high_out);
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent);
+HAL_StatusTypeDef setMaxChargeVoltage(float maxVoltage);
 void setSendOnlyOneCell(int cellIdx);
 void clearSendOnlyOneCell();
 HAL_StatusTypeDef cliSetVBatt(float VBatt);

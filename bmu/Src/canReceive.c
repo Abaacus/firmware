@@ -26,16 +26,18 @@
 
 void CAN_Msg_BMU_batteryLimits_Callback()
 {
-    // set maxChargeCurrent, maxChargeVoltage
+    // set maxChargeCurrent,
     setMaxChargeCurrent(MaxChargeCurrent);
+    // set maxChargeVoltage
+    setMaxChargeVoltage(MaxChargeVoltage);
     // set adjustedCellIR
-    cliSetStateBusHVSendPeriod(AdjustedCellIR);
-    //TODO: set maxChargeVoltage, adjustedCellIR (pos soln 1: create setters in batteries.c)
+    cliSetStateBusHVSendPeriod(StateBusHVSendPeriod);
+    //TODO: set adjustedCellIR 
 }
 
 void CAN_Msg_BMU_stateSOC_Callback()
 {
-    // set capacity_startup, and IBus_integrated
+    //TODO: set capacity_startup, and IBus_integrated
 }
 
 void CAN_Msg_DCU_buttonEvents_Callback()
