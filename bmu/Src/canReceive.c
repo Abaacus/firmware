@@ -15,6 +15,7 @@
 #include "debug.h"
 #include "boardTypes.h"
 #include "batteries.h"
+#include "state_of_charge.h"
 
 #include "controlStateMachine.h"
 
@@ -30,14 +31,18 @@ void CAN_Msg_BMU_batteryLimits_Callback()
     setMaxChargeCurrent(MaxChargeCurrent);
     // set maxChargeVoltage
     setMaxChargeVoltage(MaxChargeVoltage);
-    // set adjustedCellIR
+    // set StateBusHVSendPeriod
     cliSetStateBusHVSendPeriod(StateBusHVSendPeriod);
-    //TODO: set adjustedCellIR 
+    // set adjustedCellIR
+    setAdjustedCellIR(AdjustedCellIR);
 }
 
 void CAN_Msg_BMU_stateSOC_Callback()
 {
-    //TODO: set capacity_startup, and IBus_integrated
+    // set CapacityStartup
+    setCapacityStartup(CapacityStartup);
+    // set IBus_Integrated
+    setIBus_Integrated(IBus_Integrated);
 }
 
 void CAN_Msg_DCU_buttonEvents_Callback()

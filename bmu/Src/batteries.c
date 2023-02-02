@@ -333,6 +333,17 @@ void cliSetStateBusHVSendPeriod(uint32_t period)
 }
 
 /**
+ * @brief Allows setting of the adjusted cell internal resistance constant
+ *
+ * @param float The value of the constant
+ */
+void setAdjustedCellIR(float _adjustedCellIR)
+{
+    adjustedCellIR = _adjustedCellIR;
+}
+
+
+/**
  * @brief Allows getting of the interval for sending state bus HV CAN messages
  */
 uint32_t cliGetStateBusHVSendPeriod() 

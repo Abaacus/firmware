@@ -26,7 +26,7 @@
 #define FAN_PERIOD_COUNT 400
 #define FAN_TASK_PERIOD_MS 1000
 
-uint32_t calculateFanPeriod()
+uint32_t calculateFanPeriod(uint32_t percentage)
 {
   // PWM Output is inverted from what we generate from PROC
 
@@ -39,10 +39,11 @@ uint32_t calculateFanPeriod()
   if (TempCellMax < FAN_OFF_TEMP) {
     return FAN_PERIOD_COUNT;
   }
-
-  return FAN_PERIOD_COUNT - map_range_float(TempCellMax, FAN_OFF_TEMP, FAN_PEAK_TEMP,
+  uint32_t standard_out = FAN_PERIOD_COUNT - map_range_float(TempCellMax, FAN_OFF_TEMP, FAN_PEAK_TEMP,
                       FAN_PERIOD_COUNT*FAN_ON_DUTY_PERCENT,
                       FAN_PERIOD_COUNT*FAN_MAX_DUTY_PERCENT);
+
+  return (standard_out > percentage) ? standard_out : percentage;
 }
 
 HAL_StatusTypeDef fanInit()
@@ -60,7 +61,7 @@ HAL_StatusTypeDef fanInit()
 
 HAL_StatusTypeDef setFan()
 {
-  uint32_t duty = calculateFanPeriod();
+  uint32_t duty = calculateFanPeriod(0);
 
   __HAL_TIM_SET_COMPARE(&FAN_HANDLE, TIM_CHANNEL_1, duty);
   
