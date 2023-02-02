@@ -140,7 +140,7 @@ float filterIBus(float IBus)
 {
   static float IBusOut = 0;
 
-  IBusOut = IBUS_FILTER_ALPHA*IBus + (1-IBUS_FILTER_ALPHA)*IBusOut;
+  IBusOut = (IBUS_FILTER_ALPHA * IBus) + ((1-IBUS_FILTER_ALPHA) * IBusOut);
 
   return IBusOut;
 }
@@ -157,7 +157,7 @@ HAL_StatusTypeDef initBusVoltagesAndCurrentQueues()
    VBusQueue = xQueueCreate(1, sizeof(float));
    VBattQueue = xQueueCreate(1, sizeof(float));
 
-   if (IBusQueue == NULL || VBusQueue == NULL || VBattQueue == NULL) {
+   if (!IBusQueue || !VBusQueue || !VBattQueue) {
       ERROR_PRINT("Failed to create bus voltages and current queues!\n");
       return HAL_ERROR;
    }
@@ -381,8 +381,8 @@ void HVMeasureTask(void *pvParamaters)
         }
 
 
-        if (xTaskGetTickCount() - lastStateBusHVSend
-            > pdMS_TO_TICKS(StateBusHVSendPeriod))
+        if ((xTaskGetTickCount() - lastStateBusHVSend) 
+        > pdMS_TO_TICKS(StateBusHVSendPeriod))
         {
             CurrentBusHV = IBus;
             VoltageBusHV = VBus;
@@ -421,7 +421,7 @@ void imdTask(void *pvParamaters)
    do {
       imdStatus = get_imd_status();
       vTaskDelay(100);
-   } while (!(imdStatus == IMDSTATUS_Normal || imdStatus == IMDSTATUS_SST_Good));
+   } while ((imdStatus != IMDSTATUS_Normal) && (imdStatus != IMDSTATUS_SST_Good));
 
    // Notify control fsm that IMD is ready
    fsmSendEvent(&fsmHandle, EV_IMD_Ready, portMAX_DELAY);
@@ -469,7 +469,7 @@ void imdTask(void *pvParamaters)
             break;
       }
 
-      if (!(imdStatus == IMDSTATUS_Normal || imdStatus == IMDSTATUS_SST_Good))
+      if ((imdStatus != IMDSTATUS_Normal) && (imdStatus != IMDSTATUS_SST_Good))
       {
          // ERROR!!!
          fsmSendEventUrgentISR(&fsmHandle, EV_HV_Fault);
@@ -658,8 +658,8 @@ void filterCellVoltages(float *cellVoltages, float *cellVoltagesFiltered)
 		first_run = false;
 	}
 	for (int i = 0; i < NUM_VOLTAGE_CELLS; i++) {
-		cellVoltagesFiltered[i] = CELL_VOLTAGE_FILTER_ALPHA*cellVoltages[i]
-								+ (1-CELL_VOLTAGE_FILTER_ALPHA)*cellVoltagesFiltered[i];
+		cellVoltagesFiltered[i] = (CELL_VOLTAGE_FILTER_ALPHA * cellVoltages[i])
+								+ ((1-CELL_VOLTAGE_FILTER_ALPHA) * cellVoltagesFiltered[i]);
 	}
 }
 
@@ -717,7 +717,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 		 ERROR_PRINT("Cell %d is overvoltage at %f Volts\n", i, measure_low);
          sendDTC_CRITICAL_CELL_VOLTAGE_HIGH(i);
          rc = HAL_ERROR;
-      } else if (!warning_dtc_sent && measure_high < LIMIT_LOWVOLTAGE_WARNING) {
+      } else if ((!warning_dtc_sent) && (measure_high < LIMIT_LOWVOLTAGE_WARNING)) {
          ERROR_PRINT("WARN: Cell %d is low voltage at %f Volts\n", i, measure_high);
          sendDTC_WARNING_CELL_VOLTAGE_LOW(i);
          warning_dtc_sent = true;
@@ -731,7 +731,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
       (*packVoltage) += measure_low;
    }
 
-   if(thermistor_lag_counter >= THERMISTORS_PER_BOARD/NUM_THERMISTOR_MEASUREMENTS_PER_CYCLE)
+   if (thermistor_lag_counter >= (THERMISTORS_PER_BOARD / NUM_THERMISTOR_MEASUREMENTS_PER_CYCLE))
    {
 	   for (int i=0; i < NUM_TEMP_CELLS; i++)
 	   {
@@ -882,7 +882,7 @@ HAL_StatusTypeDef initPackVoltageQueue()
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 {
   // Range check, arbitrary max that probable will never need to be changed
-  if (maxCurrent <= 0 || maxCurrent >= 100)
+  if ((maxCurrent <= 0) || (maxCurrent >= 100))
   {
     return HAL_ERROR;
   }
@@ -1071,7 +1071,7 @@ float map_range_float(float in, float low, float high, float low_out, float high
     float in_range = high - low;
     float out_range = high_out - low_out;
 
-    return (in - low) * out_range / in_range + low_out;
+    return (((in - low) * out_range) / in_range) + low_out;
 }
 
 /**
@@ -1189,9 +1189,9 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
          * Check if we should balance any cells
          * Only balance above a minimum voltage
          */
-        if (VoltageCellMin >= BALANCE_START_VOLTAGE || !using_charger)
+        if ((VoltageCellMin >= BALANCE_START_VOLTAGE) || !using_charger)
         {
-            if (xTaskGetTickCount() - lastBalanceCheck
+            if ((xTaskGetTickCount() - lastBalanceCheck)
                 > pdMS_TO_TICKS(BALANCE_RECHECK_PERIOD_MS))
             {
                 balancingCells = false;
@@ -1210,7 +1210,7 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
                     watchdogTaskCheckIn(BATTERY_TASK_ID);
                     /*DEBUG_PRINT("Cell %d SOC: %f\n", cell, cellSOC);*/
 
-                    if (cellSOC - minCellSOC > BALANCE_MIN_SOC_DELTA) {
+                    if ((cellSOC - minCellSOC) > BALANCE_MIN_SOC_DELTA) {
                         DEBUG_PRINT("Balancing cell %d\n", cell);
 #if IS_BOARD_F7
                         batt_balance_cell(cell);

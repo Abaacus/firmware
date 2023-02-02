@@ -183,7 +183,7 @@ static HAL_StatusTypeDef batt_read_data(uint8_t first_byte, uint8_t second_byte,
 	}
 
 
-	if(xTaskGetTickCount() - last_PEC_tick > 10000)
+	if((xTaskGetTickCount() - last_PEC_tick) > 10000)
 	{
 		DEBUG_PRINT("\nPEC Rate: %lu errors/10s \n", PEC_count);
 		PEC_count = 0;
@@ -427,17 +427,17 @@ HAL_StatusTypeDef batt_readBackCellVoltage(float *cell_voltage_array, voltage_op
 
 				for (int cvreg = 0; cvreg < VOLTAGES_PER_BLOCK; cvreg++)
 				{
-					uint8_t voltage_terminal = cvreg + block * VOLTAGES_PER_BLOCK;
+					uint8_t voltage_terminal = cvreg + (block * VOLTAGES_PER_BLOCK);
 					// pins C5 and C6 are connected to CELL4 but like we don't want to measure them, so we skip index 4 and 5
-					if(voltage_terminal == 4 || voltage_terminal == 5)
+					if((voltage_terminal == 4) || (voltage_terminal == 5))
 					{
 						continue;
 					}
 
 					size_t registerIndex = cvreg * CELL_VOLTAGE_SIZE_BYTES;
-					size_t cellIdx = (board * NUM_LTC_CHIPS_PER_BOARD + ltc_chip) * CELLS_PER_CHIP + local_cell_idx;
+					size_t cellIdx = (((board * NUM_LTC_CHIPS_PER_BOARD) + ltc_chip) * CELLS_PER_CHIP) + local_cell_idx;
 
-					uint16_t temp = ((uint16_t) (adc_vals[(registerIndex + 1)] << 8 | adc_vals[registerIndex]));
+					uint16_t temp = ((uint16_t) ((adc_vals[(registerIndex + 1)] << 8) | adc_vals[registerIndex]));
 					if(!failed_read) // If we read successfully
 					{
 						cell_voltage_array[cellIdx] = ((float)temp) / VOLTAGE_REGISTER_COUNTS_PER_VOLT;
@@ -446,7 +446,7 @@ HAL_StatusTypeDef batt_readBackCellVoltage(float *cell_voltage_array, voltage_op
 							open_wire_failure[cellIdx].num_times_consec = 0;
 						}
 					}
-					else if(failed_read && voltage_operation == OPEN_WIRE)
+					else if(failed_read && (voltage_operation == OPEN_WIRE))
 					{
 						open_wire_failure[cellIdx].num_times_consec++;
 						open_wire_failure[cellIdx].occurred = true;
@@ -511,10 +511,10 @@ HAL_StatusTypeDef batt_read_thermistors(size_t channel, float *cell_temp_array) 
 			}
 			return HAL_OK;
 		}
-		size_t cellIdx = (board) * THERMISTORS_PER_BOARD + channel;
+		size_t cellIdx = ((board) * THERMISTORS_PER_BOARD) + channel;
 		
 		// We only use the first GPIO register, 2 bytes out of the total 6 in adc_vals
-		uint16_t temp = ((uint16_t) (adc_vals[TEMP_ADC_IDX_HIGH] << 8
+		uint16_t temp = ((uint16_t) ((adc_vals[TEMP_ADC_IDX_HIGH] << 8)
 									| adc_vals[TEMP_ADC_IDX_LOW]));
 		float voltageThermistor = ((float)temp) / VOLTAGE_REGISTER_COUNTS_PER_VOLT;
 		cell_temp_array[cellIdx] = batt_convert_voltage_to_temp(voltageThermistor);

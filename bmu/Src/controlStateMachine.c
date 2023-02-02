@@ -255,7 +255,7 @@ uint32_t dischargeFinished(uint32_t event)
     sendCAN_BMU_HV_Power_State();
 
     DC_DC_OFF;
-	if(currentState == STATE_Failure_CBRB_Enabled || currentState == STATE_Failure_CBRB_Disabled)
+	if((currentState == STATE_Failure_CBRB_Enabled) || (currentState == STATE_Failure_CBRB_Disabled))
 	{
 		return currentState;
 	}

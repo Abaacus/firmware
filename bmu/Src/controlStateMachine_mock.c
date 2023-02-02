@@ -99,7 +99,7 @@ BaseType_t testLowPassFilter(char *writeBuffer, size_t writeBufferLength,
     filtersInit();
 
     uint32_t startTime = getRunTimeCounterValue();
-    for (int i=0; i<DATA_LENGTH / BLOCK_SIZE; i++) {
+    for (int i=0; i < (DATA_LENGTH / BLOCK_SIZE); i++) {
         samplePointer = &(data[i*BLOCK_SIZE]);
         outputPointer = &(output[i*BLOCK_SIZE]);
         lowPassFilter(samplePointer, BLOCK_SIZE, outputPointer);
@@ -162,18 +162,18 @@ BaseType_t printBattInfo(char *writeBuffer, size_t writeBufferLength,
         return pdTRUE;
     }
     // Note that the temperature channels are not correlated with the voltage cell
-	if(cellIdx >= NUM_VOLTAGE_CELLS && cellIdx < NUM_TEMP_CELLS){
+	if((cellIdx >= NUM_VOLTAGE_CELLS) && (cellIdx < NUM_TEMP_CELLS)){
 		COMMAND_OUTPUT("%d\t(N/A)\t%f\r\n", cellIdx, TempChannel[cellIdx]);
-	} else if(cellIdx < NUM_VOLTAGE_CELLS && cellIdx >= NUM_TEMP_CELLS) {
+	} else if((cellIdx < NUM_VOLTAGE_CELLS) && (cellIdx >= NUM_TEMP_CELLS)) {
 		COMMAND_OUTPUT("%d\t%f\t(N/A)\r\n", cellIdx, VoltageCell[cellIdx]);
-	} else if(cellIdx < NUM_VOLTAGE_CELLS && cellIdx < NUM_TEMP_CELLS) {
+	} else if((cellIdx < NUM_VOLTAGE_CELLS) && (cellIdx < NUM_TEMP_CELLS)) {
 		COMMAND_OUTPUT("%d\t%f\t%f\r\n", cellIdx, VoltageCell[cellIdx], TempChannel[cellIdx]);
 	}
 	else {
 		// Do nothing
 	}
 	++cellIdx;
-    if (cellIdx >= NUM_VOLTAGE_CELLS && cellIdx >= NUM_TEMP_CELLS) {
+    if ((cellIdx >= NUM_VOLTAGE_CELLS) && (cellIdx >= NUM_TEMP_CELLS)) {
         cellIdx = -6;
         return pdFALSE;
     } else {
@@ -200,7 +200,7 @@ BaseType_t setCellVoltage(char *writeBuffer, size_t writeBufferLength,
 
     sscanf(idxParam, "%u", &cellIdx);
 
-    if (cellIdx < 0 || cellIdx >= NUM_VOLTAGE_CELLS) {
+    if ((cellIdx < 0) || (cellIdx >= NUM_VOLTAGE_CELLS)) {
         COMMAND_OUTPUT("Cell Index must be between 0 and %d\n", NUM_VOLTAGE_CELLS);
         return pdFALSE;
     }
@@ -228,7 +228,7 @@ BaseType_t setChannelTemp(char *writeBuffer, size_t writeBufferLength,
 
     sscanf(idxParam, "%u", &cellIdx);
 
-    if (cellIdx < 0 || cellIdx >= NUM_TEMP_CELLS) {
+    if ((cellIdx < 0) || (cellIdx >= NUM_TEMP_CELLS)) {
         COMMAND_OUTPUT("Cell Index must be between 0 and %d\n", NUM_TEMP_CELLS);
         return pdFALSE;
     }
@@ -377,7 +377,7 @@ BaseType_t printState(char *writeBuffer, size_t writeBufferLength,
 {
     uint8_t index;
     index = fsmGetState(&fsmHandle);
-    if ( index >= 0 && index < STATE_ANY ){
+    if ( (index >= 0) && (index < STATE_ANY) ){
         COMMAND_OUTPUT("State: %s\n", BMU_states_string[index]);
     } else {
         COMMAND_OUTPUT("Error: state index out of range. Index: %u\n", index);
@@ -697,7 +697,7 @@ BaseType_t balanceCellCommand(char *writeBuffer, size_t writeBufferLength,
     const char *idxParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
     sscanf(idxParam, "%u", &cellIdx);
 
-    if (cellIdx < 0 || cellIdx >= NUM_VOLTAGE_CELLS) {
+    if ((cellIdx < 0) || (cellIdx >= NUM_VOLTAGE_CELLS)) {
         COMMAND_OUTPUT("Cell Index must be between 0 and %d\n", NUM_VOLTAGE_CELLS-1);
         return pdFALSE;
     }
@@ -1031,7 +1031,7 @@ BaseType_t setCellIRCommand(char *writeBuffer, size_t writeBufferLength,
     float cellIR;
     sscanf(newCellIR, "%f", &cellIR);
 
-    if (cellIR < 0.0 || cellIR > 0.01){
+    if ((cellIR < 0.0) || (cellIR > 0.01)){
         COMMAND_OUTPUT("invalid cell IR [0,0.01]\r\n");
     }else{
 	    adjustedCellIR = cellIR;

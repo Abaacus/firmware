@@ -82,7 +82,7 @@ HAL_StatusTypeDef checkPEC(uint8_t *rxBuffer, size_t dataSize)
     uint8_t pec[2];
     batt_gen_pec(rxBuffer, dataSize, pec);
     uint32_t pec_loc = dataSize;
-    if (pec[0] == rxBuffer[pec_loc] && pec[1] == rxBuffer[pec_loc + 1])
+    if ((pec[0] == rxBuffer[pec_loc]) && (pec[1] == rxBuffer[pec_loc + 1]))
     {
         return HAL_OK;
     } else {
@@ -126,7 +126,7 @@ int batt_spi_wakeup(bool sleeping)
 {
     if (!sleeping) {
         // The boards have been initialized, so we're in the REFUP state
-        if (xTaskGetTickCount() - lastWakeup_ticks <= pdMS_TO_TICKS(T_IDLE_MS)) {
+        if ((xTaskGetTickCount() - lastWakeup_ticks) <= pdMS_TO_TICKS(T_IDLE_MS)) {
             // SPI bus already up
             return 0;
         }
@@ -172,8 +172,8 @@ float batt_convert_voltage_to_temp(float voltage) {
     float x = voltage;
 
     // Calculated from matlab
-    float output = p1*pow(x,9) + p2*pow(x,8) + p3*pow(x,7) + p4*pow(x,6) + p5*pow(x,5)
-        + p6*pow(x,4) + p7*pow(x,3) + p8*pow(x,2) + p9*x + p10;
+    float output = (p1*pow(x,9)) + (p2*pow(x,8)) + (p3*pow(x,7)) + (p4*pow(x,6)) + (p5*pow(x,5))
+        + (p6*pow(x,4)) + (p7*pow(x,3)) + (p8*pow(x,2)) + (p9*x) + p10;
 
     return output;
 }

@@ -148,14 +148,14 @@ float float_abs(float x)
 
 void addCellVoltages(float *cell_voltages, float *cell_voltages_average)
 {
-    for (int i = 0; i < CELLS_PER_BOARD * NUM_BOARDS; i++) {
+    for (int i = 0; i < (CELLS_PER_BOARD * NUM_BOARDS); i++) {
         cell_voltages_average[i] += cell_voltages[i];
     }
 }
 
 void divideCellVoltages(float *cell_voltages_average, unsigned int num_readings)
 {
-    for (int i = 0; i < CELLS_PER_BOARD * NUM_BOARDS; i++) {
+    for (int i = 0; i < (CELLS_PER_BOARD * NUM_BOARDS); i++) {
         cell_voltages_average[i] /= num_readings;
     }
 }
@@ -242,7 +242,7 @@ HAL_StatusTypeDef checkForOpenCircuit()
     {
         for (int cell = 1; cell < CELLS_PER_BOARD; cell++)
         {
-        	uint8_t cellIdx = board * CELLS_PER_BOARD + cell;
+        	uint8_t cellIdx = (board * CELLS_PER_BOARD) + cell;
         	if(!open_wire_failure[cellIdx].occurred)
 			{
 				float pullup = cell_voltages_pullup[cellIdx];
@@ -255,7 +255,7 @@ HAL_StatusTypeDef checkForOpenCircuit()
 								float_abs(pullup - pulldown));
 					return HAL_ERROR;
 				}
-				if(cell == CELLS_PER_BOARD - 1 && (float_abs(cell_voltages_pulldown[cellIdx] - 0) < 0.0002))
+				if((cell == (CELLS_PER_BOARD - 1)) && (float_abs(cell_voltages_pulldown[cellIdx] - 0) < 0.0002))
 				{	
 					ERROR_PRINT("Cell %d open (val: %f, diff: %f < 0.0002)\n",
 								cellIdx, cell_voltages_pulldown[cellIdx],
@@ -298,7 +298,7 @@ HAL_StatusTypeDef batt_balance_cell(int cell)
 
     int boardIdx = cell / CELLS_PER_BOARD;
     int chipIdx = (cell % CELLS_PER_BOARD) / CELLS_PER_CHIP;
-    int amsCellIdx = cell - (boardIdx * CELLS_PER_BOARD + chipIdx * CELLS_PER_CHIP);
+    int amsCellIdx = cell - ((boardIdx * CELLS_PER_BOARD) + (chipIdx * CELLS_PER_CHIP));
 
     batt_set_balancing_cell(boardIdx, chipIdx, amsCellIdx);
 
@@ -313,7 +313,7 @@ HAL_StatusTypeDef batt_stop_balance_cell(int cell)
 
     int boardIdx = cell / CELLS_PER_BOARD;
     int chipIdx = (cell % CELLS_PER_BOARD) / CELLS_PER_CHIP;
-    int amsCellIdx = cell - (boardIdx * CELLS_PER_BOARD + chipIdx * CELLS_PER_CHIP);
+    int amsCellIdx = cell - ((boardIdx * CELLS_PER_BOARD) + (chipIdx * CELLS_PER_CHIP));
 
     batt_unset_balancing_cell(boardIdx, chipIdx, amsCellIdx);
 
@@ -330,7 +330,7 @@ bool batt_is_cell_balancing(int cell)
 
     int boardIdx = cell / CELLS_PER_BOARD;
     int chipIdx = (cell % CELLS_PER_BOARD) / CELLS_PER_CHIP;
-    int amsCellIdx = cell - (boardIdx * CELLS_PER_BOARD + chipIdx * CELLS_PER_CHIP);
+    int amsCellIdx = cell - ((boardIdx * CELLS_PER_BOARD) + (chipIdx * CELLS_PER_CHIP));
 
     return batt_get_balancing_cell_state(boardIdx, chipIdx, amsCellIdx);
 }
