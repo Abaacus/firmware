@@ -226,7 +226,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         return PCDC_ERROR;
     }
 
-    if ((VBus > packVoltage) * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK)
+    if (VBus > (packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK))
     {
         DEBUG_PRINT("Already precharged, discharging\n");
         if (discharge() != PCDC_DONE) {
