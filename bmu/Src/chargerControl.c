@@ -44,7 +44,7 @@ HAL_StatusTypeDef startChargerCommunication(float maxVoltage, float maxCurrent, 
             return HAL_ERROR;
         }
 
-        if (xTaskGetTickCount() - startTickCount >= pdMS_TO_TICKS(CHARGER_COMM_START_TIMEOUT_MS))
+        if ((xTaskGetTickCount() - startTickCount) >= pdMS_TO_TICKS(CHARGER_COMM_START_TIMEOUT_MS))
         {
            ERROR_PRINT("Timeout waiting for charger can comms start\n");
            return HAL_ERROR;

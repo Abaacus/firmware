@@ -209,10 +209,10 @@ uint32_t blockSize)
 
          /* Sample 1. 5 cycles */
          Xn3  = pIn[2 ];
-         acc1 = b0 * Xn1 + d1;
+         acc1 = (b0 * Xn1) + d1;
          
          Xn4  = pIn[3 ];
-         d1 = b1 * Xn1 + d2;
+         d1 = (b1 * Xn1) + d2;
          
          Xn5  = pIn[4 ];
          d2 = b2 * Xn1;
@@ -225,10 +225,10 @@ uint32_t blockSize)
 
          /* Sample 2. 5 cycles */
          Xn8  = pIn[7 ];
-         acc2 = b0 * Xn2 + d1;
+         acc2 = (b0 * Xn2) + d1;
          
          Xn9  = pIn[8 ];
-         d1 = b1 * Xn2 + d2;
+         d1 = (b1 * Xn2) + d2;
          
          Xn10 = pIn[9 ];
          d2 = b2 * Xn2;
@@ -241,10 +241,10 @@ uint32_t blockSize)
 
          /* Sample 3. 5 cycles */
          Xn13 = pIn[12];
-         acc3 = b0 * Xn3 + d1;
+         acc3 = (b0 * Xn3) + d1;
          
          Xn14 = pIn[13];
-         d1 = b1 * Xn3 + d2;
+         d1 = (b1 * Xn3) + d2;
          
          Xn15 = pIn[14];
          d2 = b2 * Xn3;
@@ -256,71 +256,71 @@ uint32_t blockSize)
          d2 += a2 * acc3;
 
          /* Sample 4. 5 cycles */
-         acc4 = b0 * Xn4 + d1;
-         d1 = b1 * Xn4 + d2;
+         acc4 = (b0 * Xn4) + d1;
+         d1 = (b1 * Xn4) + d2;
          d2 = b2 * Xn4;
          d1 += a1 * acc4;
          d2 += a2 * acc4;
 
          /* Sample 5. 5 cycles */
-         acc5 = b0 * Xn5 + d1;
-         d1 = b1 * Xn5 + d2;
+         acc5 = (b0 * Xn5) + d1;
+         d1 = (b1 * Xn5) + d2;
          d2 = b2 * Xn5;
          d1 += a1 * acc5;
          d2 += a2 * acc5;
 
          /* Sample 6. 5 cycles */
-         acc6 = b0 * Xn6 + d1;
-         d1 = b1 * Xn6 + d2;
+         acc6 = (b0 * Xn6) + d1;
+         d1 = (b1 * Xn6) + d2;
          d2 = b2 * Xn6;
          d1 += a1 * acc6;
          d2 += a2 * acc6;
 
          /* Sample 7. 5 cycles */
-         acc7 = b0 * Xn7 + d1;
-         d1 = b1 * Xn7 + d2;
+         acc7 = (b0 * Xn7) + d1;
+         d1 = (b1 * Xn7) + d2;
          d2 = b2 * Xn7;
          d1 += a1 * acc7;
          d2 += a2 * acc7;
 
          /* Sample 8. 5 cycles */
-         acc8 = b0 * Xn8 + d1;
-         d1 = b1 * Xn8 + d2;
+         acc8 = (b0 * Xn8) + d1;
+         d1 = (b1 * Xn8) + d2;
          d2 = b2 * Xn8;
          d1 += a1 * acc8;
          d2 += a2 * acc8;
 
          /* Sample 9. 5 cycles */
-         acc9 = b0 * Xn9 + d1;
-         d1 = b1 * Xn9 + d2;
+         acc9 = (b0 * Xn9) + d1;
+         d1 = (b1 * Xn9) + d2;
          d2 = b2 * Xn9;
          d1 += a1 * acc9;
          d2 += a2 * acc9;
 
          /* Sample 10. 5 cycles */
-         acc10 = b0 * Xn10 + d1;
-         d1 = b1 * Xn10 + d2;
+         acc10 = (b0 * Xn10) + d1;
+         d1 = (b1 * Xn10) + d2;
          d2 = b2 * Xn10;
          d1 += a1 * acc10;
          d2 += a2 * acc10;
 
          /* Sample 11. 5 cycles */
-         acc11 = b0 * Xn11 + d1;
-         d1 = b1 * Xn11 + d2;
+         acc11 = (b0 * Xn11) + d1;
+         d1 = (b1 * Xn11) + d2;
          d2 = b2 * Xn11;
          d1 += a1 * acc11;
          d2 += a2 * acc11;
 
          /* Sample 12. 5 cycles */
-         acc12 = b0 * Xn12 + d1;
-         d1 = b1 * Xn12 + d2;
+         acc12 = (b0 * Xn12) + d1;
+         d1 = (b1 * Xn12) + d2;
          d2 = b2 * Xn12;
          d1 += a1 * acc12;
          d2 += a2 * acc12;
 
          /* Sample 13. 5 cycles */
-         acc13 = b0 * Xn13 + d1;         
-         d1 = b1 * Xn13 + d2;         
+         acc13 = (b0 * Xn13) + d1;         
+         d1 = (b1 * Xn13) + d2;         
          d2 = b2 * Xn13;
          
          pOut[0 ] = acc1 ;
@@ -331,10 +331,10 @@ uint32_t blockSize)
 
          /* Sample 14. 5 cycles */
          pOut[2 ] = acc3 ;	
-         acc14 = b0 * Xn14 + d1;
+         acc14 = (b0 * Xn14) + d1;
              
          pOut[3 ] = acc4 ;
-         d1 = b1 * Xn14 + d2;
+         d1 = (b1 * Xn14) + d2;
           
          pOut[4 ] = acc5 ; 
          d2 = b2 * Xn14;
@@ -348,10 +348,10 @@ uint32_t blockSize)
          /* Sample 15. 5 cycles */
          pOut[7 ] = acc8 ;
          pOut[8 ] = acc9 ;  
-         acc15 = b0 * Xn15 + d1;
+         acc15 = (b0 * Xn15) + d1;
               
          pOut[9 ] = acc10;	
-         d1 = b1 * Xn15 + d2;
+         d1 = (b1 * Xn15) + d2;
          
          pOut[10] = acc11;	
          d2 = b2 * Xn15;
@@ -364,10 +364,10 @@ uint32_t blockSize)
 
          /* Sample 16. 5 cycles */
          pOut[13] = acc14;	
-         acc16 = b0 * Xn16 + d1;
+         acc16 = (b0 * Xn16) + d1;
          
          pOut[14] = acc15;	
-         d1 = b1 * Xn16 + d2;
+         d1 = (b1 * Xn16) + d2;
          
          pOut[15] = acc16;
          d2 = b2 * Xn16;
@@ -382,10 +382,10 @@ uint32_t blockSize)
       sample = blockSize & 0xFu;
       while(sample > 0u) {
          Xn1 = *pIn;         
-         acc1 = b0 * Xn1 + d1;
+         acc1 = (b0 * Xn1) + d1;
          
          pIn++;
-         d1 = b1 * Xn1 + d2;
+         d1 = (b1 * Xn1) + d2;
          
          *pOut = acc1; 
          d2 = b2 * Xn1;
