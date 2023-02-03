@@ -5,12 +5,11 @@
 #include "pdu_can.h"
 #include "debug.h"
 
-#define BRAKE_LIGHT_ON_THRESHOLD 15
 #define BRAKE_TASK_PERIOD_MS 300
 
 bool isBrakePressed(uint32_t brakePercent)
 {
-    return (BrakePercent > BRAKE_LIGHT_ON_THRESHOLD);
+    return (BrakePercent > BrakelightThresholdPercent);
 }
 
 void CAN_Msg_VCU_Data_Callback()
@@ -21,3 +20,5 @@ void CAN_Msg_VCU_Data_Callback()
         BRAKE_LIGHT_DISABLE;
     }
 }
+
+
