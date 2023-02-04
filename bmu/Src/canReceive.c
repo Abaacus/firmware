@@ -70,3 +70,11 @@ void CAN_Msg_UartOverCanConfig_Callback()
 {
 	isUartOverCanEnabled = UartOverCanConfigSignal & 0x2;	
 }
+
+/*BMU state*/
+
+/*DCU state*/
+
+/*PDU state*/
+
+/*VCU state*/
