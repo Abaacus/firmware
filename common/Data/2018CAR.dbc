@@ -65,6 +65,23 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ CurrentHVBusInverterLeft : 0|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
+BO_ 2285243394 VCU_StateMachineState: 8 VCU_F7
+ SG_ VCU_State : 0|4@1+ (1,0) [0|0] ""  VCU_BeagleBone
+
+BO_ 2285177859 PDU_StateMachineState: 8 PDU
+ SG_ PDU_CoolingState : 8|4@1+ (1,0) [0|0] ""  VCU_BeagleBone
+ SG_ PDU_MotorControlState : 4|4@1+ (1,0) [0|0] ""  VCU_BeagleBone
+ SG_ PDU_MainState : 0|4@1+ (1,0) [0|0] ""  VCU_BeagleBone
+
+BO_ 2285112327 DCU_StateMachineState: 8 DCU
+ SG_ DCU_State : 0|4@1+ (1,0) [0|0] ""  VCU_BeagleBone
+
+BO_ 2285046785 BMU_StateMachineState: 8 BMU
+ SG_ BMU_State : 0|4@1+ (1,0) [0|0] ""  VCU_BeagleBone
+
+BO_ 2285043468 BoardStateRequest: 8 VCU_BeagleBone
+ SG_ RequestedBoard : 0|4@1+ (1,0) [0|0] ""  VCU_F7,PDU,DCU,BMU
+
 BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
  SG_ SpeedMotorRightKPH : 16|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
  SG_ SpeedMotorLeftKPH : 0|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
