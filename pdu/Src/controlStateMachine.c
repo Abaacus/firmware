@@ -229,7 +229,9 @@ void coolingControlTask(void *pvParameters)
 
     fsmTaskFunction(&coolingFsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){
+
+    } // Shouldn't reach here
 }
 
 void motorControlTask(void *pvParameters)
@@ -242,7 +244,9 @@ void motorControlTask(void *pvParameters)
 
     fsmTaskFunction(&motorFsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){
+        
+    } // Shouldn't reach here
 }
 
 void mainControlTask(void *pvParameters)
@@ -258,7 +262,9 @@ void mainControlTask(void *pvParameters)
 
     fsmTaskFunction(&mainFsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){
+
+    } // Shouldn't reach here
 }
 
 HAL_StatusTypeDef startControl()
@@ -405,7 +411,7 @@ uint32_t motorsOff(uint32_t event)
     if (sendCAN_PDU_ChannelStatus() != HAL_OK) {
         ERROR_PRINT("Failed to send pdu channel status CAN message\n");
     }
-
+// cppcheck-suppress misra-c2012-10.4
     if (event == MTR_EV_EM_DISABLE) {
         return MTR_STATE_Motors_Off;
     } else {

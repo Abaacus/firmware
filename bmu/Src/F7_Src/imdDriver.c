@@ -45,7 +45,8 @@ static void print_error(char err[]) {
 HAL_StatusTypeDef init_imd_measurement(void) {
   // Compute the right prescaler to set timer frequency
   RCC_ClkInitTypeDef      clkconfig;
-  uint32_t                uwTimclock, uwAPB1Prescaler = 0U;
+  uint32_t                uwTimclock = 0U;
+  uint32_t                uwAPB1Prescaler = 0U;
   uint32_t                uwPrescalerValue = 0U;
   uint32_t                timerFrequency;
   uint32_t                pFLatency;

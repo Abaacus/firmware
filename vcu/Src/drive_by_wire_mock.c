@@ -106,7 +106,8 @@ BaseType_t setFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     BaseType_t paramLen;
-    float throttlePercent1, throttlePercent2;
+    float throttlePercent1;
+    float throttlePercent2;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(param, "%f", &throttlePercent1);
@@ -132,7 +133,7 @@ static const CLI_Command_Definition_t throttleABCommandDefinition =
 BaseType_t getThrottle(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    float throttle = 0;
+    float throttle = 0.0;
     ThrottleStatus_t rc = getNewThrottle(&throttle);
     COMMAND_OUTPUT("Throttle %f, status (%s)\n", throttle, rc==THROTTLE_OK?"OK":"FAIL");
 

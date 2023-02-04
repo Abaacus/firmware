@@ -25,7 +25,11 @@ typedef enum PDU_Channels_t {
     NUM_PDU_CHANNELS
 } PDU_Channels_t;
 
-const char *channelNames[NUM_PDU_CHANNELS];
+extern const char *channelNames[NUM_PDU_CHANNELS];
+extern volatile uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
+HAL_StatusTypeDef startADCConversions();
+bool checkBlownFuse(float channelCurrent);
+void sensorTask(void *pvParameters);
 
 #define SENSOR_READ_PERIOD_MS 500
 

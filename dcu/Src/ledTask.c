@@ -13,6 +13,7 @@
 #include "bsp.h"
 #include "mainTaskEntry.h"
 #include "canReceive.h"
+#include "ledTask.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -23,6 +24,8 @@
 #define ERROR_LED_BLINK_PERIOD_MS 100
 
 #define FLASH_DURATION_MS 150
+
+extern FSM_Handle_Struct DCUFsmHandle;
 
 void selfTestLEDs(void);
 void flashLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);

@@ -115,7 +115,8 @@ bool is_tps_within_tolerance(uint16_t throttle1_percent, uint16_t throttle2_perc
 // @ret False if implausibility, true otherwise
 bool getThrottlePositionPercent(float *throttleOut)
 {
-    uint32_t throttle1_percent, throttle2_percent;
+    uint32_t throttle1_percent;
+    uint32_t throttle2_percent;
     float throttle;
     (*throttleOut) = 0;
 
@@ -139,7 +140,7 @@ bool getThrottlePositionPercent(float *throttleOut)
         return false;
     } else {
         /*DEBUG_PRINT("t1 %ld, t2 %ld\n", throttle1_percent, throttle2_percent);*/
-        throttle = (throttle1_percent + throttle2_percent) / 2;
+        throttle = (float)((throttle1_percent + throttle2_percent) / 2);
     }
 
     *throttleOut = throttle;
@@ -154,7 +155,7 @@ bool getThrottlePositionPercent(float *throttleOut)
  */
 ThrottleStatus_t getNewThrottle(float *throttleOut)
 {
-    float throttle = 0;
+    float throttle = 0.0;
     (*throttleOut) = 0;
 
     if (!getThrottlePositionPercent(&throttle)) {
@@ -235,7 +236,7 @@ int getBrakePressure() {
 // Full left turn angle: -100 degrees
 // Full right turn angle: 100 degrees
 int getSteeringAngle() {
-  int steeringPotVal = brakeThrottleSteeringADCVals[STEERING_INDEX];
+  int32_t steeringPotVal = (int32_t) brakeThrottleSteeringADCVals[STEERING_INDEX];
   return (steeringPotVal-STEERING_POT_OFFSET) / STEERING_SCALE_DIVIDER;
 }
 

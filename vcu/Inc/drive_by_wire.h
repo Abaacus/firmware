@@ -2,6 +2,7 @@
 #define __DRIVE_BY_WIRE_H
 #include "stm32f7xx_hal.h"
 #include "state_machine.h"
+#include "timers.h"
 
 // Throttle poll time is linked to brake timeout and implausibilty timeout
 #define THROTTLE_POLL_TIME_MS 50
@@ -56,4 +57,8 @@ HAL_StatusTypeDef driveByWireInit(void);
 HAL_StatusTypeDef startDriveByWire();
 HAL_StatusTypeDef MotorStop();
 void driveByWireTask(void *pvParameters);
+HAL_StatusTypeDef turnOnMotorControllers(void);
+HAL_StatusTypeDef turnOffMotorControllers(void);
+extern Transition_t transitions[];
+extern TimerHandle_t throttleUpdateTimer;
 #endif // __DRIVE_BY_WIRE_H

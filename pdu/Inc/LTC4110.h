@@ -5,6 +5,8 @@
 
 #define POWER_TASK_INTERVAL_MS 250
 
+void powerTask(void *pvParameters);
+
 extern volatile bool DC_DC_state;
 HAL_StatusTypeDef LTC4110Init(void);
 

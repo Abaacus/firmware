@@ -11,14 +11,16 @@
 #define MAIN_TASK_ID 1
 #define MAIN_TASK_PERIOD_MS 1000
 
-void mainTaskFunction(void const * argument)
+void mainTaskFunction(void const *argument);
+
+void mainTaskFunction(void const *argument)
 {
-    if (registerTaskToWatch(MAIN_TASK_ID, 5*pdMS_TO_TICKS(MAIN_TASK_PERIOD_MS), false, NULL) != HAL_OK)
+    if (registerTaskToWatch(MAIN_TASK_ID, 5 * pdMS_TO_TICKS(MAIN_TASK_PERIOD_MS), false, NULL) != HAL_OK)
     {
         ERROR_PRINT("Failed to register main task with watchdog!\n");
         Error_Handler();
     }
-    
+
     DEBUG_PRINT("Started Up");
 
     TickType_t xLastWakeTime = xTaskGetTickCount();

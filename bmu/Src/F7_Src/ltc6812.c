@@ -268,7 +268,8 @@ HAL_StatusTypeDef batt_broadcast_command(ltc_command_t curr_command) {
 const size_t TX_BUFF_SIZE = COMMAND_SIZE + PEC_SIZE;
 uint8_t txBuffer[TX_BUFF_SIZE];
 
-uint8_t command_byte_low, command_byte_high;
+uint8_t command_byte_low;
+uint8_t command_byte_high;
 switch(curr_command) {
 	case(ADCV): 
 	{
@@ -327,7 +328,8 @@ uint8_t adc_vals[VOLTAGE_BLOCK_SIZE * NUM_BOARDS * NUM_LTC_CHIPS_PER_BOARD] = {0
 
 for (int block = 0; block < VOLTAGE_BLOCKS_PER_CHIP; block++) {
 
-	uint8_t cmdByteLow, cmdByteHigh;
+	uint8_t cmdByteLow;
+    uint8_t cmdByteHigh;
 
 	// Select appropriate bank
 	if(block == 0)

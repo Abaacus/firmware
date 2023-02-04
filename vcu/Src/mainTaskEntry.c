@@ -3,6 +3,7 @@
 
 #include "bsp.h"
 #include "debug.h"
+#include "mainTaskEntry.h"
 
 #define MAIN_TASK_PERIOD 1000
 

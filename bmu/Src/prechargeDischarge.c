@@ -85,8 +85,11 @@ void setPosContactor(ContactorState_t state)
 {
     DEBUG_PRINT("%s positive contactor\n", (state==CONTACTOR_CLOSED)?"Closing":"Opening");
 
-    if (state==CONTACTOR_CLOSED) CONT_POS_CLOSE;
-    else if (state == CONTACTOR_OPEN) CONT_POS_OPEN;
+    if (state==CONTACTOR_CLOSED) {
+        CONT_POS_CLOSE;
+    } else if (state == CONTACTOR_OPEN) {
+        CONT_POS_OPEN;
+    }
 }
 
 /**
@@ -99,8 +102,11 @@ void setPrechargeContactor(ContactorState_t state)
 {
     DEBUG_PRINT("%s precharge contactor\n", (state==CONTACTOR_CLOSED)?"Closing":"Opening");
 
-    if (state==CONTACTOR_CLOSED) PCDC_PC;
-    else if (state == CONTACTOR_OPEN) PCDC_DC;
+    if (state==CONTACTOR_CLOSED) {
+        PCDC_PC;
+    } else if (state == CONTACTOR_OPEN) {
+        PCDC_DC;   
+    }
 }
 
 /**
@@ -179,7 +185,9 @@ float HITL_VPACK = 0;
  */
 Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
 {
-    float VBatt, VBus, IBus;
+    float VBatt;
+    float VBus;
+    float IBus;
     uint32_t dbwTaskNotifications;
     DEBUG_PRINT("precharge type %d\n", prechargeType);
     if (prechargeType >= PC_NumTypes) {

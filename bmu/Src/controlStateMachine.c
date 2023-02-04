@@ -138,7 +138,9 @@ void controlTask(void *pvParameters)
 
     fsmTaskFunction(&fsmHandle);
 
-    for(;;); // Shouldn't reach here
+    for(;;){
+        
+    } // Shouldn't reach here
 }
 
 HAL_StatusTypeDef startControl()

@@ -1,6 +1,7 @@
 #ifndef DCU_STATE_MACHINE
 #define DCU_STATE_MACHINE
 #include "state_machine.h"
+#include "cmsis_os.h"
 
 typedef enum DCU_States_t {
     STATE_Self_Test = 0,
@@ -30,6 +31,19 @@ extern bool TC_on;
 extern bool endurance_on;
 FSM_Handle_Struct DCUFsmHandle;
 HAL_StatusTypeDef dcuFsmInit();
+uint32_t updateFromCAN(uint32_t event);
+uint32_t fatalTransition(uint32_t event);
+uint32_t doNothing(uint32_t event);
+int sendHVToggleMsg(void);
+int sendEMToggleMsg(void);
+void HAL_GPIO_EXTI_Callback(uint16_t pin);
+extern TimerHandle_t buzzerSoundTimer;
+extern bool buzzerTimerStarted;
+extern bool debounceTimerStarted;
+extern Transition_t transitions[];
+extern bool alreadyDebouncing;
+extern uint16_t debouncingPin;
+extern TimerHandle_t debounceTimer;
 
 uint8_t getTC(void);
 

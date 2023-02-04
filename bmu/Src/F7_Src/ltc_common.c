@@ -34,7 +34,7 @@ void batt_gen_pec(uint8_t * arrdata, unsigned int num_bytes, uint8_t * pecAddr) 
     unsigned short pec = PEC_INIT_VAL;
     for (n = 0; n < num_bytes; n++) {
         uint8_t data = arrdata[n];
-        for (i = 0; i < 8; i++, data = data << 1) {
+        for (i = 0; i < 8; i++) {
             unsigned char din = GETBIT(data, 7);
 
             in0 = din ^ GETBIT(pec, 14);
@@ -60,6 +60,8 @@ void batt_gen_pec(uint8_t * arrdata, unsigned int num_bytes, uint8_t * pecAddr) 
             ASSIGNBIT(pec, GETBIT(pec, 1), 2);
             ASSIGNBIT(pec, GETBIT(pec, 0), 1);
             ASSIGNBIT(pec, in0, 0);
+
+            data = data << 1;
         }
     }
 
@@ -184,7 +186,9 @@ void delay_us(uint32_t time_us)
 	__HAL_TIM_SetCounter(&DELAY_TIMER,0);
 	__HAL_TIM_SetAutoreload(&DELAY_TIMER,0xffff);
 	HAL_TIM_Base_Start(&DELAY_TIMER);
-	while(DELAY_TIMER_INSTANCE->CNT < time_us);
+	while(DELAY_TIMER_INSTANCE->CNT < time_us){
+        
+    }
 	HAL_TIM_Base_Stop(&DELAY_TIMER);
 }
 

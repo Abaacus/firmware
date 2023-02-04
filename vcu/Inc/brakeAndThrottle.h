@@ -85,6 +85,19 @@ int getBrakePressure();
 HAL_StatusTypeDef brakeAndThrottleStart();
 int getSteeringAngle();
 float getBrakePositionPercent();
+HAL_StatusTypeDef startADCConversions();
+int map_range(int in, int low, int high, int low_out, int high_out);
+bool is_throttle1_in_range(uint32_t throttle);
+bool is_throttle2_in_range(uint32_t throttle);
+uint16_t calculate_throttle_percent1(uint16_t tps_value);
+uint16_t calculate_throttle_percent2(uint16_t tps_value);
+bool is_tps_within_tolerance(uint16_t throttle1_percent, uint16_t throttle2_percent);
+bool getThrottlePositionPercent(float *throttleOut);
+void canPublishTask(void *pvParameters);
+bool throttleAndBrakePressedError;
+extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
+extern bool throttleAndBrakePressedError;
+
 
 // For testing
 uint16_t calculate_throttle_adc_from_percent1(uint16_t percent);

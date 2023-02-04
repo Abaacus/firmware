@@ -1039,8 +1039,11 @@ HAL_StatusTypeDef resumeBalance()
 HAL_StatusTypeDef balance_cell(int cell, bool set)
 {
 #if IS_BOARD_F7 && defined(ENABLE_BALANCE)
-  if (set) batt_balance_cell(cell);
-  else batt_stop_balance_cell(cell);
+  if (set) {
+        batt_balance_cell(cell);
+  } else {
+        batt_stop_balance_cell(cell);
+  }
 #endif
 #if IS_BOARD_F7 && defined(ENABLE_AMS) && defined(ENABLE_BALANCE)
     if (batt_write_config() != HAL_OK) {

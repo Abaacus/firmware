@@ -15,7 +15,6 @@
 #define POLL_SENSORS_TASK_ID 2
 #define POLL_SENSORS_PERIOD_MS 100
 
-
 // Encoder Information
 #define ENCODER_COUNTER (__HAL_TIM_GET_COUNTER(&ENCODER_TIM_HANDLE))
 #define ENCODER_PULSES_PER_REVOLUTION (6)
@@ -28,12 +27,12 @@
 #define ENCODER_COUNT_TO_MM(count) ((count*(WHEEL_DIAMETER_MM*PI_SCALED/PI_SCALE))/ENCODER_PULSES_PER_REVOLUTION)
 #define ENCODER_COUNT_TO_RADS_S(delta_count, period) (((2*PI_SCALED*delta_count)/(ENCODER_PULSES_PER_REVOLUTION*PI_SCALE))/(period))
 
-typedef struct {
+typedef struct
+{
 	volatile uint32_t encoder_counts;
 	volatile uint32_t encoder_mm;
-	volatile float    encoder_speed;
+	volatile float encoder_speed;
 } sensors_data_S;
-
 
 static sensors_data_S sensors_data;
 
@@ -48,11 +47,11 @@ static void poll_encoder(void)
 	uint32_t count_diff = current_count - last_count;
 	sensors_data.encoder_counts += count_diff;
 	sensors_data.encoder_mm = ENCODER_COUNT_TO_MM(sensors_data.encoder_counts);
-	sensors_data.encoder_speed = ENCODER_COUNT_TO_RADS_S(count_diff, (float)(POLL_SENSORS_PERIOD_MS)/1000.0f);
+	sensors_data.encoder_speed = ENCODER_COUNT_TO_RADS_S(count_diff, (float)(POLL_SENSORS_PERIOD_MS) / 1000.0f);
 	last_count = current_count;
 }
 
-void pollSensorsTask(void const * argument)
+void pollSensorsTask(void const *argument)
 {
     if (registerTaskToWatch(POLL_SENSORS_TASK_ID, 5*pdMS_TO_TICKS(POLL_SENSORS_PERIOD_MS), false, NULL) != HAL_OK)
     {
@@ -68,15 +67,15 @@ void pollSensorsTask(void const * argument)
 
 		transmit_sensor_values();
 
-        watchdogTaskCheckIn(POLL_SENSORS_TASK_ID);
-		
+		watchdogTaskCheckIn(POLL_SENSORS_TASK_ID);
+
 		// Always poll at almost exactly PERIOD
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(POLL_SENSORS_PERIOD_MS));
 	}
 }
 
 static void transmit_encoder(void)
-{	
+{
 #if (BOARD_ID == ID_WSBFL)
 	FL_Speed = sensors_data.encoder_speed;
 	FL_WheelDistance = sensors_data.encoder_mm;
@@ -111,10 +110,10 @@ float sensor_encoder_speed(void)
 
 HAL_StatusTypeDef sensors_init(void)
 {
-    if(HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_1) != HAL_OK)
+	if (HAL_TIM_IC_Start(&htim3, TIM_CHANNEL_1) != HAL_OK)
 	{
 		ERROR_PRINT("Failed to start Encoder timer\n");
-		return HAL_ERROR;	
+		return HAL_ERROR;
 	}
 	return HAL_OK;
 }

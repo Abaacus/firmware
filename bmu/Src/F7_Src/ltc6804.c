@@ -106,7 +106,7 @@ void batt_init_chip_configs()
 	memset(open_wire_failure, 0, NUM_BOARDS*CELLS_PER_BOARD*sizeof(open_wire_failure_t));
 	for(int board = 0; board < NUM_BOARDS; board++) {
 		for(int ltc_chip = 0; ltc_chip < NUM_LTC_CHIPS_PER_BOARD; ltc_chip++){
-			m_batt_config[board][ltc_chip][0] = REFON(1) | ADC_OPT(0) | SWTRD(1);
+			m_batt_config[board][ltc_chip][0] = REFON(1U) | ADC_OPT(0U) | SWTRD(1U);
 		}
 	}
 }
@@ -202,7 +202,7 @@ HAL_StatusTypeDef batt_read_config(uint8_t config[NUM_BOARDS][NUM_LTC_CHIPS_PER_
 	for(int board = 0; board < NUM_BOARDS; board++){
 		for(int ltc_chip = 0; ltc_chip < NUM_LTC_CHIPS_PER_BOARD; ltc_chip++){
 
-			int address = LTC_ADDRESS[board][ltc_chip];
+			uint8_t address = LTC_ADDRESS[board][ltc_chip];
 		    uint8_t response_buffer[BATT_CONFIG_SIZE] = {0};
 
 			batt_read_data(RDCFG_BYTE0(address), RDCFG_BYTE1, response_buffer, BATT_CONFIG_SIZE);
@@ -247,7 +247,8 @@ HAL_StatusTypeDef batt_send_command(ltc_command_t curr_command, bool broadcast, 
     const size_t TX_BUFF_SIZE = COMMAND_SIZE + PEC_SIZE;
     uint8_t txBuffer[TX_BUFF_SIZE];
 	
-	uint8_t command_byte_low, command_byte_high;
+	uint8_t command_byte_low;
+    uint8_t command_byte_high;
 	uint8_t address = LTC_ADDRESS[board][ltc_chip];
 	switch(curr_command) {
 		case(ADCV): 
@@ -286,7 +287,7 @@ HAL_StatusTypeDef batt_send_command(ltc_command_t curr_command, bool broadcast, 
 			{
 				command_byte_low = ADOW_BYTE0(address);
 			}
-			command_byte_high = ADOW_BYTE1(1);
+			command_byte_high = ADOW_BYTE1(1U);
 			break;
 		}
 		case(ADOW_DOWN):
@@ -299,7 +300,7 @@ HAL_StatusTypeDef batt_send_command(ltc_command_t curr_command, bool broadcast, 
 			{
 				command_byte_low = ADOW_BYTE0(address);
 			}
-			command_byte_high = ADOW_BYTE1(0);
+			command_byte_high = ADOW_BYTE1(0U);
 			break;
 		}
 		default:
@@ -349,7 +350,8 @@ HAL_StatusTypeDef batt_readBackCellVoltage(float *cell_voltage_array, voltage_op
 			for (int block = 0; block < VOLTAGE_BLOCKS_PER_CHIP; block++) {
 				
 				uint8_t address = LTC_ADDRESS[board][ltc_chip]; 
-				uint8_t cmdByteLow, cmdByteHigh;
+				uint8_t cmdByteLow;
+                uint8_t cmdByteHigh;
 				// Select appropriate voltage register group
 				switch(block){
 					case 0:
@@ -485,7 +487,7 @@ void batt_set_temp_config(size_t channel) {
 		uint8_t gpioPins = channel;
 
 		// Set the external MUX to channel we want to read. MUX pin is selected via GPIO2, GPIO3, GPIO4, LSB first.
-		m_batt_config[board][THERMISTOR_CHIP][0] = (1<<GPIO5_POS) | ((gpioPins & 0xFF) << GPIO1_POS) | REFON(1) | ADC_OPT(0) | SWTRD(1);
+		m_batt_config[board][THERMISTOR_CHIP][0] = (1U<<GPIO5_POS) | ((gpioPins & 0xFF) << GPIO1_POS) | REFON(1U) | ADC_OPT(0U) | SWTRD(1U);
 	}
 }
 

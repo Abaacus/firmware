@@ -129,7 +129,10 @@ BaseType_t printBattInfo(char *writeBuffer, size_t writeBufferLength,
 
     static int cellIdx = -6;
 
-    float IBus, VBus, VBatt, packVoltage;
+    float IBus;
+    float VBus;
+    float VBatt;
+    float packVoltage;
 
     getIBus(&IBus);
     getVBus(&VBus);
@@ -248,7 +251,9 @@ static const CLI_Command_Definition_t setChannelTempCommandDefinition =
 BaseType_t printHVMeasurements(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    float IBus, VBus, VBatt;
+    float IBus;
+    float VBus;
+    float VBatt;
     getIBus(&IBus);
     getVBus(&VBus);
     getVBatt(&VBatt);

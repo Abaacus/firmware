@@ -9,6 +9,8 @@
 #include "motorController.h"
 #include "beaglebone.h"
 
+#include "userInit.h"
+
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                     signed char *pcTaskName )

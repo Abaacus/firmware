@@ -102,7 +102,7 @@ HAL_StatusTypeDef adc_read(uint8_t addr, int32_t *dataOut){
   HAL_StatusTypeDef status;
   uint8_t rbuffer[4] = {0};
   uint8_t tbuffer[4] = {0};
-  int32_t data = 0x0;
+  uint32_t data = 0x0; // change here
 
   //modifying address to datasheet format
   addr <<= 3;
@@ -121,11 +121,11 @@ HAL_StatusTypeDef adc_read(uint8_t addr, int32_t *dataOut){
 
 
   // shift to upper three bytes, then right-shift one byte to sign extend
-  data |= (int32_t)rbuffer[1] << 24;
+  data = data | (int32_t)(rbuffer[1] << 24);
 
-  data |= (int32_t)rbuffer[2] << 16;
+  data = data | (int32_t)(rbuffer[2] << 16);
 
-  data |= (int32_t)rbuffer[3] << 8;
+  data = data | (int32_t)(rbuffer[3] << 8);
 
   (*dataOut) = data >> 8;
 
@@ -221,7 +221,7 @@ HAL_StatusTypeDef hvadc_init()
       return HAL_ERROR;
     }
     vTaskDelay(5);
-  } while (status0 & (1<<RESET_ON_BIT));
+  } while (status0 & (1U<<RESET_ON_BIT));
 
   // Set up config register
   uint8_t cfgWrite = ADC_LOW_BW_ENABLE | ADC_FREQ_1KHZ;
