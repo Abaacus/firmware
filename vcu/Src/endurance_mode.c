@@ -20,9 +20,9 @@ static float initial_soc = 0.0f;
 static uint32_t num_laps = 0;
 static uint32_t num_laps_to_complete = NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT*(ENDURANCE_MODE_BUFFER);
 static bool in_endurance_mode = false;
-static const float em_kP = 200.0f;
-static const float em_kI = 0.2f;
 extern osThreadId enduranceModeHandle;
+static float em_kP = 200.0f; // cppcheck-suppress misra-c2012-8.9
+static float em_kI = 0.2f;   // cppcheck-suppress misra-c2012-8.9
 
 void endurance_mode_EM_callback(void)
 {

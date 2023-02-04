@@ -22,6 +22,8 @@ BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
 {
     "isUartOverCanEnabled",
@@ -43,6 +45,8 @@ BaseType_t setBrakePosition(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t brakePositionCommandDefinition =
 {
     "brake",
@@ -72,6 +76,8 @@ BaseType_t pduMCsOnOffMock(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t mcOnOffCommandDefinition =
 {
     "mc",
@@ -94,6 +100,8 @@ BaseType_t setFakeThrottle(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t throttleCommandDefinition =
 {
     "throttle",
@@ -121,6 +129,8 @@ BaseType_t setFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t throttleABCommandDefinition =
 {
     "throttleAB",
@@ -141,6 +151,8 @@ BaseType_t getThrottle(char *writeBuffer, size_t writeBufferLength,
                    /*brakeThrottleSteeringADCVals[3], brakeThrottleSteeringADCVals[4]);*/
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t getThrottleCommandDefinition =
 {
     "getThrottle",
@@ -157,6 +169,8 @@ BaseType_t getSteering(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t getSteeringCommandDefinition =
 {
     "getSteering",
@@ -176,6 +190,8 @@ BaseType_t getBrake(char *writeBuffer, size_t writeBufferLength,
                    /*brakeThrottleSteeringADCVals[3], brakeThrottleSteeringADCVals[4]);*/
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t getBrakeCommandDefinition =
 {
     "getBrake",
@@ -199,6 +215,8 @@ BaseType_t getFakeThrottleAB(char *writeBuffer, size_t writeBufferLength,
     return pdFALSE;
 }
 
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t getThrottleABCommandDefinition =
 {
     "getThrottleAB",
@@ -225,6 +243,8 @@ BaseType_t getADCInputs(char *writeBuffer, size_t writeBufferLength,
                    /*brakeThrottleSteeringADCVals[3], brakeThrottleSteeringADCVals[4]);*/
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t getADCInputsCommandDefinition =
 {
     "adcInputs",
@@ -250,6 +270,8 @@ BaseType_t setFakeBrakePressure(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t brakePressureCommandDefinition =
 {
     "brakePressure",
@@ -264,6 +286,8 @@ BaseType_t setFakeDCUCanTimeout(char *writeBuffer, size_t writeBufferLength,
     fsmSendEventISR(&fsmHandle, EV_DCU_Can_Timeout);
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t dcuTimeoutCommandDefinition =
 {
     "dcuTimeout",
@@ -278,6 +302,8 @@ BaseType_t fakeEM_ToggleDCU(char *writeBuffer, size_t writeBufferLength,
     fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t emToggleCommandDefinition =
 {
     "emToggle",
@@ -303,6 +329,8 @@ BaseType_t setTcKp(char *writeBuffer, size_t writeBufferLength,
     COMMAND_OUTPUT("Setting kP %f\n", tc_kP);
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t setKpCommandDefinition =
 {
     "setTcKp",
@@ -322,6 +350,8 @@ BaseType_t setErrorFloor(char *writeBuffer, size_t writeBufferLength,
     COMMAND_OUTPUT("setting error floor %f\n", adjustment_torque_floor);
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t setErrorFloorCommandDefinition =
 {
     "setErrorFloor",
@@ -341,6 +371,8 @@ BaseType_t setAdjustmentFloor(char *writeBuffer, size_t writeBufferLength,
     COMMAND_OUTPUT("setting error floor %f\n", error_floor);
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t setAdjustmentFloorCommandDefinition =
 {
     "setAdjustmentFloor",
@@ -377,6 +409,8 @@ BaseType_t fakeHVStateChange(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t hvStateCommandDefinition =
 {
     "hv",
@@ -396,6 +430,7 @@ BaseType_t printState(char *writeBuffer, size_t writeBufferLength,
     return pdFALSE;
 }
 
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t printStateCommandDefinition =
 {
     "state",
@@ -424,6 +459,8 @@ BaseType_t beagleBonePower(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t beagleBonePowerCommandDefinition =
 {
     "BB",
@@ -449,6 +486,8 @@ BaseType_t torqueDemandMaxCommand(char *writeBuffer, size_t writeBufferLength,
     }
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t torqueDemandMaxCommandDefinition =
 {
     "maxTorque",
@@ -472,6 +511,8 @@ BaseType_t speedLimitCommand(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t speedLimitCommandDefinition =
 {
     "speedLimit",
@@ -493,6 +534,8 @@ BaseType_t mcInitCommand(char *writeBuffer, size_t writeBufferLength,
 
     return pdFALSE;
 }
+
+// cppcheck-suppress misra-c2012-8.9
 static const CLI_Command_Definition_t mcInitCommandDefinition =
 {
     "mcInit",
