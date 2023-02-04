@@ -145,7 +145,7 @@ float map_range_float(float in, float low, float high, float low_out, float high
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent);
 HAL_StatusTypeDef setMaxChargeVoltage(float maxVoltage);
 void setSendOnlyOneCell(int cellIdx);
-void setAdjustedCellIR(float _adjustedCellIR);
+void setAdjustedCellIR(float newAdjustedCellIR);
 void clearSendOnlyOneCell();
 HAL_StatusTypeDef cliSetVBatt(float VBatt);
 HAL_StatusTypeDef cliSetVBus(float VBus);

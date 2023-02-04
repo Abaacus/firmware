@@ -27,21 +27,15 @@
 
 void CAN_Msg_BMU_batteryLimits_Callback()
 {
-    // set maxChargeCurrent,
     setMaxChargeCurrent(MaxChargeCurrent);
-    // set maxChargeVoltage
     setMaxChargeVoltage(MaxChargeVoltage);
-    // set StateBusHVSendPeriod
     cliSetStateBusHVSendPeriod(StateBusHVSendPeriod);
-    // set adjustedCellIR
     setAdjustedCellIR(AdjustedCellIR);
 }
 
 void CAN_Msg_BMU_stateSOC_Callback()
 {
-    // set CapacityStartup
     setCapacityStartup(CapacityStartup);
-    // set IBus_Integrated
     setIBus_Integrated(IBus_Integrated);
 }
 

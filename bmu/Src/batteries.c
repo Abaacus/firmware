@@ -333,13 +333,13 @@ void cliSetStateBusHVSendPeriod(uint32_t period)
 }
 
 /**
- * @brief Allows setting of the adjusted cell internal resistance constant
+ * @brief Update the internal resistance estimation for the cells
  *
  * @param float The value of the constant
  */
-void setAdjustedCellIR(float _adjustedCellIR)
+void setAdjustedCellIR(float newAdjustedCellIR)
 {
-    adjustedCellIR = _adjustedCellIR;
+    adjustedCellIR = newAdjustedCellIR;
 }
 
 
@@ -912,8 +912,9 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
  */
 HAL_StatusTypeDef setMaxChargeVoltage(float maxVoltage)
 {
+  float defaultVoltageMax = DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS;
   // Range check, arbitrary max that probably will never need to be changed
-  if (maxVoltage <= 0 || maxVoltage >= (DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS))
+  if (maxVoltage <= 0 || maxVoltage >= defaultVoltageMax)
   {
     return HAL_ERROR;
   }

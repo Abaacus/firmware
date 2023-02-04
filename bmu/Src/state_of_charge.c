@@ -168,9 +168,9 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
  *
  * @param uint64_t The value of the startup capacity
  */
-void setCapacityStartup(uint64_t _capacity_startup)
+void setCapacityStartup(uint64_t NewCapacity_startup)
 {
-    capacity_startup = _capacity_startup;
+    capacity_startup = NewCapacity_startup;
 }
 
 /**
@@ -178,7 +178,7 @@ void setCapacityStartup(uint64_t _capacity_startup)
  *
  * @param float The value of the float 
  */
-void setIBus_Integrated(float _IBus_Integrated)
+void setIBus_Integrated(float NewIBus_Integrated)
 {
-    IBus_Integrated = _IBus_Integrated;
+    IBus_Integrated = NewIBus_Integrated;
 }
