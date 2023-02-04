@@ -157,3 +157,8 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
             break;
     }
 }
+
+/*VCU state*/
+uint32_t get_vcu_state(){
+    return fsmGetState(&fsmHandle);
+}

@@ -26,3 +26,9 @@ void DTC_Fatal_Callback(BoardIDs board) {
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
 }
 
+/*PDU state*/
+uint32_t get_state_pdu(){
+    uint32_t main_state = fsmGetState(mainFsmHandle);
+    uint32_t motor_state = fsmGetState(motorFsmHandle);
+    uint32_t cooling_state = fsmGetState(coolingFsmHandle);
+}

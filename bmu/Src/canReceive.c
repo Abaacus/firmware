@@ -72,9 +72,6 @@ void CAN_Msg_UartOverCanConfig_Callback()
 }
 
 /*BMU state*/
-
-/*DCU state*/
-
-/*PDU state*/
-
-/*VCU state*/
+uint32_t get_bmu_state(){
+    return fsmGetState(&fsmHandle);
+}

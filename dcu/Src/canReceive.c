@@ -83,3 +83,8 @@ void DTC_Fatal_Callback(BoardIDs board)
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = isUartOverCanEnabled & 0x8;
 }
+
+/*DCU state*/
+uint32_t get_state_bmu(){
+    return fsmGetState(&DCUFsmHandle);
+}
