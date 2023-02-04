@@ -65,14 +65,14 @@ void CAN_Msg_PDU_ChannelStatus_Callback()
     if (!motorControllersStatus && StatusPowerMCLeft == StatusPowerMCLeft_CHANNEL_ON &&
         StatusPowerMCRight == StatusPowerMCRight_CHANNEL_ON) {
         xTaskNotifyFromISR( driveByWireHandle,
-                            (1<<NTFY_MCs_ON),
+                            (1U<<NTFY_MCs_ON),
                             eSetBits,
                             &xHigherPriorityTaskWoken );
         motorControllersStatus = true;
     } else if (motorControllersStatus) {
         // Only send a notification if MCs turned off if MCs were already ON
         xTaskNotifyFromISR( driveByWireHandle,
-                            (1<<NTFY_MCs_OFF),
+                            (1U<<NTFY_MCs_OFF),
                             eSetBits,
                             &xHigherPriorityTaskWoken );
         motorControllersStatus = false;
