@@ -21,23 +21,18 @@ float32_t lowPassFilter_state[4*NUM_SECTIONS] = {0};
 
 void filtersInit()
 {
-   int k=0;
-   for (int i=0; i<NUM_SECTIONS; i++)
-   {
-      lowPassFilter_coeffs[k] = b[i][0];
-      k++;
-      lowPassFilter_coeffs[k] = b[i][1];
-      k++;
-      lowPassFilter_coeffs[k] = b[i][2];
-      k++;
-      lowPassFilter_coeffs[k] = -a[i][1];
-      k++;
-      lowPassFilter_coeffs[k] = -a[i][2];
-      k++;
-   }
-   lowPassFilterInstance.numStages = NUM_SECTIONS;
-   lowPassFilterInstance.pState = lowPassFilter_state;
-   lowPassFilterInstance.pCoeffs = lowPassFilter_coeffs;
+    int k = 0;
+    for (int i=0; i<NUM_SECTIONS; i++)
+    {
+        lowPassFilter_coeffs[k++] = b[i][0];  // cppcheck-suppress misra-c2012-13.3
+        lowPassFilter_coeffs[k++] = b[i][1];  // cppcheck-suppress misra-c2012-13.3
+        lowPassFilter_coeffs[k++] = b[i][2];  // cppcheck-suppress misra-c2012-13.3
+        lowPassFilter_coeffs[k++] = -a[i][1]; // cppcheck-suppress misra-c2012-13.3
+        lowPassFilter_coeffs[k++] = -a[i][2]; // cppcheck-suppress misra-c2012-13.3
+    }
+    lowPassFilterInstance.numStages = NUM_SECTIONS;
+    lowPassFilterInstance.pState = lowPassFilter_state;
+    lowPassFilterInstance.pCoeffs = lowPassFilter_coeffs;
 
 }
 
