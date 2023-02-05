@@ -86,7 +86,7 @@ void CAN_Msg_UartOverCanConfig_Callback() {
 
 /*Send DCU state*/
 void CAN_Msg_BoardStateRequest_Callback(){
-    if(RequestedBoard == 7 || RequestedBoard == 0xffff){
+    if(RequestedBoard == ID_DCU || RequestedBoard == 0xffff){
         DCU_State = fsmGetState(&DCUFsmHandle);
         sendCAN_DCU_StateMachineState();
     }
