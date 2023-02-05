@@ -73,7 +73,7 @@ void CAN_Msg_UartOverCanConfig_Callback()
 
 /*Send BMU state*/
 void CAN_Msg_BoardStateRequest_Callback(){
-    if(RequestedBoard == ID_BMU || RequestedBoard == 0xffff){
+    if(RequestedBoard == ID_BMU || RequestedBoard == 0xf){
         BMU_State = fsmGetState(&fsmHandle);
         sendCAN_BMU_StateMachineState();
     }

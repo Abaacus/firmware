@@ -28,7 +28,7 @@ void DTC_Fatal_Callback(BoardIDs board) {
 
 /*Send PDU state*/
 void CAN_Msg_BoardStateRequest_Callback(){
-    if(RequestedBoard == ID_PDU || RequestedBoard == 0xffff){
+    if(RequestedBoard == ID_PDU || RequestedBoard == 0xf){
         PDU_MainState = fsmGetState(&mainFsmHandle);
         PDU_MotorControlState = fsmGetState(&motorFsmHandle);
         PDU_CoolingState = fsmGetState(&coolingFsmHandle);
