@@ -84,7 +84,10 @@ void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = isUartOverCanEnabled & 0x8;
 }
 
-/*DCU state*/
-uint32_t get_state_bmu(){
-    return fsmGetState(&DCUFsmHandle);
+/*Send DCU state*/
+void CAN_Msg_BoardStateRequest_Callback(){
+    if(RequestedBoard == 7 || RequestedBoard == 0xffff){
+        DCU_State = fsmGetState(&DCUFsmHandle);
+        sendCAN_DCU_StateMachineState();
+    }
 }

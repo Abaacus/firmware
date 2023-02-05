@@ -71,7 +71,10 @@ void CAN_Msg_UartOverCanConfig_Callback()
 	isUartOverCanEnabled = UartOverCanConfigSignal & 0x2;	
 }
 
-/*BMU state*/
-uint32_t get_bmu_state(){
-    return fsmGetState(&fsmHandle);
+/*Send BMU state*/
+void CAN_Msg_BoardStateRequest_Callback(){
+    if(RequestedBoard == 1 || RequestedBoard == 0xffff){
+        BMU_State = fsmGetState(&fsmHandle);
+        sendCAN_BMU_StateMachineState();
+    }
 }
