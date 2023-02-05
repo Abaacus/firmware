@@ -65,15 +65,15 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ CurrentHVBusInverterLeft : 0|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
-BO_ 2283803137 BMU_stateSOC: 8 VCU_F7
- SG_ CapacityStartup : 16|8@1+ (1,0) [0|0] ""  BMU,VCU_BeagleBone
- SG_ IBus_Integrated : 0|16@1- (0.001,0) [-32.768|32.767] "A-s"  BMU,VCU_BeagleBone
+BO_ 2283798796 BMU_CAN_Update_stateSOC: 8 VCU_BeagleBone
+ SG_ CapacityStartup : 16|8@1+ (1,0) [0|0] ""  BMU
+ SG_ IBus_Integrated : 0|16@1+ (0.001,0) [0|65.535] "A-s"  BMU
 
-BO_ 2217742849 BMU_batteryLimits: 8 VCU_F7
- SG_ StateBusHVSendPeriod : 48|16@1+ (1,0) [0|65535] "ms"  BMU,VCU_BeagleBone
- SG_ MaxChargeVoltage : 32|16@1+ (0.01,0) [0|655.35] "V"  BMU,VCU_BeagleBone
- SG_ AdjustedCellIR : 16|16@1+ (0.01,0) [0|655.35] ""  BMU,VCU_BeagleBone
- SG_ MaxChargeCurrent : 0|16@1+ (0.01,0) [0|655.35] "A"  BMU,VCU_BeagleBone
+BO_ 2217738508 BMU_CAN_Update_BatteryLimits: 8 VCU_BeagleBone
+ SG_ StateBusHVSendPeriodMS : 48|16@1+ (1,0) [0|65535] "ms"  BMU
+ SG_ MaxChargeVoltageV : 32|16@1+ (0.01,0) [0|655.35] "V"  BMU
+ SG_ AdjustedCellIROhms : 16|16@1+ (1E-005,0) [0|0.01] "Ohms"  BMU
+ SG_ MaxChargeCurrentA : 0|16@1+ (0.01,0) [0|655.35] "A"  BMU
 
 BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
  SG_ SpeedMotorRightKPH : 16|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
