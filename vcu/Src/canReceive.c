@@ -158,11 +158,6 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
     }
 }
 
-/*VCU state*/
-uint32_t get_vcu_state(){
-    return fsmGetState(&fsmHandle);
-}
-
 /*Send VCU state*/
 void CAN_Msg_BoardStateRequest_Callback(){
     if(RequestedBoard == 2 || RequestedBoard == 0xffff){
