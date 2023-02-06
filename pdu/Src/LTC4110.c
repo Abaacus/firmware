@@ -11,6 +11,7 @@
 #include "pdu_can.h"
 #include "watchdog.h"
 #include "pdu_dtc.h"
+#include "errorHandler.h"
 
 volatile bool DC_DC_state = false;
 
@@ -19,7 +20,7 @@ void powerTask(void *pvParameters)
     if (registerTaskToWatch(5, 2*POWER_TASK_INTERVAL_MS, false, NULL) != HAL_OK)
     {
         ERROR_PRINT("Failed to register power task with watchdog!\n");
-        Error_Handler();
+        PDU_error(Failure_registerTaskToWatch);
     }
 
     // Delay to allow system to turn on

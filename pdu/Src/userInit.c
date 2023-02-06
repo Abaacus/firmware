@@ -7,6 +7,7 @@
 #include "userCan.h"
 #include "controlStateMachine_mock.h"
 #include "LTC4110.h"
+#include "errorHandler.h"
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                     signed char *pcTaskName )
@@ -22,21 +23,21 @@ void userInit()
 {
     /* Should be the first thing initialized, otherwise print will fail */
     if (debugInit() != HAL_OK) {
-        Error_Handler();
+        PDU_error(Failure_debugInit);
     }
 
     if (initStateMachines() != HAL_OK) {
         ERROR_PRINT("Failed to init state machines!\n");
-        Error_Handler();
+        PDU_error(Failure_initStateMachines);
     }
 
     if (canInit(&CAN_HANDLE) != HAL_OK) {
-      Error_Handler();
+      PDU_error(Failure_canInit);
     }
 
     if (mockStateMachineInit() != HAL_OK) {
         ERROR_PRINT("Failed to init state machines!\n");
-        Error_Handler();
+        PDU_error(Failure_mockStateMachineInit);
     }
 
     uartStartReceiving(&DEBUG_UART_HANDLE);

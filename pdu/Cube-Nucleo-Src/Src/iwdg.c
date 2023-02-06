@@ -51,7 +51,7 @@
 #include "iwdg.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "errorHandler.h"
 /* USER CODE END 0 */
 
 IWDG_HandleTypeDef hiwdg;
@@ -66,7 +66,7 @@ void MX_IWDG_Init(void)
   hiwdg.Init.Reload = 4095;
   if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_IWDG_Init);
   }
 
 }

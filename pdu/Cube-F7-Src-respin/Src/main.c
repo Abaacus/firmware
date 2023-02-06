@@ -64,6 +64,7 @@
 #include "generalErrorHandler.h"
 #include "watchdog.h"
 #include "stm32f7xx_hal_timebase_tim.c"
+#include "errorHandler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -187,13 +188,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_RCC_OscConfig);
   }
   /** Activate the Over-Drive mode
   */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_PWREx_EnableOverDrive);
   }
   /** Initializes the CPU, AHB and APB buses clocks
   */
@@ -206,13 +207,13 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_6) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_RCC_ClockConfig);
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_UART4;
   PeriphClkInitStruct.Uart4ClockSelection = RCC_UART4CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_RCCEx_PeriphCLKConfig);
   }
 }
 

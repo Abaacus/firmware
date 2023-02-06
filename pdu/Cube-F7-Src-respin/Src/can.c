@@ -21,7 +21,7 @@
 #include "can.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "errorHandler.h"
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan3;
@@ -51,7 +51,7 @@ void MX_CAN3_Init(void)
   hcan3.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan3) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_CAN_Init);
   }
   /* USER CODE BEGIN CAN3_Init 2 */
 

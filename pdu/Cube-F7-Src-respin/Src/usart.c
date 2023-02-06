@@ -21,7 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "errorHandler.h"
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart4;
@@ -50,7 +50,7 @@ void MX_UART4_Init(void)
   huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
   if (HAL_UART_Init(&huart4) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_UART_Init);
   }
   /* USER CODE BEGIN UART4_Init 2 */
 
@@ -96,7 +96,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     hdma_uart4_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_uart4_rx) != HAL_OK)
     {
-      Error_Handler();
+      PDU_error(Failure_DMA_Init);
     }
 
     __HAL_LINKDMA(uartHandle,hdmarx,hdma_uart4_rx);

@@ -51,7 +51,7 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "errorHandler.h"
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim3;
@@ -70,18 +70,18 @@ void MX_TIM3_Init(void)
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_TIM_Base_Init);
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_TIM_ConfigClockSource);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_TIMEx_MasterConfigSynchronization);
   }
 
 }

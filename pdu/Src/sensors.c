@@ -11,6 +11,7 @@
 #include "pdu_can.h"
 #include "pdu_dtc.h"
 #include "watchdog.h"
+#include "errorHandler.h"
 
 volatile uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 
@@ -35,12 +36,12 @@ HAL_StatusTypeDef startADCConversions()
     if (HAL_ADC_Start_DMA(&ADC_HANDLE, (uint32_t*)ADC_Buffer, NUM_PDU_CHANNELS) != HAL_OK)
     {
         ERROR_PRINT("Failed to start ADC DMA conversions\n");
-        Error_Handler();
+        PDU_error(Failure_ADC_Start_DMA);
         return HAL_ERROR;
     }
     if (HAL_TIM_Base_Start(&ADC_TIM_HANDLE) != HAL_OK) {
         ERROR_PRINT("Failed to start ADC Timer\n");
-        Error_Handler();
+        PDU_error(Failure_TIM_Base_Start);
         return HAL_ERROR;
     }
 #else
@@ -101,12 +102,12 @@ void sensorTask(void *pvParameters)
     if (registerTaskToWatch(4, 2*pdMS_TO_TICKS(SENSOR_READ_PERIOD_MS), false, NULL) != HAL_OK)
     {
         ERROR_PRINT("Failed to register sensor task with watchdog!\n");
-        Error_Handler();
+        PDU_error(Failure_registerTaskToWatch);
     }
 
     if (startADCConversions() != HAL_OK) {
         ERROR_PRINT("Failed to start ADC conversions\n");
-        Error_Handler();
+        PDU_error(Failure_startADCConversions);
     }
 
     // Delay to allow adc readings to start

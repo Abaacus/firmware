@@ -12,6 +12,7 @@
 #include "bsp.h"
 #include "watchdog.h"
 #include "LTC4110.h"
+#include "errorHandler.h"
 
 #define HV_CRITICAL_MAIN_DELAY_TIME_MS 1000
 #define LV_SHUTDOWN_DELAY_TIME_MS 1000
@@ -224,7 +225,7 @@ void coolingControlTask(void *pvParameters)
     if (canStart(&CAN_HANDLE) != HAL_OK)
     {
         ERROR_PRINT("Failed to start CAN!\n");
-        Error_Handler();
+        PDU_error(Failure_canStart);
     }
 
     fsmTaskFunction(&coolingFsmHandle);
@@ -237,7 +238,7 @@ void motorControlTask(void *pvParameters)
     if (canStart(&CAN_HANDLE) != HAL_OK)
     {
         ERROR_PRINT("Failed to start CAN!\n");
-        Error_Handler();
+        PDU_error(Failure_canStart);
     }
 
     fsmTaskFunction(&motorFsmHandle);
@@ -253,7 +254,7 @@ void mainControlTask(void *pvParameters)
     if (canStart(&CAN_HANDLE) != HAL_OK)
     {
         ERROR_PRINT("Failed to start CAN!\n");
-        Error_Handler();
+        PDU_error(Failure_canStart);
     }
 
     fsmTaskFunction(&mainFsmHandle);

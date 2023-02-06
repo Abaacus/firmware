@@ -51,7 +51,7 @@
 #include "can.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "errorHandler.h"
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;
@@ -74,7 +74,7 @@ void MX_CAN1_Init(void)
   hcan1.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan1) != HAL_OK)
   {
-    Error_Handler();
+    PDU_error(Failure_CAN_Init);
   }
 
 }
