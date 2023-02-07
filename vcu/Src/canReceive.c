@@ -158,11 +158,13 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
     }
 }
 
-/*Send VCU state*/
-void CAN_Msg_BoardStateRequest_Callback(){
-    if(RequestedBoard == ID_VCU_F7 || RequestedBoard == 0xf){
+/* Send VCU state */
+void CAN_Msg_BoardStateRequest_Callback() {
+    if (RequestedBoard == ID_VCU_F7 || RequestedBoard == 0xf) {
         VCU_State = fsmGetState(&fsmHandle);
-        sendCAN_VCU_StateMachineState();
+        if (sendCAN_VCU_StateMachineState() != HAL_OK) {
+            ERROR_PRINT("Failed to send vcu state data\n");
+        }
     }
 
 }

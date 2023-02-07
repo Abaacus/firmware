@@ -84,10 +84,12 @@ void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = isUartOverCanEnabled & 0x8;
 }
 
-/*Send DCU state*/
-void CAN_Msg_BoardStateRequest_Callback(){
-    if(RequestedBoard == ID_DCU || RequestedBoard == 0xf){
+/* Send DCU state */
+void CAN_Msg_BoardStateRequest_Callback() {
+    if (RequestedBoard == ID_DCU || RequestedBoard == 0xf) {
         DCU_State = fsmGetState(&DCUFsmHandle);
-        sendCAN_DCU_StateMachineState();
+        if (sendCAN_DCU_StateMachineState() != HAL_OK) {
+            ERROR_PRINT("Failed to send dcu state data\n");
+        }
     }
 }

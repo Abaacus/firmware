@@ -26,12 +26,15 @@ void DTC_Fatal_Callback(BoardIDs board) {
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
 }
 
-/*Send PDU state*/
-void CAN_Msg_BoardStateRequest_Callback(){
-    if(RequestedBoard == ID_PDU || RequestedBoard == 0xf){
+/* Send PDU state */
+void CAN_Msg_BoardStateRequest_Callback() {
+    if (RequestedBoard == ID_PDU || RequestedBoard == 0xf) {
         PDU_MainState = fsmGetState(&mainFsmHandle);
         PDU_MotorControlState = fsmGetState(&motorFsmHandle);
         PDU_CoolingState = fsmGetState(&coolingFsmHandle);
         sendCAN_PDU_StateMachineState();
+        if (sendCAN_PDU_StateMachineState() != HAL_OK) {
+            ERROR_PRINT("Failed to send pdu state data\n");
+        }
     }
 }
