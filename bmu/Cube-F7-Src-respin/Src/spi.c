@@ -89,7 +89,7 @@ void MX_SPI4_Init(void)
   hspi4.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
   if (HAL_SPI_Init(&hspi4) != HAL_OK)
   {
-    BMU_error(SPI_Init);
+    BMU_error(Failed_SPI_Init);
   }
   /* USER CODE BEGIN SPI4_Init 2 */
 

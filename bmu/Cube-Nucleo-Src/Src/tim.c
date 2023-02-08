@@ -82,7 +82,7 @@ void MX_TIM10_Init(void)
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
-    BMU_error(Failed_TIM_PWM_ConfigChannel_1);
+    BMU_error(Failed_TIM_PWM_ConfigChannel);
   }
   HAL_TIM_MspPostInit(&htim10);
 

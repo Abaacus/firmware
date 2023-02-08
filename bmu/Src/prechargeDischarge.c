@@ -612,7 +612,7 @@ void pcdcTask(void *pvParameter)
     Precharge_Discharge_Return_t rc;
 
     if (pcdcInit() != HAL_OK) {
-        BMU_error(Failed_pcdcInit):
+        BMU_error(Failed_pcdcInit);
     }
 
     while (1)

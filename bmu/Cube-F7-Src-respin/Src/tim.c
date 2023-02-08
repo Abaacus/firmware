@@ -143,13 +143,13 @@ void MX_TIM3_Init(void)
   sConfigIC.ICFilter = 0;
   if (HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    BMU_error(Failed_TIM_IC_ConfigChannel_1);
+    BMU_error(Failed_TIM_IC_ConfigChannel);
   }
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   if (HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_2) != HAL_OK)
   {
-    BMU_error(Failed_TIM_IC_ConfigChannel_2);
+    BMU_error(Failed_TIM_IC_ConfigChannel);
   }
   /* USER CODE BEGIN TIM3_Init 2 */
 
@@ -202,19 +202,19 @@ void MX_TIM4_Init(void)
   sConfigIC.ICFilter = 0;
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    BMU_error(Failed_TIM_IC_ConfigChannel_1);
+    BMU_error(Failed_TIM_IC_ConfigChannel);
   }
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_2) != HAL_OK)
   {
-    BMU_error(Failed_TIM_IC_ConfigChannel_2);
+    BMU_error(Failed_TIM_IC_ConfigChannel);
   }
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_3) != HAL_OK)
   {
-    BMU_error(Failed_TIM_IC_ConfigChannel_3);
+    BMU_error(Failed_TIM_IC_ConfigChannel);
   }
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_4) != HAL_OK)
   {
-    BMU_error(Failed_TIM_IC_ConfigChannel_4);
+    BMU_error(Failed_TIM_IC_ConfigChannel);
   }
   /* USER CODE BEGIN TIM4_Init 2 */
 
@@ -332,7 +332,7 @@ void MX_TIM8_Init(void)
   sConfigIC.ICFilter = 0;
   if (HAL_TIM_IC_ConfigChannel(&htim8, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    BMU_error(Failed_TIM_IC_ConfigChannel_1);
+    BMU_error(Failed_TIM_IC_ConfigChannel);
   }
   /* USER CODE BEGIN TIM8_Init 2 */
 
@@ -401,7 +401,7 @@ void MX_TIM12_Init(void)
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim12, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
-    BMU_error(Failed_TIM_PWM_ConfigChannel_1);
+    BMU_error(Failed_TIM_PWM_ConfigChannel);
   }
   /* USER CODE BEGIN TIM12_Init 2 */
 
