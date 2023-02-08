@@ -19,3 +19,9 @@ int log_assert_violation(char *file, int line, char *condition)
     ERROR_PRINT("ASSERT FAILURE: (%s): %s:%d\n", condition, file, line);
     return 1;
 }
+
+void BMU_error(uint8_t error_num)
+{
+    ERROR_PRINT("BMU ERROR: %u\r\n", error_num);
+    // sendDTC_CRITICAL_VCU_ERROR_HANDLER(error_num); // WHERE IS THIS COMING FROM?
+}
