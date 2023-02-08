@@ -18,6 +18,7 @@
 #include "controlStateMachine_mock.h"
 #include "controlStateMachine.h"
 #include "batteries.h"
+#include "errorHandler.h"
 
 #if IS_BOARD_F7
 #include "imdDriver.h"
@@ -47,40 +48,40 @@ void userInit()
 {
     /* Should be the first thing initialized, otherwise print will fail */
     if (debugInit() != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_debugInit);
     }
 
     if (uartStartReceiving(&DEBUG_UART_HANDLE) != HAL_OK)
     {
-        Error_Handler();
+        BMU_error(Failed_uartStartReceiving);
     }
 
     if (canInit(&CAN_HANDLE) != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_canInit);
     }
 
     if (initBusVoltagesAndCurrentQueues() != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_initBusVoltagesAndCurrentQueues);
     }
  
     if (stateMachineMockInit() != HAL_OK) {
-       Error_Handler();
+        BMU_error(Failed_stateMachineMockInit);
     }
 
     if (controlInit() != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_controlInit);
     }
 
     if (initPackVoltageQueue() != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_initPackVoltageQueue);
     }
 #if IS_BOARD_F7
     if (init_imd_measurement() != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_init_imd_measurement);
     }
 #endif
 	if (init_HW_check_timer() != HAL_OK) {
-		Error_Handler();
+		BMU_error(Failed_init_HW_check_timer);
 	}
 
     printf("Finished user init\n");
