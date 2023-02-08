@@ -17,6 +17,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "bmu_can.h"
+#include "errorHandler.h"
 
 #define FAULT_MEASURE_TASK_PERIOD 100
 #define FAULT_TASK_ID 6
@@ -223,8 +224,7 @@ void faultMonitorTask(void *pvParameters)
 
    if (registerTaskToWatch(FAULT_TASK_ID, 2*pdMS_TO_TICKS(FAULT_MEASURE_TASK_PERIOD), false, NULL) != HAL_OK)
    {
-     ERROR_PRINT("Fault Monitor: Failed to register fault monitor task with watchdog!\n");
-     Error_Handler();
+     BMU_error(Failed_Fault_Monitor_Task_Unregistered_with_Watchdog);
    }
 	
    bool cbrb_pressed = false;

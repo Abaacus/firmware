@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
+#include "errorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -56,22 +57,22 @@ void MX_TIM2_Init(void)
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_ConfigClockSource);
   }
   if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_PWM_Init);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIMEx_MasterConfigSynchronization);
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 500;
@@ -79,7 +80,7 @@ void MX_TIM2_Init(void)
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_PWM_ConfigChannel);
   }
   /* USER CODE BEGIN TIM2_Init 2 */
 
@@ -111,16 +112,16 @@ void MX_TIM3_Init(void)
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_ConfigClockSource);
   }
   if (HAL_TIM_IC_Init(&htim3) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_Init);
   }
   sSlaveConfig.SlaveMode = TIM_SLAVEMODE_RESET;
   sSlaveConfig.InputTrigger = TIM_TS_TI2FP2;
@@ -128,13 +129,13 @@ void MX_TIM3_Init(void)
   sSlaveConfig.TriggerFilter = 0;
   if (HAL_TIM_SlaveConfigSynchro(&htim3, &sSlaveConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_SlaveConfigSynchro);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIMEx_MasterConfigSynchronization);
   }
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
   sConfigIC.ICSelection = TIM_ICSELECTION_INDIRECTTI;
@@ -142,13 +143,13 @@ void MX_TIM3_Init(void)
   sConfigIC.ICFilter = 0;
   if (HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_ConfigChannel_1);
   }
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   if (HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, TIM_CHANNEL_2) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_ConfigChannel_2);
   }
   /* USER CODE BEGIN TIM3_Init 2 */
 
@@ -178,22 +179,22 @@ void MX_TIM4_Init(void)
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_ConfigClockSource);
   }
   if (HAL_TIM_IC_Init(&htim4) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_Init);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIMEx_MasterConfigSynchronization);
   }
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
@@ -201,19 +202,19 @@ void MX_TIM4_Init(void)
   sConfigIC.ICFilter = 0;
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_ConfigChannel_1);
   }
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_2) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_ConfigChannel_2);
   }
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_3) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_ConfigChannel_3);
   }
   if (HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, TIM_CHANNEL_4) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_ConfigChannel_4);
   }
   /* USER CODE BEGIN TIM4_Init 2 */
 
@@ -242,18 +243,18 @@ void MX_TIM5_Init(void)
   htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim5) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim5, &sClockSourceConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_ConfigClockSource);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIMEx_MasterConfigSynchronization);
   }
   /* USER CODE BEGIN TIM5_Init 2 */
 
@@ -280,13 +281,13 @@ void MX_TIM6_Init(void)
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIMEx_MasterConfigSynchronization);
   }
   /* USER CODE BEGIN TIM6_Init 2 */
 
@@ -316,14 +317,14 @@ void MX_TIM8_Init(void)
   htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_IC_Init(&htim8) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_Init);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIMEx_MasterConfigSynchronization);
   }
   sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
@@ -331,7 +332,7 @@ void MX_TIM8_Init(void)
   sConfigIC.ICFilter = 0;
   if (HAL_TIM_IC_ConfigChannel(&htim8, &sConfigIC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_IC_ConfigChannel_1);
   }
   /* USER CODE BEGIN TIM8_Init 2 */
 
@@ -359,12 +360,12 @@ void MX_TIM9_Init(void)
   htim9.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim9) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim9, &sClockSourceConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_ConfigClockSource);
   }
   /* USER CODE BEGIN TIM9_Init 2 */
 
@@ -392,7 +393,7 @@ void MX_TIM12_Init(void)
   htim12.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim12) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_PWM_Init);
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 500;
@@ -400,7 +401,7 @@ void MX_TIM12_Init(void)
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim12, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_PWM_ConfigChannel_1);
   }
   /* USER CODE BEGIN TIM12_Init 2 */
 

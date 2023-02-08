@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
+#include "errorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -41,18 +42,18 @@ void MX_TIM3_Init(void)
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_ConfigClockSource);
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIMEx_MasterConfigSynchronization);
   }
 
 }
@@ -69,11 +70,11 @@ void MX_TIM10_Init(void)
   htim10.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_Base_Init);
   }
   if (HAL_TIM_PWM_Init(&htim10) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_PWM_Init);
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 500;
@@ -81,7 +82,7 @@ void MX_TIM10_Init(void)
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_TIM_PWM_ConfigChannel_1);
   }
   HAL_TIM_MspPostInit(&htim10);
 

@@ -58,6 +58,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "errorHandler.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -195,13 +196,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLR = 2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_RCC_OscConfig);
   }
   /** Activate the Over-Drive mode
   */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_PWREx_EnableOverDrive);
   }
   /** Initializes the CPU, AHB and APB buses clocks
   */
@@ -214,13 +215,13 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_6) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_RCC_ClockConfig);
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART2;
   PeriphClkInitStruct.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_RCCEx_PeriphCLKConfig);
   }
 }
 

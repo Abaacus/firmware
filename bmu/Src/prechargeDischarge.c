@@ -22,6 +22,7 @@
 #include "bmu_can.h"
 #include "bmu_dtc.h"
 #include "batteries.h"
+#include "errorHandler.h"
 
 /** Define this to enable contactor control, otherwise PCDC will always
  *  return successful.
@@ -611,7 +612,7 @@ void pcdcTask(void *pvParameter)
     Precharge_Discharge_Return_t rc;
 
     if (pcdcInit() != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_pcdcInit):
     }
 
     while (1)

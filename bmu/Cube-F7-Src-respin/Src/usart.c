@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
+#include "errorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -51,7 +52,7 @@ void MX_USART2_UART_Init(void)
   huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
   if (HAL_UART_Init(&huart2) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_UART_Init);
   }
   /* USER CODE BEGIN USART2_Init 2 */
 
@@ -97,7 +98,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     hdma_usart2_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_usart2_rx) != HAL_OK)
     {
-      Error_Handler();
+      BMU_error(Failed_DMA_Init);
     }
 
     __HAL_LINKDMA(uartHandle,hdmarx,hdma_usart2_rx);

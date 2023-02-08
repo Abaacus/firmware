@@ -23,6 +23,7 @@
 #include "watchdog.h"
 #include "batteries.h"
 #include "chargerControl.h"
+#include "errorHandler.h"
 
 extern osThreadId PCDCHandle;
 extern osThreadId BatteryTaskHandle;
@@ -133,7 +134,7 @@ void controlTask(void *pvParameters)
     startControl();
 
     if (canStart(&CAN_HANDLE) != HAL_OK) {
-        Error_Handler();
+        BMU_error(Failed_canStart);
     }
 
     fsmTaskFunction(&fsmHandle);

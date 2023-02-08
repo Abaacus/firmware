@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "spi.h"
+#include "errorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -54,7 +55,7 @@ void MX_SPI1_Init(void)
   hspi1.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
   if (HAL_SPI_Init(&hspi1) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(Failed_SPI_Init);
   }
   /* USER CODE BEGIN SPI1_Init 2 */
 
@@ -88,7 +89,7 @@ void MX_SPI4_Init(void)
   hspi4.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
   if (HAL_SPI_Init(&hspi4) != HAL_OK)
   {
-    Error_Handler();
+    BMU_error(SPI_Init);
   }
   /* USER CODE BEGIN SPI4_Init 2 */
 

@@ -14,6 +14,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "watchdog.h"
+#include "errorHandler.h"
 
 /*#define SENSOR_TASK_PERIOD 50*/
 #define SENSOR_TASK_PERIOD 1000
@@ -25,15 +26,13 @@ HAL_StatusTypeDef sensorTaskInit()
 #if IS_BOARD_F7
     if (HAL_ADC_Start_DMA(&BRAKE_ADC_HANDLE, (uint32_t *)brakeAndHVILVals, 2) != HAL_OK)
     {
-        ERROR_PRINT("Failed to start Brake sensor ADC DMA conversions\n");
-        Error_Handler();
+        BMU_error(Failed_Brake_Sensor_ADC_DMA_Conversions_not_Started);
         return HAL_ERROR;
     }
 
     if (HAL_TIM_Base_Start(&BRAKE_TIM_ADC_HANDLE) != HAL_OK)
     {
-        ERROR_PRINT("Failed to start Brake sensor ADC DMA conversions\n");
-        Error_Handler();
+        BMU_error(Failed_Brake_Sensor_ADC_DMA_Conversions_not_Started);
         return HAL_ERROR;
     }
 #else
@@ -52,13 +51,11 @@ void sensorTask(void *pvParameters)
     
     if (registerTaskToWatch(3, 2*pdMS_TO_TICKS(SENSOR_TASK_PERIOD), false, NULL) != HAL_OK)
     {
-        ERROR_PRINT("Failed to register battery task with watchdog!\n");
-        Error_Handler();
+        BMU_error(Failed_Battery_Task_Unregistered_with_Watchdog);
     }
 
     if (sensorTaskInit() != HAL_OK) {
-       ERROR_PRINT("Failed to init sensor task\n");
-       Error_Handler();
+        BMU_error(Failed_sensorTaskInit);
     }
 
    TickType_t xLastWakeTime = xTaskGetTickCount();

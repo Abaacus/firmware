@@ -17,6 +17,7 @@
 #include "debug.h"
 #include "controlStateMachine.h"
 #include "state_machine.h"
+#include "errorHandler.h"
 
 #define FAN_OFF_TEMP 25
 #define FAN_PEAK_TEMP 35
@@ -76,7 +77,7 @@ void fanTask()
 {
   if (fanInit() != HAL_OK) {
     ERROR_PRINT("Failed to init fans\n");
-    Error_Handler();
+    BMU_error(Failed_fanInit);
   }
 
   TickType_t xLastWakeTime = xTaskGetTickCount();

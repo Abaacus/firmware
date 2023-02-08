@@ -32,6 +32,7 @@
 #include "canReceive.h"
 #include "chargerControl.h"
 #include "state_of_charge.h"
+#include "errorHandler.h"
 
 /*
  *
@@ -361,8 +362,7 @@ void HVMeasureTask(void *pvParamaters)
 
     if (registerTaskToWatch(HV_MEASURE_TASK_ID, 5*pdMS_TO_TICKS(HV_MEASURE_TASK_PERIOD_MS), false, NULL) != HAL_OK)
     {
-        ERROR_PRINT("Failed to register hv measure task with watchdog!\n");
-        Error_Handler();
+        BMU_error(Failed_HV_Measure_Task_Unregistered_with_Watchdog);
     }
 
     uint32_t lastStateBusHVSend = 0;
@@ -412,8 +412,7 @@ void imdTask(void *pvParamaters)
    IMDStatus imdStatus;
 
    if (begin_imd_measurement() != HAL_OK) {
-      ERROR_PRINT("Failed to start IMD measurement\n");
-      Error_Handler();
+      BMU_error(Failed_IMD_Measurement_not_Started);
    }
 
    // Wait for IMD to startup
@@ -428,8 +427,7 @@ void imdTask(void *pvParamaters)
 
    if (registerTaskToWatch(IMD_TASK_ID, 2*pdMS_TO_TICKS(IMD_TASK_PERIOD_MS), false, NULL) != HAL_OK)
    {
-     ERROR_PRINT("Failed to register imd task with watchdog!\n");
-     Error_Handler();
+     BMU_error(Failed_IMD_Task_Unregistered_with_Watchdog);
    }
    TickType_t xLastWakeTime = xTaskGetTickCount();
    while (1) {
@@ -1338,7 +1336,7 @@ void batteryTask(void *pvParameter)
 {
     if (initVoltageAndTempArrays() != HAL_OK)
     {
-       Error_Handler();
+       BMU_error(Failed_initVoltageAndTempArrays);
     }
 
 
@@ -1363,7 +1361,7 @@ void batteryTask(void *pvParameter)
     if (registerTaskToWatch(BATTERY_TASK_ID, 2*pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS), false, NULL) != HAL_OK)
     {
         ERROR_PRINT("Failed to register battery task with watchdog!\n");
-        Error_Handler();
+        BMU_error(Failed_Battery_Task_Unregistered_with_Watchdog);
     }
 
     float packVoltage;
