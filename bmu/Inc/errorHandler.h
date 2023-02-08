@@ -4,7 +4,15 @@
 #include "main.h"
 
 typedef enum Error_events_t {
-    // TODO
+    Failed_debugInit = 0,
+    Failed_uartStartReceiving,
+    Failed_canInit,
+    Failed_initBusVoltagesAndCurrentQueues,
+    Failed_stateMachineMockInit,
+    Failed_controlInit,
+    Failed_initPackVoltageQueue,
+    Failed_init_imd_measurement,
+    Failed_init_HW_check_timer,
 } Error_events_t;
 
 void BMU_error(uint8_t error_num);
