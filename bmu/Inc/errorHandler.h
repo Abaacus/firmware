@@ -3,6 +3,12 @@
 #define ERRORHANDLER_H
 #include "main.h"
 
+typedef enum Error_events_t {
+    // TODO
+} Error_events_t;
+
+void BMU_error(uint8_t error_num);
+
 #if IS_BOARD_NUCLEO_F7
 #ifndef Error_Handler
 #define Error_Handler() _Error_Handler(__FILE__, __LINE__)
