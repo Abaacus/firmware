@@ -9,7 +9,7 @@
 
 bool isBrakePressed()
 {
-    return BrakePercent > BrakelightThresholdPercent;
+    return BrakePercent > brakelightOnThreshold;
 }
 
 void CAN_Msg_VCU_Data_Callback()
@@ -21,4 +21,15 @@ void CAN_Msg_VCU_Data_Callback()
     }
 }
 
+void setBrakeLightOnThresholdPercent(uint8_t percent)
+{
+    if (percent > 100) {
+        percent = 100;
+    }
+    if (percent < 0) {
+        percent = 0;
+    }
+    
+    brakelightOnThreshold = percent;
+}
 

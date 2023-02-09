@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "boardTypes.h"
 #include "canReceive.h"
+#include "brakeLight.h"
 
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
@@ -19,6 +20,10 @@ void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_DISABLE);
         fsmSendEventISR(&coolingFsmHandle, COOL_EV_EM_DISABLE);
     }
+}
+
+void CAN_Msg_PDU_BrakeLightOnThreshold_Callback(){
+   setBrakeLightOnThresholdPercent(BrakeLightOnThresholdPercent);
 }
 
 void DTC_Fatal_Callback(BoardIDs board) {
