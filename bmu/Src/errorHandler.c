@@ -23,5 +23,6 @@ int log_assert_violation(char *file, int line, char *condition)
 void BMU_error(uint8_t error_num)
 {
     ERROR_PRINT("BMU ERROR: %u\r\n", error_num);
-    // sendDTC_CRITICAL_VCU_ERROR_HANDLER(error_num); // WHERE IS THIS COMING FROM?
+    // sendDTC_CRITICAL_BMU_ERROR_HANDLER(error_num);
+    // 60,BMU_ERROR_HANDLER,BMU,2,BMU,ErrorNumber,"BMU Error #data"
 }
