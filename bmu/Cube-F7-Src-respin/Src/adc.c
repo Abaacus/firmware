@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "adc.h"
-#include "errorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -58,7 +57,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
-    BMU_error(Failed_ADC_Init);
+    Error_Handler();
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
@@ -67,7 +66,7 @@ void MX_ADC1_Init(void)
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
-    BMU_error(Failed_ADC_ConfigChannel);
+    Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
 
@@ -103,7 +102,7 @@ void MX_ADC2_Init(void)
   hadc2.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   if (HAL_ADC_Init(&hadc2) != HAL_OK)
   {
-    BMU_error(Failed_ADC_Init);
+    Error_Handler();
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
@@ -112,7 +111,7 @@ void MX_ADC2_Init(void)
   sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
   {
-    BMU_error(Failed_ADC_ConfigChannel);
+    Error_Handler();
   }
   /* USER CODE BEGIN ADC2_Init 2 */
 
@@ -180,7 +179,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     hdma_adc2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_adc2) != HAL_OK)
     {
-      BMU_error(Failed_DMA_Init);
+      Error_Handler();
     }
 
     __HAL_LINKDMA(adcHandle,DMA_Handle,hdma_adc2);

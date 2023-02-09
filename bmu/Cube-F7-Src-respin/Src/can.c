@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
-#include "errorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -53,7 +52,7 @@ void MX_CAN1_Init(void)
   hcan1.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan1) != HAL_OK)
   {
-    BMU_error(Failed_CAN_Init);
+    Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
 
@@ -85,7 +84,7 @@ void MX_CAN3_Init(void)
   hcan3.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan3) != HAL_OK)
   {
-    BMU_error(Failed_CAN_Init);
+    Error_Handler();
   }
   /* USER CODE BEGIN CAN3_Init 2 */
 

@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "iwdg.h"
-#include "errorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -37,7 +36,7 @@ void MX_IWDG_Init(void)
   hiwdg.Init.Reload = 160;
   if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
   {
-    BMU_error(Failed_IWDG_Init);
+    Error_Handler();
   }
 
 }
