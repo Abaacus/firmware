@@ -139,9 +139,9 @@ BaseType_t channelEnableCommand(char *writeBuffer, size_t writeBufferLength,
     const char * onOffParam = FreeRTOS_CLIGetParameter(commandString, 2, &paramLen);
 
     bool onOff = false;
-    if (STR_EQ(onOffParam, "on", paramLen)) {
+    if (STR_EQ(onOffParam, "on", paramLen) != 0) {
         onOff = true;
-    } else if (STR_EQ(onOffParam, "off", paramLen)) {
+    } else if (STR_EQ(onOffParam, "off", paramLen) != 0) {
         onOff = false;
     } else {
         COMMAND_OUTPUT("Unkown parameter\n");
@@ -150,35 +150,35 @@ BaseType_t channelEnableCommand(char *writeBuffer, size_t writeBufferLength,
 
     const char * boardParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    if (STR_EQ(boardParam, "BMU", paramLen)) {
+    if (STR_EQ(boardParam, "BMU", paramLen) != 0) {
         COMMAND_OUTPUT("Turning BMU %s\n", onOff?"on":"off");
         if (onOff) {
             BMU_ENABLE;
         } else {
             BMU_DISABLE;
         }
-    } else if (STR_EQ(boardParam, "DCU", paramLen)) {
+    } else if (STR_EQ(boardParam, "DCU", paramLen) != 0) {
         COMMAND_OUTPUT("Turning DCU %s\n", onOff?"on":"off");
         if (onOff) {
             DCU_ENABLE;
         } else {
             DCU_DISABLE;
         }
-    } else if (STR_EQ(boardParam, "VCU_F7", paramLen)) {
+    } else if (STR_EQ(boardParam, "VCU_F7", paramLen) != 0) {
         COMMAND_OUTPUT("Turning VCU_F7 %s\n", onOff?"on":"off");
         if (onOff) {
             VCU_ENABLE;
         } else {
             VCU_DISABLE;
         }
-    } else if (STR_EQ(boardParam, "WSB", paramLen)) {
+    } else if (STR_EQ(boardParam, "WSB", paramLen) != 0) {
         COMMAND_OUTPUT("Turning WSB %s\n", onOff?"on":"off");
         if (onOff) {
             WSB_ENABLE;
         } else {
             WSB_DISABLE;
         }
-    } else if (STR_EQ(boardParam, "ALL", paramLen)) {
+    } else if (STR_EQ(boardParam, "ALL", paramLen) != 0) {
         COMMAND_OUTPUT("Turning ALL %s\n", onOff?"on":"off");
         if (onOff) {
             BMU_ENABLE;
@@ -212,9 +212,9 @@ BaseType_t mockEMEnableDisable(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    if (STR_EQ(param, "enable", paramLen)) {
+    if (STR_EQ(param, "enable", paramLen) != 0) {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_ENABLE);
-    } else if (STR_EQ(param, "disable", paramLen)) {
+    } else if (STR_EQ(param, "disable", paramLen) != 0) {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_DISABLE);
     } else {
         COMMAND_OUTPUT("Unkown parameter\n");
@@ -236,9 +236,9 @@ BaseType_t mockHVEnableDisable(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    if (STR_EQ(param, "enable", paramLen)) {
+    if (STR_EQ(param, "enable", paramLen) != 0) {
         fsmSendEventISR(&coolingFsmHandle, COOL_EV_EM_ENABLE);
-    } else if (STR_EQ(param, "disable", paramLen)) {
+    } else if (STR_EQ(param, "disable", paramLen) != 0) {
         fsmSendEventISR(&coolingFsmHandle, COOL_EV_EM_DISABLE);
     } else {
         COMMAND_OUTPUT("Unkown parameter\n");
@@ -380,7 +380,7 @@ BaseType_t controlFans(char *writeBuffer, size_t writeBufferLength,
     const char *selectionParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(selectionParam, "%u", &selection);
-    if (selection & 0x1U)
+    if ((selection & 0x1U) != 0)
 	{
 		FAN_RIGHT_ENABLE;
 	}
@@ -388,7 +388,7 @@ BaseType_t controlFans(char *writeBuffer, size_t writeBufferLength,
 	{
 		FAN_RIGHT_DISABLE;
 	}
-	if (selection & 0x2U)
+	if ((selection & 0x2U) != 0)
 	{
 		FAN_LEFT_ENABLE;
 	}
@@ -416,7 +416,7 @@ BaseType_t controlPumps(char *writeBuffer, size_t writeBufferLength,
     const char *selectionParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
     sscanf(selectionParam, "%u", &selection);
-    if (selection & 0x1U)
+    if ((selection & 0x1U) != 0)
 	{
 		PUMP_RIGHT_ENABLE;
 	}
@@ -424,7 +424,7 @@ BaseType_t controlPumps(char *writeBuffer, size_t writeBufferLength,
 	{
 		PUMP_RIGHT_DISABLE;
 	}
-	if (selection & 0x2U)
+	if ((selection & 0x2U) != 0)
 	{
 		PUMP_LEFT_ENABLE;
 	}
