@@ -421,6 +421,11 @@ BaseType_t versionCLICommand(char *writeBuffer, size_t writeBufferLength,
 		vTaskDelay(1);
 		versionCLIwriting = 4;
     		return pdTRUE;
+	} else if (versionCLIwriting == 4){
+		COMMAND_OUTPUT("Branch status: \r\n", CUR_BRANCH_STATUS);
+		vTaskDelay(1);
+		versionCLIwriting = 5;
+    		return pdTRUE;
 	} else {
 		COMMAND_OUTPUT("\n");
 		versionCLIwriting = 0;
