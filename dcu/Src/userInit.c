@@ -18,7 +18,7 @@
 #include "userCan.h"
 #include "dcu_can.h"
 #include "controlStateMachine.h"
-#include "userInit.h"
+#include "controlStateMachine_mock.h"
 /**
  * Called by FreeRTOS on stack overflow
  */
@@ -56,6 +56,10 @@ void userInit()
     if (dcuFsmInit() != HAL_OK)
     {
         Error_Handler();
+    }
+
+    if (stateMachineMockInit() != HAL_OK) {
+      Error_Handler();
     }
 
     HV_Power_State = 0;

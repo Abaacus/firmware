@@ -33,7 +33,6 @@
 #include "chargerControl.h"
 #include "state_of_charge.h"
 
-
 /*
  *
  * Platform specific includes
@@ -56,128 +55,18 @@
 #define ENABLE_CHARGER
 #define ENABLE_BALANCE
 
-/*
- * Battery task Defines and Variables
- */
-
-// This is subject to change and is expected to be 50ms
-// I moved it to 75ms to be safe
-#define BATTERY_TASK_PERIOD_MS 75
-#define BATTERY_CHARGE_TASK_PERIOD_MS 2000
-#define BATTERY_TASK_ID 2
-
-/**
- * @defgroup CellConfig
- *
- * Used for various safety checks and State of Charge calculation.
- * Update these values for new cells.
- *
- * @{
- */
-
-/* The following is specified in Volts (floating point) */
-/// Maximum voltage of a cell, will send a critical DTC is exceeded.
-
-#define DEFAULT_LIMIT_OVERVOLTAGE 4.2F
-volatile float LIMIT_OVERVOLTAGE = DEFAULT_LIMIT_OVERVOLTAGE;
-/// Used in SOC function. TODO: confirm this value
-#define LIMIT_HIGHVOLTAGE 4.2F
-/// Used in SOC function. TODO: confirm this value
-#define LIMIT_LOWVOLTAGE 3.0F
-/// Minimum voltage of a cell, will send a critical DTC if it goes below
-#define DEFAULT_LIMIT_UNDERVOLTAGE 2.5F
-volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
-/// Warning voltage of a cell, will send a warning DTC if it goes below
-#define LIMIT_LOWVOLTAGE_WARNING 2.8F
-/// Rate at which the low voltage threshold dynamically lowers vs current
-#define LIMIT_LOWVOLTAGE_WARNING_SLOPE 0.0043125F
-
-/* The following values are used in State of Power calculation and should
- * be determined from cell testing data */
-
-// TODO: Update these values for 2021 cells
-#define CELL_TIME_TO_FAILURE_ALLOWABLE (6.0)    ///< seconds?
-#define CELL_DCR (0.01)                         ///< Ohms
-#define CELL_HEAT_CAPACITY (1034.2)             ///< kJ/kg*K
-#define CELL_MASS (0.496)                       ///< kg
-
-// A constant which defines how much we adjust our AdjustedCellVoltage factoring in the cell's Internal Resistance
-// This is a very conservative number of 3mOhms. This is not the measured cell internal resistance.
-// Our current pack is 70s7p. So this assumption factors in that IBus is total current from cells and the current gets divided by 7
-#define ADJUSTED_CELL_IR (0.00286F)
-
-/** Maximum allowable cell temperature, will send critical DTC if surpassed */
-#define CELL_OVERTEMP (CELL_MAX_TEMP_C)
-/** Temp at warning DTC is sent */
-#define CELL_OVERTEMP_WARNING (CELL_MAX_TEMP_C - 10)
-/** Similar to @ref CELL_OVERTEMP, minimum temp before sending critical DTC */
-#define CELL_UNDERTEMP 0
-/** Similar to @ref CELL_OVERTEMP_WARNING, temp will send warning DTC */
-#define CELL_UNDERTEMP_WARNING 5
-
-/** @} Cell Characteristics */
-
-/*
- * Charging constants
- */
-
-/// Block balancing below this cell voltage
-#define BALANCE_START_VOLTAGE (3.5F)
-
-/**
- * Threshold to begin balancing a cell when it's SoC is this percent higher
- * than the minimum cell SoC in the entire pack
- */
-#define BALANCE_MIN_SOC_DELTA (1.0F)
-
-/// Pause balancing for this length when reading cell voltages to get good readings
-#define CELL_RELAXATION_TIME_MS (1000)
-
-/// SoC to stop charging at (of the cell with lowest SoC)
-#define CHARGE_STOP_SOC (98.0)
-
-/**
- * If using charge cart heartbeat, this heartbeat timeout. NB: We are phasing
- * out use of charge cart as a board with a microcontroller
- */
-#define CHARGE_CART_HEARTBEAT_MAX_PERIOD (1000)
-
-/// Default charging current limit (Amps)
-#define CHARGE_DEFAULT_MAX_CURRENT 5
-
-/**
- * Period at which cell SoCs are checked to determine which cells to balance.
- * This should be long enough so cells aren't constantly being toggled
- * between balance and not
- */
-#define BALANCE_RECHECK_PERIOD_MS (3000)
-#define START_NUM_TRIES (3)
-/**
- * Return of balance charge function
- */
-typedef enum ChargeReturn
-{
-    CHARGE_DONE,    ///< Charging finished, cells reached fully charged
-    CHARGE_STOPPED, ///< Charging was stopped as requested, cells not fully charged
-    CHARGE_ERROR    ///< Error occured stopping charging, cells not fully charged
-} ChargeReturn;
 
 extern osThreadId BatteryTaskHandle;
 
 /// Charging current limit
 float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
 
+float adjustedCellIR = ADJUSTED_CELL_IR_DEFAULT;
+
 /**
  * Charging voltage limit to be sent to charger. Charging is actually stopped based on min cell SoC as specified by @ref CHARGE_STOP_SOC
  */
 float maxChargeVoltage = DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS;
-
-/**
- * Set to true if we've already sent a low voltage warning for this cell to
- * stop repeated warnings being sent. Reset to false on init or when cell
- * voltage increases above low voltage warning limit
- */
-bool warningSentForCellVoltage[NUM_VOLTAGE_CELLS];
 
 /**
  * Set to true if we've already sent a high temperature warning for this cell to
@@ -251,7 +140,7 @@ float filterIBus(float IBus)
 {
   static float IBusOut = 0;
 
-  IBusOut = IBUS_FILTER_ALPHA*IBus + (1-IBUS_FILTER_ALPHA)*IBusOut;
+  IBusOut = (IBUS_FILTER_ALPHA * IBus) + ((1-IBUS_FILTER_ALPHA) * IBusOut);
 
   return IBusOut;
 }
@@ -268,7 +157,7 @@ HAL_StatusTypeDef initBusVoltagesAndCurrentQueues()
    VBusQueue = xQueueCreate(1, sizeof(float));
    VBattQueue = xQueueCreate(1, sizeof(float));
 
-   if (IBusQueue == NULL || VBusQueue == NULL || VBattQueue == NULL) {
+   if (!IBusQueue || !VBusQueue || !VBattQueue) {
       ERROR_PRINT("Failed to create bus voltages and current queues!\n");
       return HAL_ERROR;
    }
@@ -477,11 +366,11 @@ void HVMeasureTask(void *pvParamaters)
     }
 
     uint32_t lastStateBusHVSend = 0;
-    TickType_t xLastWakeTime = xTaskGetTickCount();
 
     float VBus;
     float VBatt;
     float IBus;
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     while (1) {
         if (readBusVoltagesAndCurrents(&IBus, &VBus, &VBatt) != HAL_OK) {
             ERROR_PRINT("Failed to read bus voltages and current!\n");
@@ -492,17 +381,17 @@ void HVMeasureTask(void *pvParamaters)
         }
 
 
-        if (xTaskGetTickCount() - lastStateBusHVSend
-            > pdMS_TO_TICKS(StateBusHVSendPeriod))
+        if ((xTaskGetTickCount() - lastStateBusHVSend) 
+        > pdMS_TO_TICKS(StateBusHVSendPeriod))
         {
             CurrentBusHV = IBus;
             VoltageBusHV = VBus;
             sendCAN_BMU_stateBusHV();
-            publishVbatt = VBatt;
+            AMS_PackVoltage = VBatt;
             sendCAN_BMU_AmsVBatt();
             lastStateBusHVSend = xTaskGetTickCount();
         }
-		integrate_bus_current(IBus, (float)(xTaskGetTickCount() - xLastWakeTime));
+		integrate_bus_current(IBus, (float)HV_MEASURE_TASK_PERIOD_MS);
 	
         watchdogTaskCheckIn(HV_MEASURE_TASK_ID);
         vTaskDelayUntil(&xLastWakeTime, HV_MEASURE_TASK_PERIOD_MS);
@@ -532,7 +421,7 @@ void imdTask(void *pvParamaters)
    do {
       imdStatus = get_imd_status();
       vTaskDelay(100);
-   } while (!(imdStatus == IMDSTATUS_Normal || imdStatus == IMDSTATUS_SST_Good));
+   } while ((imdStatus != IMDSTATUS_Normal) && (imdStatus != IMDSTATUS_SST_Good));
 
    // Notify control fsm that IMD is ready
    fsmSendEvent(&fsmHandle, EV_IMD_Ready, portMAX_DELAY);
@@ -542,6 +431,7 @@ void imdTask(void *pvParamaters)
      ERROR_PRINT("Failed to register imd task with watchdog!\n");
      Error_Handler();
    }
+   TickType_t xLastWakeTime = xTaskGetTickCount();
    while (1) {
       imdStatus =  get_imd_status();
 
@@ -579,14 +469,14 @@ void imdTask(void *pvParamaters)
             break;
       }
 
-      if (!(imdStatus == IMDSTATUS_Normal || imdStatus == IMDSTATUS_SST_Good))
+      if ((imdStatus != IMDSTATUS_Normal) && (imdStatus != IMDSTATUS_SST_Good))
       {
          // ERROR!!!
          fsmSendEventUrgentISR(&fsmHandle, EV_HV_Fault);
       }
 
       watchdogTaskCheckIn(IMD_TASK_ID);
-      vTaskDelay(IMD_TASK_PERIOD_MS);
+      vTaskDelayUntil(&xLastWakeTime, IMD_TASK_PERIOD_MS);
    }
 #else
    // Notify control fsm that IMD is ready
@@ -634,7 +524,7 @@ void enterAdjustedCellVoltages(void)
 	getIBus(&bus_current_A);
 	for (int cell = 0; cell < NUM_VOLTAGE_CELLS; cell++)
 	{
-		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * ADJUSTED_CELL_IR);
+		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * adjustedCellIR);
 	}
 }
 /**
@@ -658,7 +548,6 @@ HAL_StatusTypeDef initVoltageAndTempArrays()
    for (int i=0; i < NUM_VOLTAGE_CELLS; i++)
    {
       VoltageCell[i] = initVoltage;
-      warningSentForCellVoltage[i] = false;
    }
    for (int i=0; i < NUM_TEMP_CELLS; i++)
    {
@@ -683,10 +572,11 @@ void BatteryTaskError()
     AMS_CONT_OPEN;
 #endif
     fsmSendEventUrgent(&fsmHandle, EV_HV_Fault, pdMS_TO_TICKS(500));
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     while (1) {
         // Suspend this task while still updating watchdog
         watchdogTaskCheckIn(BATTERY_TASK_ID);
-        vTaskDelay(pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS));
+        vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS));
     }
 }
 
@@ -768,8 +658,8 @@ void filterCellVoltages(float *cellVoltages, float *cellVoltagesFiltered)
 		first_run = false;
 	}
 	for (int i = 0; i < NUM_VOLTAGE_CELLS; i++) {
-		cellVoltagesFiltered[i] = CELL_VOLTAGE_FILTER_ALPHA*cellVoltages[i]
-								+ (1-CELL_VOLTAGE_FILTER_ALPHA)*cellVoltagesFiltered[i];
+		cellVoltagesFiltered[i] = (CELL_VOLTAGE_FILTER_ALPHA * cellVoltages[i])
+								+ ((1-CELL_VOLTAGE_FILTER_ALPHA) * cellVoltagesFiltered[i]);
 	}
 }
 
@@ -809,8 +699,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
    static uint8_t thermistor_lag_counter = 0;
    enterAdjustedCellVoltages();
 
-   // We should only send a warning at max every cycle otherwise we could trigger a watchdog timeout
-   bool warning_dtc_sent_this_period = false;
+   static bool warning_dtc_sent = false;
    for (int i=0; i < NUM_VOLTAGE_CELLS; i++)
    {
 	  // We have 2 basically confidence measurements
@@ -828,15 +717,10 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 		 ERROR_PRINT("Cell %d is overvoltage at %f Volts\n", i, measure_low);
          sendDTC_CRITICAL_CELL_VOLTAGE_HIGH(i);
          rc = HAL_ERROR;
-      } else if (measure_high < LIMIT_LOWVOLTAGE_WARNING) {
-         if (!warningSentForCellVoltage[i] && !warning_dtc_sent_this_period) {
-            ERROR_PRINT("WARN: Cell %d is low voltage at %f Volts\n", i, measure_high);
-            sendDTC_WARNING_CELL_VOLTAGE_LOW(i);
-            warningSentForCellVoltage[i] = true;
-            warning_dtc_sent_this_period = true;
-         }
-      } else if (warningSentForCellVoltage[i] == true) {
-         warningSentForCellVoltage[i] = false;
+      } else if ((!warning_dtc_sent) && (measure_high < LIMIT_LOWVOLTAGE_WARNING)) {
+         ERROR_PRINT("WARN: Cell %d is low voltage at %f Volts\n", i, measure_high);
+         sendDTC_WARNING_CELL_VOLTAGE_LOW(i);
+         warning_dtc_sent = true;
       }
 
       // Update max voltage
@@ -847,7 +731,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
       (*packVoltage) += measure_low;
    }
 
-   if(thermistor_lag_counter >= THERMISTORS_PER_BOARD/NUM_THERMISTOR_MEASUREMENTS_PER_CYCLE)
+   if (thermistor_lag_counter >= (THERMISTORS_PER_BOARD / NUM_THERMISTOR_MEASUREMENTS_PER_CYCLE))
    {
 	   for (int i=0; i < NUM_TEMP_CELLS; i++)
 	   {
@@ -998,7 +882,7 @@ HAL_StatusTypeDef initPackVoltageQueue()
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 {
   // Range check, arbitrary max that probable will never need to be changed
-  if (maxCurrent <= 0 || maxCurrent >= 100)
+  if ((maxCurrent <= 0) || (maxCurrent >= 100))
   {
     return HAL_ERROR;
   }
@@ -1075,11 +959,9 @@ HAL_StatusTypeDef stopCharging()
 HAL_StatusTypeDef stopBalance()
 {
 #if IS_BOARD_F7 && defined(ENABLE_BALANCE)
-    if (batt_unset_balancing_all_cells() != HAL_OK) {
-        return HAL_ERROR;
-    }
+    batt_unset_balancing_all_cells();
 #endif
-
+    
 #if IS_BOARD_F7 && defined(ENABLE_AMS) && defined(ENABLE_BALANCE)
     if (batt_write_config() != HAL_OK) {
         return HAL_ERROR;
@@ -1110,7 +992,8 @@ HAL_StatusTypeDef pauseBalance()
     }
 
     if (stopBalance() != HAL_OK) {
-        ERROR_PRINT("Failed to pause balance\n");
+        ERROR_PRINT("Failed to stop balance\n");
+        return HAL_ERROR;
     }
 #endif
 
@@ -1191,7 +1074,7 @@ float map_range_float(float in, float low, float high, float low_out, float high
     float in_range = high - low;
     float out_range = high_out - low_out;
 
-    return (in - low) * out_range / in_range + low_out;
+    return (((in - low) * out_range) / in_range) + low_out;
 }
 
 /**
@@ -1309,9 +1192,9 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
          * Check if we should balance any cells
          * Only balance above a minimum voltage
          */
-        if (VoltageCellMin >= BALANCE_START_VOLTAGE || !using_charger)
+        if ((VoltageCellMin >= BALANCE_START_VOLTAGE) || !using_charger)
         {
-            if (xTaskGetTickCount() - lastBalanceCheck
+            if ((xTaskGetTickCount() - lastBalanceCheck)
                 > pdMS_TO_TICKS(BALANCE_RECHECK_PERIOD_MS))
             {
                 balancingCells = false;
@@ -1330,7 +1213,7 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
                     watchdogTaskCheckIn(BATTERY_TASK_ID);
                     /*DEBUG_PRINT("Cell %d SOC: %f\n", cell, cellSOC);*/
 
-                    if (cellSOC - minCellSOC > BALANCE_MIN_SOC_DELTA) {
+                    if ((cellSOC - minCellSOC) > BALANCE_MIN_SOC_DELTA) {
                         DEBUG_PRINT("Balancing cell %d\n", cell);
 #if IS_BOARD_F7
                         batt_balance_cell(cell);
@@ -1542,6 +1425,7 @@ void batteryTask(void *pvParameter)
                         fsmSendEvent(&fsmHandle, EV_Notification_Done, 20);
                     } else if (chargeRc == CHARGE_STOPPED) {
                         DEBUG_PRINT("Stopped charge/balancing\n");
+                        fsmSendEvent(&fsmHandle, EV_Notification_Stop, 20);
                     } else {
                         ERROR_PRINT("Unkown charge return code %d\n", chargeRc);
                         fsmSendEvent(&fsmHandle, EV_Charge_Error, portMAX_DELAY);
@@ -1671,6 +1555,7 @@ void clearSendOnlyOneCell()
 void canSendCellTask(void *pvParameters)
 {
   uint32_t cellIdxToSend = 0;
+  TickType_t xLastWakeTime = xTaskGetTickCount();
 
   while (1) {
     if (sendOneCellVoltAndTemp) {
@@ -1688,6 +1573,6 @@ void canSendCellTask(void *pvParameters)
     cellIdxToSend += 3;
     cellIdxToSend = cellIdxToSend % NUM_VOLTAGE_CELLS;
 
-    vTaskDelay(pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
   }
 }

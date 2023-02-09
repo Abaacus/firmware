@@ -128,8 +128,8 @@ static HAL_StatusTypeDef format_and_send_config(
 	// Therefore, we send data destined for the last board first
 	for (int board = (NUM_BOARDS-1); board >= 0; board--) {
 		for(int ltc_chip = (NUM_LTC_CHIPS_PER_BOARD-1); ltc_chip >= 0; ltc_chip--){
-			uint32_t configsWritten = ((NUM_BOARDS - 1) - board) * NUM_LTC_CHIPS_PER_BOARD + ((NUM_LTC_CHIPS_PER_BOARD - 1) - ltc_chip);
-			size_t startByte = COMMAND_SIZE + PEC_SIZE + configsWritten * (BATT_CONFIG_SIZE + PEC_SIZE);
+			uint32_t configsWritten = (((NUM_BOARDS - 1) - board) * NUM_LTC_CHIPS_PER_BOARD) + ((NUM_LTC_CHIPS_PER_BOARD - 1) - ltc_chip);
+			size_t startByte = COMMAND_SIZE + PEC_SIZE + (configsWritten * (BATT_CONFIG_SIZE + PEC_SIZE));
 
 			for (int dbyte = 0; dbyte < BATT_CONFIG_SIZE; dbyte++)
 			{
@@ -185,7 +185,7 @@ static HAL_StatusTypeDef batt_read_data(uint8_t cmdByteLow, uint8_t cmdByteHigh,
 
     for (int board = 0; board < NUM_BOARDS; board++) {
     	for(int ltc_chip = 0; ltc_chip < NUM_LTC_CHIPS_PER_BOARD; ltc_chip++){
-			int dataStartIdx = DATA_START_IDX + (PEC_SIZE+readSizePerChip) * (board * NUM_LTC_CHIPS_PER_BOARD + ltc_chip);
+			int dataStartIdx = DATA_START_IDX + ((PEC_SIZE+readSizePerChip) * ((board * NUM_LTC_CHIPS_PER_BOARD) + ltc_chip));
 			if (checkPEC(&(rxBuffer[dataStartIdx]), readSizePerChip) != HAL_OK)
 			{
 				ERROR_PRINT("PEC mismatch\n");
@@ -194,7 +194,7 @@ static HAL_StatusTypeDef batt_read_data(uint8_t cmdByteLow, uint8_t cmdByteHigh,
 
 			// Copy data out
 			for (int i = 0; i < readSizePerChip; i++) {
-				dataOutBuffer[(board * NUM_LTC_CHIPS_PER_BOARD + ltc_chip)*readSizePerChip + i] = rxBuffer[dataStartIdx + i];
+				dataOutBuffer[(((board * NUM_LTC_CHIPS_PER_BOARD) + ltc_chip)*readSizePerChip) + i] = rxBuffer[dataStartIdx + i];
 			}
 		}
     }
@@ -371,10 +371,10 @@ for (int block = 0; block < VOLTAGE_BLOCKS_PER_CHIP; block++) {
 			for (int cvreg = 0; cvreg < VOLTAGES_PER_BLOCK; cvreg ++)
 			{
 				size_t registerIndex = cvreg*CELL_VOLTAGE_SIZE_BYTES;
-				size_t registerStartForChip = (board * NUM_LTC_CHIPS_PER_BOARD + ltc_chip) * (CELL_VOLTAGE_SIZE_BYTES * VOLTAGES_PER_BLOCK);
+				size_t registerStartForChip = ((board * NUM_LTC_CHIPS_PER_BOARD) + ltc_chip) * (CELL_VOLTAGE_SIZE_BYTES * VOLTAGES_PER_BLOCK);
 				size_t index = registerIndex + registerStartForChip;
-				size_t cellIdx = cvreg + (board * NUM_LTC_CHIPS_PER_BOARD + ltc_chip) * CELLS_PER_CHIP + VOLTAGES_PER_BLOCK*block;
-				uint16_t temp = ((uint16_t) (adc_vals[(index + 1)] << 8 | adc_vals[index]));
+				size_t cellIdx = cvreg + (((board * NUM_LTC_CHIPS_PER_BOARD) + ltc_chip) * CELLS_PER_CHIP) + (VOLTAGES_PER_BLOCK*block);
+				uint16_t temp = ((uint16_t) ((adc_vals[(index + 1)] << 8) | adc_vals[index]));
 				cell_voltage_array[cellIdx] = ((float)temp) / VOLTAGE_REGISTER_COUNTS_PER_VOLT;
 			}
 		}
@@ -450,10 +450,10 @@ HAL_StatusTypeDef batt_read_thermistors(size_t channel, float *cell_temp_array) 
 
     for (int board = 0; board < NUM_BOARDS; board++) {
     	for(int ltc_chip = 0; ltc_chip < NUM_LTC_CHIPS_PER_BOARD; ltc_chip++) {
-			size_t cellIdx = board * CELLS_PER_BOARD + ltc_chip * CELLS_PER_CHIP + channel;
+			size_t cellIdx = (board * CELLS_PER_BOARD) + (ltc_chip * CELLS_PER_CHIP) + channel;
 			// We only use one GPIO input to measure temperatures, so pick that out
-			size_t boardStartIdx = (board * NUM_LTC_CHIPS_PER_BOARD + ltc_chip) * (AUX_BLOCK_SIZE);
-			uint16_t temp = ((uint16_t) (adc_vals[boardStartIdx + TEMP_ADC_IDX_HIGH] << 8
+			size_t boardStartIdx = ((board * NUM_LTC_CHIPS_PER_BOARD) + ltc_chip) * (AUX_BLOCK_SIZE);
+			uint16_t temp = ((uint16_t) ((adc_vals[boardStartIdx + TEMP_ADC_IDX_HIGH] << 8)
 										| adc_vals[boardStartIdx + TEMP_ADC_IDX_LOW]));
 			float voltageThermistor = ((float)temp) / VOLTAGE_REGISTER_COUNTS_PER_VOLT;
 			cell_temp_array[cellIdx] = batt_convert_voltage_to_temp(voltageThermistor);

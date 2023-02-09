@@ -21,9 +21,6 @@
 #include "cmsis_os.h"
 #include "dcu_dtc.h"
 
-extern osThreadId mainTaskHandle;
-extern FSM_Handle_Struct DCUFsmHandle;
-
 /**
  * Get current HV power state, updated from BMU CAN messages
  */
@@ -81,4 +78,8 @@ void DTC_Fatal_Callback(BoardIDs board)
 {
 	ERROR_PRINT_ISR("DTC fatal received\n");
         fsmSendEventUrgentISR(&DCUFsmHandle, EV_CAN_Recieve_Fatal);
+}
+
+void CAN_Msg_UartOverCanConfig_Callback() {
+    isUartOverCanEnabled = isUartOverCanEnabled & 0x8;
 }

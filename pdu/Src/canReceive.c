@@ -7,6 +7,10 @@
 #include "boardTypes.h"
 #include "canReceive.h"
 
+void CAN_Msg_UartOverCanConfig_Callback() {
+    isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
+}
+
 void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
     if (EM_Power_State_Request == EM_Power_State_Request_On) {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_ENABLE);
@@ -18,6 +22,7 @@ void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
 }
 
 void DTC_Fatal_Callback(BoardIDs board) {
+    DEBUG_PRINT_ISR("DTC Receieved from board %lu \n", board);
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
 }
 

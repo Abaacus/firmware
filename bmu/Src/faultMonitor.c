@@ -81,13 +81,13 @@ bool getIL_BRB_Status()
 // IL in to the BMU
 bool getIL_Status()
 {
-   return (HAL_GPIO_ReadPin(TSMS_SENSE_GPIO_Port, TSMS_SENSE_Pin) == GPIO_PIN_SET || skip_il);
+   return ((HAL_GPIO_ReadPin(TSMS_SENSE_GPIO_Port, TSMS_SENSE_Pin) == GPIO_PIN_SET) || skip_il);
 }
 
 // Cockpit BRB IL in to the BMU
 bool getCBRB_IL_Status()
 {
-   return (HAL_GPIO_ReadPin(COCKPIT_BRB_SENSE_GPIO_Port, COCKPIT_BRB_SENSE_Pin) == GPIO_PIN_SET || skip_il);
+   return ((HAL_GPIO_ReadPin(COCKPIT_BRB_SENSE_GPIO_Port, COCKPIT_BRB_SENSE_Pin) == GPIO_PIN_SET) || skip_il);
 }
 
 /**
@@ -228,6 +228,7 @@ void faultMonitorTask(void *pvParameters)
    }
 	
    bool cbrb_pressed = false;
+   TickType_t xLastWakeTime = xTaskGetTickCount();
    while (1)
    {
 		if (getHVIL_Status() == false)
@@ -273,13 +274,12 @@ void faultMonitorTask(void *pvParameters)
 		}
 
 		watchdogTaskCheckIn(FAULT_TASK_ID);
-		vTaskDelay(FAULT_MEASURE_TASK_PERIOD);
+		vTaskDelayUntil(&xLastWakeTime, FAULT_MEASURE_TASK_PERIOD);
    }
 
 #else
 
    fsmSendEvent(&fsmHandle, EV_FaultMonitorReady, portMAX_DELAY);
-
    while (1) {
 		vTaskDelay(FAULT_MEASURE_TASK_PERIOD);
    }

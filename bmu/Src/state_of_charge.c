@@ -18,7 +18,7 @@
 // Units A-s
 static const float TOTAL_CAPACITY = 74700.0f;
 
-static float capacity_startup = 0.0f;
+static float capacity_startup = 1.0f;
 
 // Units A-s
 static volatile float IBus_integrated = 0.0f;
@@ -29,7 +29,7 @@ static float interpolateLut(float value, float lut_min, float lut_step, uint8_t 
 // In amp seconds
 void integrate_bus_current(float IBus, float period_ms)
 {
-	IBus_integrated += IBus * (period_ms)/1000.0;
+	IBus_integrated += IBus * (period_ms/1000.0);
 }
 
 
@@ -71,8 +71,8 @@ static float compute_voltage_soc(void)
 		lut_len = LV_SOC_LUT_LEN;	
 	}
 	soc = interpolateLut(segment_voltage, lut_min, lut_step, lut_len, soc_lut);
-	soc = soc > 1.0f ? 1.0f : soc;
-	soc = soc < 0.0f ? 0.0f : soc;
+	soc = (soc > 1.0f) ? 1.0f : soc;
+	soc = (soc < 0.0f) ? 0.0f : soc;
 	return soc;
 }
 
@@ -80,8 +80,8 @@ static float compute_current_soc(void)
 {
 	float capacity = capacity_startup - IBus_integrated;
 	float soc = capacity/TOTAL_CAPACITY;
-	soc = soc > 1.0f ? 1.0f : soc;
-	soc = soc < 0.0f ? 0.0f : soc;
+	soc = (soc > 1.0f) ? 1.0f : soc;
+	soc = (soc < 0.0f) ? 0.0f : soc;
 	return soc;
 }
 
@@ -125,8 +125,8 @@ void socTask(void *pvParamaters)
 		}
 		
 		// Clamp voltage weight
-		voltage_weight = voltage_weight > 1.0f ? 1.0f : voltage_weight;
-		voltage_weight = voltage_weight < 0.0f ? 0.0f : voltage_weight;
+		voltage_weight = (voltage_weight > 1.0f) ? 1.0f : voltage_weight;
+		voltage_weight = (voltage_weight < 0.0f) ? 0.0f : voltage_weight;
 
 		float soc = (v_soc * voltage_weight) + (i_soc * (1.0f-voltage_weight));
 		//DEBUG_PRINT("SOC: %f, v_soc: %f, i_soc: %f \n", soc, v_soc, i_soc);
@@ -145,12 +145,12 @@ static float interpolateLut(float value, float lut_min, float lut_step, uint8_t 
     {
         return lut[0];
     }
-    else if (lowIndex >= lutLen-1) //Can not interpolate with last value in LUT
+    else if (lowIndex >= (lutLen-1)) //Can not interpolate with last value in LUT
     {
         return lut[lutLen-1];
     }
 //	DEBUG_PRINT("lowIndex : %u\n", lowIndex);
-	float lowValue = lut_min + lowIndex*lut_step;
+	float lowValue = lut_min + (lowIndex*lut_step);
     
     return lut[lowIndex] + (value - lowValue)*(lut[lowIndex+1]-lut[lowIndex])/(lut_step);
 }

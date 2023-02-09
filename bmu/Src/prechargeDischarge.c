@@ -71,12 +71,9 @@ typedef enum ContactorState_t {
  */
 void setNegContactor(ContactorState_t state)
 {
-    DEBUG_PRINT("%s negative contactor\n", state==CONTACTOR_CLOSED?"Closing":"Opening");
-    if (state==CONTACTOR_CLOSED) {
-        CONT_NEG_CLOSE;
-    } else if (state == CONTACTOR_OPEN) {
-        CONT_NEG_OPEN;
-    }
+    DEBUG_PRINT("%s negative contactor\n", (state==CONTACTOR_CLOSED)?"Closing":"Opening");
+    if (state==CONTACTOR_CLOSED) CONT_NEG_CLOSE;
+    else if (state == CONTACTOR_OPEN) CONT_NEG_OPEN;
 }
 
 /**
@@ -86,7 +83,7 @@ void setNegContactor(ContactorState_t state)
  */
 void setPosContactor(ContactorState_t state)
 {
-    DEBUG_PRINT("%s positive contactor\n", state==CONTACTOR_CLOSED?"Closing":"Opening");
+    DEBUG_PRINT("%s positive contactor\n", (state==CONTACTOR_CLOSED)?"Closing":"Opening");
 
     if (state==CONTACTOR_CLOSED) {
         CONT_POS_CLOSE;
@@ -103,7 +100,7 @@ void setPosContactor(ContactorState_t state)
  */
 void setPrechargeContactor(ContactorState_t state)
 {
-    DEBUG_PRINT("%s precharge contactor\n", state==CONTACTOR_CLOSED?"Closing":"Opening");
+    DEBUG_PRINT("%s precharge contactor\n", (state==CONTACTOR_CLOSED)?"Closing":"Opening");
 
     if (state==CONTACTOR_CLOSED) {
         PCDC_PC;
@@ -237,7 +234,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         return PCDC_ERROR;
     }
 
-    if (VBus > packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK)
+    if (VBus > (packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK))
     {
         DEBUG_PRINT("Already precharged, discharging\n");
         if (discharge() != PCDC_DONE) {
@@ -247,14 +244,14 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
 
     DEBUG_PRINT("PC Step 1\n");
     ERROR_PRINT("INFO: VBUS %f\n", VBus);
-    if (VBus > packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK)
+    if (VBus > (packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK))
     {
         ERROR_PRINT("ERROR: VBUS %f > %f\n", VBus,
                     packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK);
         return PCDC_ERROR;
     }
     ERROR_PRINT("INFO: VBatt %f\n", VBatt);
-    if (VBatt > packVoltage * PRECHARGE_STEP_1_VBATT_MAX_PERCENT_VPACK) {
+    if (VBatt > (packVoltage * PRECHARGE_STEP_1_VBATT_MAX_PERCENT_VPACK)) {
         ERROR_PRINT("ERROR: VBatt %f > %f\n", VBatt,
                     packVoltage * PRECHARGE_STEP_1_VBUS_MAX_PERCENT_VPACK);
         return PCDC_ERROR;
@@ -293,7 +290,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
             return PCDC_ERROR;
         }
 
-        if (xTaskGetTickCount() - startTickCount > PRECHARGE_STEP_2_TIMEOUT) {
+        if ((xTaskGetTickCount() - startTickCount) > PRECHARGE_STEP_2_TIMEOUT) {
             ERROR_PRINT("Precharge step 2 timed out waiting for IBus to zero\n");
             ERROR_PRINT("INFO: VBUS %f\n", VBus);
             ERROR_PRINT("INFO: VBatt %f\n", VBatt);
@@ -304,7 +301,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
 
     DEBUG_PRINT("PC Step 2\n");
     ERROR_PRINT("INFO: VBUS %f\n", VBus);
-    if (VBus > packVoltage * PRECHARGE_STEP_2_VBUS_MAX_PERCENT_VPACK)
+    if (VBus > (packVoltage * PRECHARGE_STEP_2_VBUS_MAX_PERCENT_VPACK))
     {
         // If pack is disconnected from any external load (motor controllers or charger)
         // and DCDC is disconnected, this might error, probably a false positive
@@ -314,7 +311,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         return PCDC_ERROR;
     }
     ERROR_PRINT("INFO: VBatt %f\n", VBatt);
-    if (VBatt < packVoltage*PRECHARGE_STEP_2_PERCENT_VBATT_MIN) {
+    if (VBatt < (packVoltage*PRECHARGE_STEP_2_PERCENT_VBATT_MIN)) {
         ERROR_PRINT("ERROR: VBatt %f < %f\n", VBatt, packVoltage*PRECHARGE_STEP_2_PERCENT_VBATT_MIN);
         return PCDC_ERROR;
     }
@@ -322,7 +319,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
 
     // Store the pack voltage to use in step 4
     // Check to make sure it is close to what AMS boards think is pack voltage
-    if (fabs(VBatt - packVoltage) > PACK_VOLTAGE_TOLERANCE_PERCENT*packVoltage) {
+    if (fabs(VBatt - packVoltage) > (PACK_VOLTAGE_TOLERANCE_PERCENT*packVoltage)) {
         ERROR_PRINT("VBatt measurement %f different than packVoltage %f\n",
                     VBatt, packVoltage);
         return PCDC_ERROR;
@@ -359,14 +356,14 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
     DEBUG_PRINT("PC Step 3\n");
     ERROR_PRINT("INFO: VBUS %f\n", VBus);
     ERROR_PRINT("INFO: VBUS %f\n", VBus);
-    if (VBus > packVoltage * PRECHARGE_STEP_3_VBUS_MAX_PERCENT_VPACK)
+    if (VBus > (packVoltage * PRECHARGE_STEP_3_VBUS_MAX_PERCENT_VPACK))
     {
         ERROR_PRINT("ERROR: VBUS %f > %f\n", VBus,
                     packVoltage * PRECHARGE_STEP_3_VBUS_MAX_PERCENT_VPACK);
         return PCDC_ERROR;
     }
     ERROR_PRINT("INFO: VBatt %f\n", VBatt);
-    if (VBatt > packVoltage * PRECHARGE_STEP_3_VBATT_MAX_PERCENT_VPACK) {
+    if (VBatt > (packVoltage * PRECHARGE_STEP_3_VBATT_MAX_PERCENT_VPACK)) {
         ERROR_PRINT("ERROR: VBatt %f > %f\n", VBatt,
                     packVoltage * PRECHARGE_STEP_3_VBUS_MAX_PERCENT_VPACK);
         return PCDC_ERROR;
@@ -413,7 +410,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         }
         WAIT_FOR_NEXT_MEASURE_OR_STOP(PRECHARGE_STEP_4_CURRENT_MEASURE_PERIOD_MS,
                                       dbwTaskNotifications);
-        if (xTaskGetTickCount() - startTickCount > PRECHARGE_STEP_4_TIMEOUT) {
+        if ((xTaskGetTickCount() - startTickCount) > PRECHARGE_STEP_4_TIMEOUT) {
             ERROR_PRINT("Precharge timed out\n");
             ERROR_PRINT("INFO: VBUS %f\n", VBus);
             ERROR_PRINT("INFO: VBatt %f\n", VBatt);
@@ -426,7 +423,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
 		{	
 			index = 0;
 			float diff = VBus_avg - VBus;
-			diff = diff > 0.0F ? diff : -diff;
+			diff = (diff > 0.0F) ? diff : -diff;
 			if(diff < PRECHARGE_STEP_4_DIFF_TOLERANCE)
 			{
 				VBus_settled = true;
@@ -488,7 +485,7 @@ Precharge_Discharge_Return_t precharge(Precharge_Type_t prechargeType)
         }
         WAIT_FOR_NEXT_MEASURE_OR_STOP(PRECHARGE_STEP_5_CURRENT_MEASURE_PERIOD_MS,
                                       dbwTaskNotifications);
-        if (xTaskGetTickCount() - startTickCount > PRECHARGE_STEP_5_TIMEOUT) {
+        if ((xTaskGetTickCount() - startTickCount) > PRECHARGE_STEP_5_TIMEOUT) {
             ERROR_PRINT("Precharge timed out\n");
             ERROR_PRINT("INFO: VBUS %f\n", VBus);
             ERROR_PRINT("INFO: VBatt %f\n", VBatt);
@@ -550,7 +547,7 @@ Precharge_Discharge_Return_t discharge()
             break;
         }
 
-        if (xTaskGetTickCount() - startTickVal >
+        if ((xTaskGetTickCount() - startTickVal) >
             pdMS_TO_TICKS(CONTACTOR_OPEN_ZERO_CURRENT_TIMEOUT_MS))
         {
             ERROR_PRINT("Timed out waiting for zero current before opening contactors\n");
@@ -583,7 +580,7 @@ Precharge_Discharge_Return_t discharge()
         ERROR_PRINT("%f,", VBatt);
         ERROR_PRINT("%f\n", IBus);
 
-        if (xTaskGetTickCount() - startTickCount > PRECHARGE_STEP_4_TIMEOUT) {
+        if ((xTaskGetTickCount() - startTickCount) > PRECHARGE_STEP_4_TIMEOUT) {
             ERROR_PRINT("Discharge timed out\n");
             ERROR_PRINT("INFO: VBUS %f\n", VBus);
             ERROR_PRINT("INFO: VBatt %f\n", VBatt);
@@ -638,8 +635,8 @@ void pcdcTask(void *pvParameter)
 
             DEBUG_PRINT("Skipping precharge/discharge due to stop\n");
 
-        } else if (dbwTaskNotifications & (1<<PRECHARGE_NOTIFICATION_CHARGER) ||
-                   dbwTaskNotifications & (1<<PRECHARGE_NOTIFICATION_MOTOR_CONTROLLERS)) {
+        } else if ((dbwTaskNotifications & (1<<PRECHARGE_NOTIFICATION_CHARGER)) ||
+                   (dbwTaskNotifications & (1<<PRECHARGE_NOTIFICATION_MOTOR_CONTROLLERS))) {
             DEBUG_PRINT("Starting precharge\n");
 
             if (dbwTaskNotifications & (1<<PRECHARGE_NOTIFICATION_MOTOR_CONTROLLERS)) {

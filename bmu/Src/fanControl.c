@@ -24,16 +24,16 @@
 #define FAN_MAX_DUTY_PERCENT 1.0
 #define FAN_ON_DUTY_PERCENT 0.2
 #define FAN_PERIOD_COUNT 400
-#define FAN_TASK_PERIOD_MS 100
+#define FAN_TASK_PERIOD_MS 1000
 
 uint32_t calculateFanPeriod()
 {
   // PWM Output is inverted from what we generate from PROC
 
   // Full fan while charging
-  if (fsmGetState(&fsmHandle) == STATE_Charging || fsmGetState(&fsmHandle) == STATE_Balancing) {
+  if ((fsmGetState(&fsmHandle) == STATE_Charging) || (fsmGetState(&fsmHandle) == STATE_Balancing)) {
     /*DEBUG_PRINT("Charging fans\n");*/
-    return FAN_PERIOD_COUNT - FAN_PERIOD_COUNT*FAN_MAX_DUTY_PERCENT;
+    return FAN_PERIOD_COUNT - (FAN_PERIOD_COUNT * FAN_MAX_DUTY_PERCENT);
   }
 
   if (TempCellMax < FAN_OFF_TEMP) {
@@ -79,8 +79,9 @@ void fanTask()
     Error_Handler();
   }
 
+  TickType_t xLastWakeTime = xTaskGetTickCount();
   while (1) {
     setFan();
-    vTaskDelay(pdMS_TO_TICKS(FAN_TASK_PERIOD_MS));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(FAN_TASK_PERIOD_MS));
   }
 }

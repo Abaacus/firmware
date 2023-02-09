@@ -33,6 +33,22 @@
 extern bool HITL_Precharge_Mode;
 extern float HITL_VPACK;
 extern uint32_t brakeAndHVILVals[2];
+extern float adjustedCellIR;
+
+BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    COMMAND_OUTPUT("isUartOverCanEnabled: %u\n", isUartOverCanEnabled);
+
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
+{
+    "isUartOverCanEnabled",
+    "isUartOverCanEnabled help string",
+    debugUartOverCan,
+    0 /* Number of parameters */
+};
 
 BaseType_t getBrakePressure(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -83,7 +99,7 @@ BaseType_t testLowPassFilter(char *writeBuffer, size_t writeBufferLength,
     filtersInit();
 
     uint32_t startTime = getRunTimeCounterValue();
-    for (int i=0; i<DATA_LENGTH / BLOCK_SIZE; i++) {
+    for (int i=0; i < (DATA_LENGTH / BLOCK_SIZE); i++) {
         samplePointer = &(data[i*BLOCK_SIZE]);
         outputPointer = &(output[i*BLOCK_SIZE]);
         lowPassFilter(samplePointer, BLOCK_SIZE, outputPointer);
@@ -149,18 +165,18 @@ BaseType_t printBattInfo(char *writeBuffer, size_t writeBufferLength,
         return pdTRUE;
     }
     // Note that the temperature channels are not correlated with the voltage cell
-	if(cellIdx >= NUM_VOLTAGE_CELLS && cellIdx < NUM_TEMP_CELLS){
+	if((cellIdx >= NUM_VOLTAGE_CELLS) && (cellIdx < NUM_TEMP_CELLS)){
 		COMMAND_OUTPUT("%d\t(N/A)\t%f\r\n", cellIdx, TempChannel[cellIdx]);
-	} else if(cellIdx < NUM_VOLTAGE_CELLS && cellIdx >= NUM_TEMP_CELLS) {
+	} else if((cellIdx < NUM_VOLTAGE_CELLS) && (cellIdx >= NUM_TEMP_CELLS)) {
 		COMMAND_OUTPUT("%d\t%f\t(N/A)\r\n", cellIdx, VoltageCell[cellIdx]);
-	} else if(cellIdx < NUM_VOLTAGE_CELLS && cellIdx < NUM_TEMP_CELLS) {
+	} else if((cellIdx < NUM_VOLTAGE_CELLS) && (cellIdx < NUM_TEMP_CELLS)) {
 		COMMAND_OUTPUT("%d\t%f\t%f\r\n", cellIdx, VoltageCell[cellIdx], TempChannel[cellIdx]);
 	}
 	else {
 		// Do nothing
 	}
 	++cellIdx;
-    if (cellIdx >= NUM_VOLTAGE_CELLS && cellIdx >= NUM_TEMP_CELLS) {
+    if ((cellIdx >= NUM_VOLTAGE_CELLS) && (cellIdx >= NUM_TEMP_CELLS)) {
         cellIdx = -6;
         return pdFALSE;
     } else {
@@ -187,7 +203,7 @@ BaseType_t setCellVoltage(char *writeBuffer, size_t writeBufferLength,
 
     sscanf(idxParam, "%u", &cellIdx);
 
-    if (cellIdx < 0 || cellIdx >= NUM_VOLTAGE_CELLS) {
+    if ((cellIdx < 0) || (cellIdx >= NUM_VOLTAGE_CELLS)) {
         COMMAND_OUTPUT("Cell Index must be between 0 and %d\n", NUM_VOLTAGE_CELLS);
         return pdFALSE;
     }
@@ -215,7 +231,7 @@ BaseType_t setChannelTemp(char *writeBuffer, size_t writeBufferLength,
 
     sscanf(idxParam, "%u", &cellIdx);
 
-    if (cellIdx < 0 || cellIdx >= NUM_TEMP_CELLS) {
+    if ((cellIdx < 0) || (cellIdx >= NUM_TEMP_CELLS)) {
         COMMAND_OUTPUT("Cell Index must be between 0 and %d\n", NUM_TEMP_CELLS);
         return pdFALSE;
     }
@@ -366,7 +382,7 @@ BaseType_t printState(char *writeBuffer, size_t writeBufferLength,
 {
     uint8_t index;
     index = fsmGetState(&fsmHandle);
-    if ( index >= 0 && index < STATE_ANY ){
+    if ( (index >= 0) && (index < STATE_ANY) ){
         COMMAND_OUTPUT("State: %s\n", BMU_states_string[index]);
     } else {
         COMMAND_OUTPUT("Error: state index out of range. Index: %u\n", index);
@@ -686,7 +702,7 @@ BaseType_t balanceCellCommand(char *writeBuffer, size_t writeBufferLength,
     const char *idxParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
     sscanf(idxParam, "%u", &cellIdx);
 
-    if (cellIdx < 0 || cellIdx >= NUM_VOLTAGE_CELLS) {
+    if ((cellIdx < 0) || (cellIdx >= NUM_VOLTAGE_CELLS)) {
         COMMAND_OUTPUT("Cell Index must be between 0 and %d\n", NUM_VOLTAGE_CELLS-1);
         return pdFALSE;
     }
@@ -996,12 +1012,58 @@ static const CLI_Command_Definition_t socCommandDefinition =
     0 /* Number of parameters */
 };
 
+BaseType_t getCellIRCommand(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+	COMMAND_OUTPUT("AdjustedCellIR: %f (default %f)\n", adjustedCellIR, ADJUSTED_CELL_IR_DEFAULT);
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t getCellIRCommandDefinition =
+{
+    "getCellIR",
+    "getCellIR:\r\n \r\n",
+    getCellIRCommand,
+    0 /* Number of parameters */
+};
+
+BaseType_t setCellIRCommand(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    BaseType_t paramLen;
+    const char *newCellIR = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+
+    float cellIR;
+    sscanf(newCellIR, "%f", &cellIR);
+
+    if ((cellIR < 0.0) || (cellIR > 0.01)){
+        COMMAND_OUTPUT("invalid cell IR [0,0.01]\r\n");
+    }else{
+	    adjustedCellIR = cellIR;
+    }
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setCellIRCommandDefinition =
+{
+    "setCellIR",
+    "setCellIR: [0,0.01]\r\n \r\n",
+    setCellIRCommand,
+    1 /* Number of parameters */
+};
+
+
+
 HAL_StatusTypeDef stateMachineMockInit()
 {
     cliSetVBatt(0);
     cliSetVBus(0);
     cliSetIBus(0);
 
+    if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
     if (FreeRTOS_CLIRegisterCommand(&printHVMeasurementsCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
@@ -1134,6 +1196,13 @@ HAL_StatusTypeDef stateMachineMockInit()
     if (FreeRTOS_CLIRegisterCommand(&getStateBusHVSendPeriodCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
+    if (FreeRTOS_CLIRegisterCommand(&getCellIRCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&setCellIRCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+
 
     return HAL_OK;
 }

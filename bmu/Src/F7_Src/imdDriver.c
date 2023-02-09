@@ -163,7 +163,7 @@ IMDStatus get_imd_status() {
   IMDMeasurements meas = get_imd_measurements();
   IMDStatus status;
 
-  if (xTaskGetTickCount() - lastCaptureTimeTicks >= pdMS_TO_TICKS(IMD_FREQ_MEAS_TIMEOUT_MS)) {
+  if ((xTaskGetTickCount() - lastCaptureTimeTicks) >= pdMS_TO_TICKS(IMD_FREQ_MEAS_TIMEOUT_MS)) {
     // We're not getting pwm pulses anymore, so the frequency is 0 Hz
     // This means a short has occured
     status = IMDSTATUS_HV_Short;

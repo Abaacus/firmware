@@ -45,4 +45,6 @@ extern bool alreadyDebouncing;
 extern uint16_t debouncingPin;
 extern TimerHandle_t debounceTimer;
 
+uint8_t getTC(void);
+
 #endif
