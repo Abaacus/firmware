@@ -32,9 +32,9 @@ HAL_StatusTypeDef startADCConversions()
       return HAL_ERROR;
     }
 #else
-    for (int i=0; i < NUM_ADC_CHANNELS; i++) {
-        if (i == BRAKE_PRES_INDEX) {
-            brakeThrottleSteeringADCVals[i] = 95 * BRAKE_PRESSURE_DIVIDER / BRAKE_PRESSURE_MULTIPLIER;
+    for (int i=0; i < (int)NUM_ADC_CHANNELS; i++) {
+        if (i == (int)BRAKE_PRES_INDEX) {
+            brakeThrottleSteeringADCVals[i] = 0x0000005FU * BRAKE_PRESSURE_DIVIDER / BRAKE_PRESSURE_MULTIPLIER;
         } else {
             brakeThrottleSteeringADCVals[i] = 0;
         }
@@ -139,7 +139,7 @@ bool getThrottlePositionPercent(float *throttleOut)
         return false;
     } else {
         /*DEBUG_PRINT("t1 %ld, t2 %ld\n", throttle1_percent, throttle2_percent);*/
-        throttle = (throttle1_percent + throttle2_percent) / 2;
+        throttle = (throttle1_percent + throttle2_percent) / 0x00000002U;
     }
 
     *throttleOut = throttle;
@@ -164,7 +164,7 @@ ThrottleStatus_t getNewThrottle(float *throttleOut)
 
     // Both throttle and brake were pressed, check if still the case
     if (throttleAndBrakePressedError) {
-        if (throttle < TPS_WHILE_BRAKE_PRESSED_RESET_PERCENT) {
+        if (throttle < (float)TPS_WHILE_BRAKE_PRESSED_RESET_PERCENT) {
             throttleAndBrakePressedError = false;
             sendDTC_WARNING_BrakeWhileThrottleError_Enabled();
         } else {
@@ -175,7 +175,7 @@ ThrottleStatus_t getNewThrottle(float *throttleOut)
     }
 
     // check if both throttle and brake are pressed
-    if (isBrakePressedHard() && throttle > TPS_MAX_WHILE_BRAKE_PRESSED_PERCENT) {
+    if (isBrakePressedHard() && throttle > (float)TPS_MAX_WHILE_BRAKE_PRESSED_PERCENT) {
         (*throttleOut) = 0;
         throttleAndBrakePressedError = true;
         sendDTC_WARNING_BrakeWhileThrottleError_Disabled();
@@ -216,7 +216,7 @@ bool throttleIsZero()
 
     if (!getThrottlePositionPercent(&throttle)) {
       return false;
-    } else if (throttle < MAX_ZERO_THROTTLE_VAL_PERCENT) {
+    } else if (throttle < (float)MAX_ZERO_THROTTLE_VAL_PERCENT) {
       return true;
     } else {
       return false;

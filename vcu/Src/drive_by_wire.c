@@ -124,7 +124,7 @@ uint32_t EM_Enable(uint32_t event)
         DEBUG_PRINT("Failed to em enable, bps fault\n");
         sendDTC_WARNING_EM_ENABLE_FAILED(0);
         state = STATE_EM_Disable;
-    } else if (!(brakePressure > MIN_BRAKE_PRESSURE)) {
+    } else if (!(brakePressure > (float)MIN_BRAKE_PRESSURE)) {
         DEBUG_PRINT("Failed to em enable, brake pressure low (%f)\n", brakePressure);
         sendDTC_WARNING_EM_ENABLE_FAILED(1);
         state = STATE_EM_Disable;
@@ -142,7 +142,9 @@ uint32_t EM_Enable(uint32_t event)
         state = STATE_EM_Disable;
     }
 
+    // cppcheck-suppress misra-c2012-10.4
     if (state != STATE_EM_Enable) {
+        // cppcheck-suppress misra-c2012-10.4
         EM_State = (state == STATE_EM_Enable)?EM_State_On:EM_State_Off;
         sendCAN_VCU_EM_State();
         return state;
@@ -163,7 +165,8 @@ uint32_t EM_Enable(uint32_t event)
     }
 
 	endurance_mode_EM_callback();
-
+    
+    //cppcheck-suppress misra-c2012-10.4
     EM_State = (state == STATE_EM_Enable)?EM_State_On:EM_State_Off;
     sendCAN_VCU_EM_State();
 
@@ -212,6 +215,7 @@ uint32_t EM_Fault(uint32_t event)
             break;
         case EV_Hv_Disable:
             {
+                //cppcheck-suppress misra-c2012-10.4
                 if (currentState == STATE_EM_Disable) {
                     DEBUG_PRINT("HV Disable, staying in EM Disabled state\n");
                 } else {
@@ -287,7 +291,9 @@ HAL_StatusTypeDef turnOnMotorControllers() {
     if (rc == pdFALSE) {
         DEBUG_PRINT("Timed out waiting for mc on\n");
         return HAL_TIMEOUT;
-    } else if (dbwTaskNotifications & (1<<NTFY_MCs_ON)) {
+    } 
+    //cppcheck-suppress misra-c2012-10.4
+    else if (dbwTaskNotifications & (1<<NTFY_MCs_ON)) {
         DEBUG_PRINT("PDU has turned on MCs\n");
     } else {
         ERROR_PRINT("Got unexpected notification 0x%lX\n", dbwTaskNotifications);
@@ -314,6 +320,7 @@ HAL_StatusTypeDef turnOffMotorControllers() {
     if (rc == pdFALSE) {
         DEBUG_PRINT("Timed out waiting for mc off\n");
         return HAL_TIMEOUT;
+        //cppcheck-suppress misra-c2012-10.4
     } else if (dbwTaskNotifications & (1<<NTFY_MCs_OFF)) {
         DEBUG_PRINT("PDU has turned off MCs\n");
     } else {
