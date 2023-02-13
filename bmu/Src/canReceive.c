@@ -27,10 +27,10 @@
 
 void CAN_Msg_BMU_batteryLimits_Callback()
 {
-    setMaxChargeCurrent(MaxChargeCurrent);
-    setMaxChargeVoltage(MaxChargeVoltage);
-    cliSetStateBusHVSendPeriod(StateBusHVSendPeriod);
-    setAdjustedCellIR(AdjustedCellIR);
+    setMaxChargeCurrent(MaxChargeCurrentA);
+    setMaxChargeVoltage(MaxChargeVoltageV);
+    cliSetStateBusHVSendPeriod(StateBusHVSendPeriodMS);
+    setAdjustedCellIR(AdjustedCellIROhms);
 }
 
 void CAN_Msg_BMU_stateSOC_Callback()
