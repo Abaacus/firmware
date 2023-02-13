@@ -34,7 +34,7 @@ HAL_StatusTypeDef startADCConversions()
 #else
     for (int i=0; i < (int)NUM_ADC_CHANNELS; i++) {
         if (i == (int)BRAKE_PRES_INDEX) {
-            brakeThrottleSteeringADCVals[i] = 0x0000005FU * BRAKE_PRESSURE_DIVIDER / BRAKE_PRESSURE_MULTIPLIER;
+            brakeThrottleSteeringADCVals[i] = UINT32_C(95) * BRAKE_PRESSURE_DIVIDER / BRAKE_PRESSURE_MULTIPLIER;
         } else {
             brakeThrottleSteeringADCVals[i] = 0;
         }
@@ -139,7 +139,7 @@ bool getThrottlePositionPercent(float *throttleOut)
         return false;
     } else {
         /*DEBUG_PRINT("t1 %ld, t2 %ld\n", throttle1_percent, throttle2_percent);*/
-        throttle = (throttle1_percent + throttle2_percent) / 0x00000002U;
+        throttle = (throttle1_percent + throttle2_percent) / UINT32_C(2);
     }
 
     *throttleOut = throttle;

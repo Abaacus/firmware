@@ -389,7 +389,7 @@ BaseType_t printState(char *writeBuffer, size_t writeBufferLength,
 {
     uint8_t index = fsmGetState(&fsmHandle);
     // cppcheck-suppress misra-c2012-10.4
-    if (index >= 0x00U && index < STATE_ANY){
+    if (index >= UINT8_C(0) && index < STATE_ANY){
         COMMAND_OUTPUT("State: %s\n", VCU_States_String[index]);
     } else {
         COMMAND_OUTPUT("Error: state index out of range. Index: %u\n", index);
@@ -442,7 +442,7 @@ BaseType_t torqueDemandMaxCommand(char *writeBuffer, size_t writeBufferLength,
     uint64_t maxTorqueDemand;
     sscanf(torqueMaxString, "%llu", &maxTorqueDemand);
 
-    if(maxTorqueDemand > 0x000000000000001EU){
+    if(maxTorqueDemand > UINT64_C(30)){
         COMMAND_OUTPUT("Max torque input out of range, must be between 0 and 30");
     }else{
         setTorqueLimit(maxTorqueDemand);    
