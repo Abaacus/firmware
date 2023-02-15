@@ -85,6 +85,7 @@ void CAN_Msg_PDU_ChannelStatus_Callback()
 
 void DTC_Fatal_Callback(BoardIDs board)
 {
+    DEBUG_PRINT_ISR("DTC Receieved from board %lu \n", board);
     fsmSendEventUrgentISR(&fsmHandle, EV_Fatal);
 }
 
@@ -152,7 +153,10 @@ void CAN_Msg_PDU_DTC_Callback(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DT
     {
         case ERROR_DCDC_Shutoff:
             //The DCDC unexpectedly stopped working. The PDU turned off cooling and the motors, now disable EM
-            fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
+            if (fsmGetState(&fsmHandle) == STATE_EM_Enable)
+            {
+                fsmSendEventISR(&fsmHandle, EV_EM_Toggle);
+            }
             break;
         default:
             // Do nothing, other events handled by fatal callback
