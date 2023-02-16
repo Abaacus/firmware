@@ -453,7 +453,7 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
         DTCs_index = DTC_HISTORY_LENGTH;
         return pdFALSE;
     } else {
-        COMMAND_OUTPUT("DTC: %u, Data: %llu\r\n", DTC_Log->dtcs[DTCs_index].code, DTC_Log->dtcs[DTCs_index].data);
+        COMMAND_OUTPUT("DTC: %d, Data: %lld\r\n", DTC_Log->dtcs[DTCs_index].code, DTC_Log->dtcs[DTCs_index].data);
         // If the tail is the next index, we have iterated the entire log
         if (DTCs_index == DTC_Log->tail) {
             DTCs_index = DTC_HISTORY_LENGTH;
