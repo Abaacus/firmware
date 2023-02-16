@@ -3,7 +3,7 @@
 #define BRAKELIGHT_H
 #include <stdint.h>
 
-uint8_t brakelightOnThreshold = 15;
+extern uint8_t brakelightOnThreshold;
 void setBrakeLightOnThresholdPercent(uint8_t percent);
 
 #endif /* end of include guard: BRAKELIGHT_H */

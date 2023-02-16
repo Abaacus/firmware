@@ -6,10 +6,10 @@
 #include "debug.h"
 
 #define BRAKE_TASK_PERIOD_MS 300
-
+uint8_t brakelightOnThreshold = 15;
 bool isBrakePressed()
 {
-    return BrakePercent > brakelightOnThreshold;
+    return (BrakePercent > brakelightOnThreshold);
 }
 
 void CAN_Msg_VCU_Data_Callback()
@@ -25,9 +25,6 @@ void setBrakeLightOnThresholdPercent(uint8_t percent)
 {
     if (percent > 100) {
         percent = 100;
-    }
-    if (percent < 0) {
-        percent = 0;
     }
     
     brakelightOnThreshold = percent;
