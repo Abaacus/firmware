@@ -56,10 +56,11 @@ volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 // Our current pack is 70s7p. So this assumption factors in that IBus is total current from cells and the current gets divided by 7
 #define ADJUSTED_CELL_IR_DEFAULT (0.00286F)
 
+float cell_max_temp_c;
 /** Maximum allowable cell temperature, will send critical DTC if surpassed */
-#define CELL_OVERTEMP (CELL_MAX_TEMP_C)
+#define CELL_OVERTEMP (cell_max_temp_c)
 /** Temp at warning DTC is sent */
-#define CELL_OVERTEMP_WARNING (CELL_MAX_TEMP_C - 10)
+#define CELL_OVERTEMP_WARNING (cell_max_temp_c - 10)
 /** Similar to @ref CELL_OVERTEMP, minimum temp before sending critical DTC */
 #define CELL_UNDERTEMP 0
 /** Similar to @ref CELL_OVERTEMP_WARNING, temp will send warning DTC */

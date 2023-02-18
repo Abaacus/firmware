@@ -684,6 +684,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
    float measure_high;
    float measure_low;
    float currentReading;
+   extern float cell_max_temp_c;
    if(getIBus(&currentReading) != HAL_OK){
        ERROR_PRINT("Cannot read current from bus!!");
        sendDTC_FATAL_BMU_ERROR();
@@ -736,7 +737,12 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 	   for (int i=0; i < NUM_TEMP_CELLS; i++)
 	   {
 			measure = TempChannel[i];
-				
+			if (fsmGetState(&fsmHandle) == STATE_Charging) {
+                //limit for charge is 45 celcius instead of 55 celcius
+                cell_max_temp_c = 45.0;
+            }else{
+                cell_max_temp_c = 55.0;
+            }
 			// Check it is within bounds
 			if (measure > CELL_OVERTEMP) {
 				ERROR_PRINT("Temp Channel %d is overtemp at %f deg C\n", i, measure);
