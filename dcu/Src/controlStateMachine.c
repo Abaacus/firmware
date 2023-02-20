@@ -66,7 +66,7 @@ uint32_t updateFromCAN(uint32_t event)
                     updated_state = STATE_HV_Enable;
                 }
 
-                DEBUG_PRINT("Received an HV on state but already in HV_Enable\n");
+                DEBUG_PRINT("HV already enabled\n");
             }
             else /* hvState == HV_Power_State_Off */
             {
@@ -75,7 +75,7 @@ uint32_t updateFromCAN(uint32_t event)
                     updated_state = STATE_HV_Disable;
                 }
 
-                DEBUG_PRINT("Received an HV off state but already in HV_Disable\n");
+                DEBUG_PRINT("HV already disabled\n");
             }
 
             break;
@@ -88,13 +88,13 @@ uint32_t updateFromCAN(uint32_t event)
                     updated_state = STATE_EM_Enable;
                 }
 
-                DEBUG_PRINT("Recieved an EM on state but already in EM_Enable\n");
+                DEBUG_PRINT("EM already enabled\n");
             }
 
             break;
 
         default:
-            ERROR_PRINT("Error: Unexpected event when updating from CAN!\n");
+            ERROR_PRINT("Error: Unexpected CAN event\n");
             Error_Handler();
             break;
     }
@@ -216,7 +216,7 @@ uint32_t toggleTC(uint32_t event)
 
 	if(sendTCToggleMsg() != HAL_OK)
 	{
-        ERROR_PRINT("Failed to send TC Toggle button event!\n");
+        ERROR_PRINT("TC toggle not sent\n");
         Error_Handler();
 	}
 	TC_on = !TC_on;
@@ -238,7 +238,7 @@ uint32_t toggleEnduranceMode(uint32_t event)
 	DEBUG_PRINT("Toggling Endurance Mode\n");
 	if(sendEnduranceToggleMsg() != HAL_OK)
 	{
-        ERROR_PRINT("Failed to send EnduranceMode Toggle button event!\n");
+        ERROR_PRINT("EnduranceMode toggle not sent\n");
         Error_Handler();
 	}
 	endurance_on = !endurance_on;
@@ -247,10 +247,10 @@ uint32_t toggleEnduranceMode(uint32_t event)
 
 uint32_t toggleEnduranceLap(uint32_t event)
 {
-	DEBUG_PRINT("Incrementing Enduranc eLap\n");
+	DEBUG_PRINT("Incrementing Endurance Lap\n");
 	if(sendEnduranceLapMsg() != HAL_OK)
 	{
-        ERROR_PRINT("Failed to send EnduranceLap Toggle button event!\n");
+        ERROR_PRINT("EnduranceLap toggle not sent\n");
         Error_Handler();
 	}
 	return STATE_EM_Enable;
@@ -265,10 +265,10 @@ uint32_t toggleHV(uint32_t event)
         TC_on = false;
     }
 
-    DEBUG_PRINT("Sending HV Toggle button event\n");
+    DEBUG_PRINT("Toggling HV\n");
     if (sendHVToggleMsg() != HAL_OK)
     {
-        ERROR_PRINT("Failed to send HV Toggle button event!\n");
+        ERROR_PRINT("HV toggle not sent\n");
         Error_Handler();
     }
 
@@ -277,10 +277,10 @@ uint32_t toggleHV(uint32_t event)
 
 uint32_t toggleEM(uint32_t event)
 {
-    DEBUG_PRINT("Sending EM Toggle button event\n");
+    DEBUG_PRINT("Toggling EM\n");
     if (sendEMToggleMsg() != HAL_OK)
     {
-        ERROR_PRINT("Failed to send EM Toggle button event!\n");
+        ERROR_PRINT("EM toggle not sent\n");
         Error_Handler();
     }
 
@@ -291,12 +291,12 @@ uint32_t hvControl(uint32_t event)
 {
     if(getHVState() == HV_Power_State_On)
     {
-        DEBUG_PRINT("Response from BMU: HV Enabled\n");
+        DEBUG_PRINT("BMU: HV Enabled\n");
         return STATE_HV_Enable;
     }
     else
     {
-        DEBUG_PRINT("Response from BMU: HV Disabled\n");
+        DEBUG_PRINT("BMU: HV Disabled\n");
         return STATE_HV_Disable;
     }
 }
@@ -305,7 +305,7 @@ uint32_t emControl(uint32_t event)
 {
     if(getEMState() == EM_State_On)
     {
-        DEBUG_PRINT("Response from VCU: EM Enabled\n");
+        DEBUG_PRINT("VCU: EM Enabled\n");
 
         /* Only ring buzzer when going to motors enabled */
         DEBUG_PRINT("Kicking off buzzer\n");
@@ -325,7 +325,7 @@ uint32_t emControl(uint32_t event)
     }
     else
     {
-        DEBUG_PRINT("Response from VCU: EM Disabled\n");
+        DEBUG_PRINT("VCU: EM Disabled\n");
 
         //Turn off TC button
         TC_LED_OFF;
@@ -374,7 +374,7 @@ void debounceTimerCallback(TimerHandle_t timer)
 
         default:
             /* Shouldn't get here */ 
-            DEBUG_PRINT_ISR("Unknown pin specified to debounce\n");
+            DEBUG_PRINT_ISR("Unknown pin specified\n");
             pin_val = GPIO_PIN_SET;
             break;
     }
@@ -406,7 +406,7 @@ void debounceTimerCallback(TimerHandle_t timer)
 
             default:
                 /* Shouldn't get here */
-                DEBUG_PRINT_ISR("Unknown pin specified to debounce\n");
+                DEBUG_PRINT_ISR("Unknown pin specified\n");
                 break;
         }
 
@@ -450,7 +450,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t pin)
 
         default:
             /* Not a fatal error here, but report error and return */
-            DEBUG_PRINT_ISR("Unknown GPIO interrupted in ISR!\n");
+            DEBUG_PRINT_ISR("Unknown GPIO interrupt in ISR\n");
             return;
             break;
     }
@@ -515,14 +515,14 @@ void mainTaskFunction(void const * argument){
 
     if (debounceTimer == NULL) 
     {
-        ERROR_PRINT("Failed to create debounce timer!\n");
+        ERROR_PRINT("Debounce timer not created\n");
         Error_Handler();
     }
 
 
     if (registerTaskToWatch(MAIN_TASK_ID, 5*pdMS_TO_TICKS(MAIN_TASK_PERIOD_MS), true, &DCUFsmHandle) != HAL_OK)
     {
-        ERROR_PRINT("Failed to register main task with watchdog!\n");
+        ERROR_PRINT("Main task not reg. w/ watchdog\n");
         Error_Handler();
     }
 
@@ -534,7 +534,7 @@ void mainTaskFunction(void const * argument){
 
 uint32_t defaultTransition(uint32_t event)
 {
-    ERROR_PRINT("No transition function registered for ");
+    ERROR_PRINT("No transition function reg. for");
     uint32_t currentState = fsmGetState(&DCUFsmHandle);
 
     //Need to do it like this since we can't do string interpolation which causes stack overflows
