@@ -31,7 +31,8 @@ BaseType_t setTractionControl (char *writeBuffer, size_t writeBufferLength,
 	}
     if(fsmGetState(&DCUFsmHandle) != STATE_EM_Enable)
 	{
-        COMMAND_OUTPUT("Error: Need to be at EM to toggle TC\r\n");
+        COMMAND_OUTPUT("Error: EM toggled from TC\r\n");
+		//Error: Need to be at EM to toggle TC
         return pdFALSE;
     }
 
