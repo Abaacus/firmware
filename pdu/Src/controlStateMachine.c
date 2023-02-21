@@ -287,7 +287,7 @@ uint32_t criticalFailureWarning(uint32_t event)
 
 uint32_t criticalFailure(uint32_t event)
 {
-    DEBUG_PRINT("Critical Failure: Boards will remain on\n");
+    DEBUG_PRINT("Critical Failure %lu: Boards will remain on\n", event);
     fsmSendEventUrgent(&motorFsmHandle, MTR_EV_Motor_Critical, 10 /* timeout */);
     fsmSendEventUrgent(&coolingFsmHandle, COOL_EV_Critical, 10 /* timeout */);
     return MN_STATE_Critical_Failure;
@@ -351,6 +351,7 @@ HAL_StatusTypeDef turnBoardsOn()
     DCU_ENABLE;
     WSB_ENABLE;
     BMU_ENABLE;
+    AUX_ENABLE;
     return HAL_OK;
 }
 
@@ -384,6 +385,7 @@ uint32_t motorsOn(uint32_t event)
     } else {
         // Don't allow motors to turn on without DC-DC power
         // Lack of response to VCU will cause timeout, and then can try again
+        ERROR_PRINT("Not turning on the motors because DCDC off\r\n");
         sendDTC_WARNING_PDU_EM_EN_BLOCKED_DCDC_OFF();
         return MTR_STATE_Motors_Off;
     }
