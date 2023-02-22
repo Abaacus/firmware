@@ -6,7 +6,7 @@
   *****************************************************************************
   */
 
-#include "errorHandler.h"
+#include "error_handler.h"
 #include "main.h"
 #include "FreeRTOS.h"
 #include "stdio.h"
@@ -23,5 +23,5 @@ int log_assert_violation(char *file, int line, char *condition)
 void BMU_error(uint8_t error_num)
 {
     ERROR_PRINT("BMU ERROR: %u\r\n", error_num);
-    sendDTC_CRITICAL_BMU_ERROR_HANDLER(error_num);
+    sendDTC_FATAL_BMU_ERROR_HANDLER(error_num);
 }

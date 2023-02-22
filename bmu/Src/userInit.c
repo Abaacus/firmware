@@ -18,7 +18,7 @@
 #include "controlStateMachine_mock.h"
 #include "controlStateMachine.h"
 #include "batteries.h"
-#include "errorHandler.h"
+#include "error_handler.h"
 
 #if IS_BOARD_F7
 #include "imdDriver.h"
@@ -77,11 +77,11 @@ void userInit()
     }
 #if IS_BOARD_F7
     if (init_imd_measurement() != HAL_OK) {
-        BMU_error(Failed_init_imd_measurement);
+        BMU_error(Failed_initIMDmeasurement);
     }
 #endif
 	if (init_HW_check_timer() != HAL_OK) {
-		BMU_error(Failed_init_HW_check_timer);
+		BMU_error(Failed_initHWcheckTimer);
 	}
 
     printf("Finished user init\n");

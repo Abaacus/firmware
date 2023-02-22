@@ -17,7 +17,7 @@
 #include "debug.h"
 #include "controlStateMachine.h"
 #include "state_machine.h"
-#include "errorHandler.h"
+#include "error_handler.h"
 
 #define FAN_OFF_TEMP 25
 #define FAN_PEAK_TEMP 35

@@ -22,7 +22,7 @@
 #include "bmu_can.h"
 #include "bmu_dtc.h"
 #include "batteries.h"
-#include "errorHandler.h"
+#include "error_handler.h"
 
 /** Define this to enable contactor control, otherwise PCDC will always
  *  return successful.

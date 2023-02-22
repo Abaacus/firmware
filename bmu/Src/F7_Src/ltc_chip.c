@@ -3,7 +3,7 @@
 #include "bsp.h"
 #include "math.h"
 #include "stdbool.h"
-#include "errorHandler.h"
+#include "error_handler.h"
 #include "debug.h"
 #include "FreeRTOS.h"
 #include "task.h"

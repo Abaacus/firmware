@@ -23,7 +23,7 @@
 #include "watchdog.h"
 #include "batteries.h"
 #include "chargerControl.h"
-#include "errorHandler.h"
+#include "error_handler.h"
 
 extern osThreadId PCDCHandle;
 extern osThreadId BatteryTaskHandle;
