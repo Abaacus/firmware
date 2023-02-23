@@ -5,6 +5,7 @@
 #include "state_machine.h"
 #include "FreeRTOS_CLI.h"
 #include "sensors.h"
+#include "pdu_can.h"
 
 extern uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 
@@ -450,6 +451,50 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
     1 /* Number of parameters */
 };
 
+BaseType_t setMotorTempRight(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    BaseType_t paramLen;
+	const char * motorTempRightParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+	float motorTempRight = 0;
+
+    sscanf(motorTempRightParam, "%f", &motorTempRight);
+
+    TempMotorRight = motorTempRight;
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setMotorTempRightDefinition =
+{
+    "setMotorTempRight",
+    "setMotorTempRight: \r\n Manually sets the temperature of the right motor\r\n",
+    setMotorTempRight,
+    1 /* Number of parameters*/
+};
+
+BaseType_t setMotorTempLeft(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    BaseType_t paramLen;
+	const char * motorTempLeftParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+	float motorTempLeft = 0;
+
+    sscanf(motorTempLeftParam, "%f", &motorTempLeft);
+
+    TempMotorLeft = motorTempLeft;
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setMotorTempLeftDefinition =
+{
+    "setMotorTempLeft",
+    "setMotorTempLeft: \r\n Manually sets the temperature of the left motor\r\n",
+    setMotorTempLeft,
+    1 /* Number of parameters*/
+};
+
 HAL_StatusTypeDef mockStateMachineInit()
 {
     if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
@@ -498,6 +543,12 @@ HAL_StatusTypeDef mockStateMachineInit()
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&controlFansCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&setMotorTempRightDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&setMotorTempLeftDefinition) != pdPASS) {
         return HAL_ERROR;
     }
 

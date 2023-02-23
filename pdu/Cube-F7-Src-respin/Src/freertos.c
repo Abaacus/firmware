@@ -82,14 +82,14 @@
 osThreadId mainTaskHandle;
 osThreadId mainControlHandle;
 osThreadId motorControlHandle;
-osThreadId stateMachineHandle;
+osThreadId coolingControlHandle;
 osThreadId printTaskNameHandle;
 osThreadId cliHandle;
 osThreadId SensorHandle;
 osThreadId watchdogTaskNamHandle;
 osThreadId powerHandle;
 osThreadId canSendTaskHandle;
-osThreadId coolingControlHandle;
+osThreadId motorCoolingHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -99,14 +99,14 @@ osThreadId coolingControlHandle;
 void mainTaskFunction(void const * argument);
 extern void mainControlTask(void const * argument);
 extern void motorControlTask(void const * argument);
-extern void stateMachineTask(void const * argument);
+extern void coolingControlTask(void const * argument);
 extern void printTask(void const * argument);
 extern void cliTask(void const * argument);
 extern void sensorTask(void const * argument);
 extern void watchdogTask(void const * argument);
 extern void powerTask(void const * argument);
 extern void canTask(void const * argument);
-extern void coolingControlTask(void const * argument);
+extern void motorCoolingTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -208,9 +208,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(motorControl, motorControlTask, osPriorityHigh, 0, 1000);
   motorControlHandle = osThreadCreate(osThread(motorControl), NULL);
 
-  /* definition and creation of stateMachine */
-  osThreadDef(stateMachine, stateMachineTask, osPriorityHigh, 0, 1000);
-  stateMachineHandle = osThreadCreate(osThread(stateMachine), NULL);
+  /* definition and creation of coolingControl */
+  osThreadDef(coolingControl, coolingControlTask, osPriorityHigh, 0, 1000);
+  coolingControlHandle = osThreadCreate(osThread(coolingControl), NULL);
 
   /* definition and creation of printTaskName */
   osThreadDef(printTaskName, printTask, osPriorityLow, 0, 1000);
@@ -236,9 +236,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(canSendTask, canTask, osPriorityRealtime, 0, 1000);
   canSendTaskHandle = osThreadCreate(osThread(canSendTask), NULL);
 
-  /* definition and creation of coolingControl */
-  osThreadDef(coolingControl, coolingControlTask, osPriorityIdle, 0, 1000);
-  coolingControlHandle = osThreadCreate(osThread(coolingControl), NULL);
+  /* definition and creation of motorCooling */
+  osThreadDef(motorCooling, motorCoolingTask, osPriorityIdle, 0, 1000);
+  motorCoolingHandle = osThreadCreate(osThread(motorCooling), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */

@@ -7,6 +7,14 @@
 #include "boardTypes.h"
 #include "canReceive.h"
 
+float tempMotorRightSum;
+uint32_t rightCount;
+float averageTempRight;
+
+float tempMotorLeftSum;
+uint32_t leftCount;
+float averageTempLeft;
+
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
 }
@@ -26,3 +34,14 @@ void DTC_Fatal_Callback(BoardIDs board) {
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
 }
 
+void CAN_Msg_TempMotorRight_Callback() {
+    tempMotorRightSum += TempMotorRight;
+    rightCount++;
+    averageTempRight = tempMotorRightSum/rightCount;
+}
+
+void CAN_Msg_TempMotorLeft_Callback() {
+    tempMotorLeftSum += TempMotorLeft;
+    leftCount++;
+    averageTempLeft = tempMotorLeftSum/leftCount;
+}
