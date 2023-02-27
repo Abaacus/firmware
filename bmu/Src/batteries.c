@@ -684,7 +684,6 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
    float measure_high;
    float measure_low;
    float currentReading;
-   extern float cell_max_temp_c;
    if(getIBus(&currentReading) != HAL_OK){
        ERROR_PRINT("Cannot read current from bus!!");
        sendDTC_FATAL_BMU_ERROR();
@@ -737,21 +736,27 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 	   for (int i=0; i < NUM_TEMP_CELLS; i++)
 	   {
 			measure = TempChannel[i];
-			if (fsmGetState(&fsmHandle) == STATE_Charging) {
-                //limit for charge is 45 celcius instead of 55 celcius
-                cell_max_temp_c = 45.0;
-            }else{
-                cell_max_temp_c = 55.0;
-            }
+            
 			// Check it is within bounds
 			if (measure > CELL_OVERTEMP) {
 				ERROR_PRINT("Temp Channel %d is overtemp at %f deg C\n", i, measure);
-				sendDTC_CRITICAL_CELL_TEMP_HIGH(i);
+				sendDTC_CRITICAL_CELL_TEMP_HIGH_DISCHARGE(i);
 				rc = HAL_ERROR;
-			} else if (measure > CELL_OVERTEMP_WARNING) {
+			} else if (fsmGetState(&fsmHandle) == STATE_Charging && measure > CELL_OVERTEMP_CHARGING) {
+                //overtemp for charging is 45 instead of 55
+                ERROR_PRINT("Temp Channel %d is overtemp at %f deg C during charging\n", i, measure);
+                sendDTC_CRITICAL_CELL_TEMP_HIGH_CHARGE(i);
+                rc = HAL_ERROR;
+            } else if (fsmGetState(&fsmHandle) == STATE_Charging && measure > CELL_OVERTEMP_CHARGING_WARNING) {
+                if (!warningSentForChannelTemp[i]) {
+                    ERROR_PRINT("WARN: Temp Channel %d is high temp at %f deg C during charging\n", i, measure);
+                    sendDTC_WARNING_CELL_TEMP_HIGH_CHARGE(i);
+                    warningSentForChannelTemp[i] = true;
+                }
+            }else if (measure > CELL_OVERTEMP_WARNING) {
 				if (!warningSentForChannelTemp[i]) {
 					ERROR_PRINT("WARN: Temp Channel %d is high temp at %f deg C\n", i, measure);
-					sendDTC_WARNING_CELL_TEMP_HIGH(i);
+					sendDTC_WARNING_CELL_TEMP_HIGH_DISCHARGE(i);
 					warningSentForChannelTemp[i] = true;
 				}
 			} else if(measure < CELL_UNDERTEMP){

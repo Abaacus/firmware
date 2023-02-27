@@ -56,11 +56,10 @@ volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 // Our current pack is 70s7p. So this assumption factors in that IBus is total current from cells and the current gets divided by 7
 #define ADJUSTED_CELL_IR_DEFAULT (0.00286F)
 
-float cell_max_temp_c;
 /** Maximum allowable cell temperature, will send critical DTC if surpassed */
-#define CELL_OVERTEMP (cell_max_temp_c)
+#define CELL_OVERTEMP (CELL_MAX_TEMP_C)
 /** Temp at warning DTC is sent */
-#define CELL_OVERTEMP_WARNING (cell_max_temp_c - 10)
+#define CELL_OVERTEMP_WARNING (CELL_MAX_TEMP_C - 10)
 /** Similar to @ref CELL_OVERTEMP, minimum temp before sending critical DTC */
 #define CELL_UNDERTEMP 0
 /** Similar to @ref CELL_OVERTEMP_WARNING, temp will send warning DTC */
@@ -122,6 +121,10 @@ typedef enum ChargeReturn
 
 // Used by FAN Control to determine when to turn on fans
 #define CELL_MAX_TEMP_C (55.0)
+
+// Used by FAN Control to determine when to turn on fans, for charging
+#define CELL_OVERTEMP_CHARGING (45.0)
+#define CELL_OVERTEMP_CHARGING_WARNING (CELL_OVERTEMP_CHARGING - 10)
 
 typedef enum Balance_Type_t {
     USING_CLI,
