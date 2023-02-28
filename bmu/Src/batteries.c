@@ -540,7 +540,7 @@ HAL_StatusTypeDef initVoltageAndTempArrays()
    float initTemp = 0;
 #elif IS_BOARD_NUCLEO_F7 || !defined(ENABLE_AMS)
    float initVoltage = LIMIT_OVERVOLTAGE - 0.1;
-   float initTemp = CELL_OVERTEMP - 20;
+   float initTemp = CELL_OVERTEMP_DISCHARGING - 20;
 #else
 #error Unsupported board type
 #endif
@@ -692,7 +692,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
    *maxVoltage = 0;
    *minVoltage = LIMIT_OVERVOLTAGE;
    *maxTemp = -100; // Cells shouldn't get this cold right??
-   *minTemp = CELL_OVERTEMP;
+   *minTemp = CELL_OVERTEMP_DISCHARGING;
    *packVoltage = 0;
 
    // Unfortunately the thermistors may run slower than the cell voltage measurements
@@ -738,7 +738,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
 			measure = TempChannel[i];
             
 			// Check it is within bounds
-			if (measure > CELL_OVERTEMP) {
+			if (measure > CELL_OVERTEMP_DISCHARGING) {
 				ERROR_PRINT("Temp Channel %d is overtemp at %f deg C\n", i, measure);
 				sendDTC_CRITICAL_CELL_TEMP_HIGH_DISCHARGE(i);
 				rc = HAL_ERROR;
@@ -753,7 +753,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
                     sendDTC_WARNING_CELL_TEMP_HIGH_CHARGE(i);
                     warningSentForChannelTemp[i] = true;
                 }
-            }else if (measure > CELL_OVERTEMP_WARNING) {
+            }else if (measure > CELL_OVERTEMP_DISCHARGING_WARNING) {
 				if (!warningSentForChannelTemp[i]) {
 					ERROR_PRINT("WARN: Temp Channel %d is high temp at %f deg C\n", i, measure);
 					sendDTC_WARNING_CELL_TEMP_HIGH_DISCHARGE(i);
