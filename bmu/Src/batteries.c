@@ -370,6 +370,13 @@ void HVMeasureTask(void *pvParamaters)
     float VBus;
     float VBatt;
     float IBus;
+
+    float voltageCellMax;
+    float voltageCellMin;
+    float tempCellMax;
+    float tempCellMin;
+    float packVoltage;
+
     TickType_t xLastWakeTime = xTaskGetTickCount();
     while (1) {
         if (readBusVoltagesAndCurrents(&IBus, &VBus, &VBatt) != HAL_OK) {
@@ -389,6 +396,16 @@ void HVMeasureTask(void *pvParamaters)
             sendCAN_BMU_stateBusHV();
             AMS_PackVoltage = VBatt;
             sendCAN_BMU_AmsVBatt();
+
+            if (checkCellVoltagesAndTemps(&voltageCellMax, &voltageCellMin,
+                &tempCellMax, &tempCellMin, &packVoltage) != HAL_OK)
+            {
+                I2t = IBus * IBus * (StateBusHVSendPeriod / 1000);
+                TempBattery = tempCellMax;
+                if (sendCAN_BMU_stateFuse() != HAL_OK) {
+                    ERROR_PRINT("Failed to send values for virtual fuse!\n");
+                }
+            }
             lastStateBusHVSend = xTaskGetTickCount();
         }
 		integrate_bus_current(IBus, (float)HV_MEASURE_TASK_PERIOD_MS);

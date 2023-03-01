@@ -11,6 +11,7 @@
 #include "bsp.h"
 #include "motorController.h"
 #include "beaglebone.h"
+#include "virtual_fuse.h"
 
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
@@ -501,6 +502,73 @@ static const CLI_Command_Definition_t mcInitCommandDefinition =
     0 /* Number of parameters */
 };
 
+BaseType_t setVirtualFuseParam(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    BaseType_t paramLen;
+    uint8_t virtualFuseParam;
+    float virtualFuseParamValue;
+    const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    sscanf(param, "%c", &virtualFuseParam);
+
+    param = FreeRTOS_CLIGetParameter(commandString, 2, &paramLen);
+    sscanf(param, "%f", &virtualFuseParamValue);
+
+    switch (virtualFuseParam)
+    {
+        case 0:
+            set_cooling_factor(virtualFuseParamValue);
+            break;
+        case 1:
+            set_linear_cutoff(virtualFuseParamValue);
+            break;
+        case 2:
+            set_normal_cutoff(virtualFuseParamValue);
+            break;
+        case 3:
+            set_motor_power_safe(virtualFuseParamValue);
+            break;
+        case 4:
+            set_motor_linear_factor(virtualFuseParamValue);
+            break;
+        default:
+            ERROR_PRINT("Did not recognize parameter!\n");
+    }
+
+    COMMAND_OUTPUT("Setting virtual fuse param %u to %f\n", virtualFuseParam, virtualFuseParamValue);
+
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t setVirtualFuseParamCommandDefinition =
+{
+    "setVirtualFuseParam",
+    "setVirtualFuseParam <param> <val>:\r\n set virtual fuse parameter (0: cooling factor, 1: linear cutoff, 2: normal cutoff, 3: motor power safe, 4: motor linear factor\r\n",
+    setVirtualFuseParam,
+    2 /* Number of parameters */
+};
+
+BaseType_t getVirtualFuseParams(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    float cooling_factor = get_cooling_factor(),
+          linear_cutoff = get_linear_cutoff(),
+          normal_cutoff = get_normal_cutoff(),
+          motor_power_safe = get_motor_power_safe(),
+          motor_linear_factor = get_motor_linear_factor();
+
+    COMMAND_OUTPUT("Virtual fuse parameters:\n  cooling factor: %f\nlinear cutoff: %f\nnormal cutoff: %f\nmotor power safe: %f\nmotor linear factor: %f\n",
+                   cooling_factor, linear_cutoff, normal_cutoff, motor_power_safe, motor_linear_factor);
+
+    return pdFALSE;
+}
+static const CLI_Command_Definition_t getVirtualFuseParamsCommandDefinition =
+{
+    "getVirtualFuseParams",
+    "getVirtualFuseParams:\r\n Get virtual fuse parameters\r\n",
+    getVirtualFuseParams,
+    0 /* Number of parameters */
+};
+
 HAL_StatusTypeDef stateMachineMockInit()
 {
     if (FreeRTOS_CLIRegisterCommand(&throttleABCommandDefinition) != pdPASS) {
@@ -569,7 +637,12 @@ HAL_StatusTypeDef stateMachineMockInit()
     if (FreeRTOS_CLIRegisterCommand(&getSteeringCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-
+    if (FreeRTOS_CLIRegisterCommand(&setVirtualFuseParamCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&getVirtualFuseParamsCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
 
     return HAL_OK;
 }

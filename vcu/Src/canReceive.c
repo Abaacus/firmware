@@ -15,6 +15,7 @@
 
 #include "endurance_mode.h"
 #include "traction_control.h"
+#include "virtual_fuse.h"
 
 /*
  * External Board Statuses:
@@ -136,6 +137,13 @@ void CAN_Msg_TempInverterRight_Callback() {
 	}
 }
 
+void CAN_Msg_BMU_stateFuse_Callback()
+{
+    float i2t_val = I2t;
+    float temp_batt = TempBattery;
+    float temp_amb = 0.0f;
+    check_virtual_fuse(i2t_val, temp_batt, temp_amb);
+}
 
 void CAN_Msg_UartOverCanConfig_Callback()
 {

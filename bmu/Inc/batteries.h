@@ -137,6 +137,7 @@ HAL_StatusTypeDef getIBus(float *IBus);
 HAL_StatusTypeDef getVBatt(float *VBatt);
 HAL_StatusTypeDef getVBus(float *VBus);
 
+HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage, float *maxTemp, float *minTemp, float *packVoltage);
 HAL_StatusTypeDef initBusVoltagesAndCurrentQueues();
 HAL_StatusTypeDef balance_cell(int cell, bool set);
 HAL_StatusTypeDef getPackVoltage(float *packVoltage);
