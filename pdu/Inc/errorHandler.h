@@ -1,4 +1,4 @@
-typedef enum pdu_error_enum {
+typedef enum Error_events_t {
      Failure_ADC_Init = 0,
      Failure_ADC_ConfigChannel,
      Failure_DMA_Init,
@@ -21,6 +21,6 @@ typedef enum pdu_error_enum {
      Failure_TIM_Base_Start,
      Failure_startADCConversions,
      Failure_canStart
-} pdu_error_enum;
+} Error_events_t;
 
-void PDU_error(pdu_error_enum error_num);
+void PDU_error(Error_events_t error_num);
