@@ -352,6 +352,7 @@ HAL_StatusTypeDef turnBoardsOn()
     DCU_ENABLE;
     WSB_ENABLE;
     BMU_ENABLE;
+    AUX_ENABLE;
     return HAL_OK;
 }
 
