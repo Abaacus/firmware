@@ -287,7 +287,8 @@ uint32_t criticalFailureWarning(uint32_t event)
 
 uint32_t criticalFailure(uint32_t event)
 {
-    DEBUG_PRINT("Critical Failure %lu: Boards will remain on\n", event);
+    DEBUG_PRINT("Critical Failure %lu: Boards will shutoff\n", event);
+    turnBoardsOff();
     fsmSendEventUrgent(&motorFsmHandle, MTR_EV_Motor_Critical, 10 /* timeout */);
     fsmSendEventUrgent(&coolingFsmHandle, COOL_EV_Critical, 10 /* timeout */);
     return MN_STATE_Critical_Failure;
