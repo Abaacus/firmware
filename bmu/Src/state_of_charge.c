@@ -173,25 +173,19 @@ void canPublishTask(void *pvParameters) {
 	while (1) {
 		vTaskDelay(500);
 		float v_soc = compute_voltage_soc();
-		float i_soc = computer_current_soc();
+		float i_soc = compute_current_soc();
 		IBus_Integrated = IBus_integrated;
 		VoltageSOC = v_soc;
 		CurrentSOC = i_soc;
 
-		float voltage_weight = 1.0f;
+		float current_weight;
 		if (v_soc >= SOC_HIGH_VOLTAGE_SOC_CUTOFF)
 		{
-			float current_weight = (1.0f - v_soc)/(1.0f - SOC_HIGH_VOLTAGE_SOC_CUTOFF);
-			voltage_weight = 1.0f - current_weight;
-		}
-		else if(v_soc >= SOC_LOW_VOLTAGE_SOC_CUTOFF)
-		{
-			voltage_weight = 0.0f;
-		}
-		else
-		{
-			float current_weight = (v_soc - 0.0f)/(SOC_LOW_VOLTAGE_SOC_CUTOFF - 0.0f);
-			voltage_weight = 1.0f - current_weight;
+			current_weight = (1.0f - v_soc)/(1.0f - SOC_HIGH_VOLTAGE_SOC_CUTOFF);
+		}else if(v_soc >= SOC_LOW_VOLTAGE_SOC_CUTOFF){
+			current_weight = 1.0f;
+		}else{
+			current_weight = (v_soc - 0.0f)/(SOC_LOW_VOLTAGE_SOC_CUTOFF - 0.0f);
 		}
 		CurrentWeight = current_weight;
 
@@ -204,6 +198,3 @@ void canPublishTask(void *pvParameters) {
 		}
 	}
 }
-
-// mention the fact that i recalculated v_soc in canPublish even though it was calculated 
-// @Justin do you want soc task to be moved to canpublish task so we don't have to recalculate everything. There is no Jira task for this.
