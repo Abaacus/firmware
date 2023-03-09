@@ -445,6 +445,7 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
     DTC_History_t * DTC_Log = get_DTC_History();
     static uint8_t DTCs_index = DTC_HISTORY_LENGTH;
     if (DTCs_index == DTC_HISTORY_LENGTH) {
+        // COMMAND_OUTPUT("Ordered from most recent DTC at the top");
         DTCs_index = DTC_Log->tail - 1;
     }
 
