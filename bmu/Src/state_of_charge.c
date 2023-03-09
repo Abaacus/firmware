@@ -4,6 +4,7 @@
 #include "batteries.h"
 #include "debug.h"
 #include "watchdog.h"
+#include "bmu_can.h"
 
 #define SOC_TASK_PERIOD 200 
 #define SOC_TASK_ID 7
@@ -13,6 +14,8 @@
 
 #define SOC_HIGH_VOLTAGE_SOC_CUTOFF (0.942f) // Ramp up to around all cells 4V
 #define SOC_LOW_VOLTAGE_SOC_CUTOFF (0.06144f) // Ramp down when all cells around 3V
+
+#define SOC_BMU_PUBLISH_TIME_MS 10000
 
 
 // Units A-s
@@ -162,3 +165,45 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
 	*segmentVoltage = (temp / (float)NUM_BOARDS);
 	return ret;
 }
+
+void canPublishTask(void *pvParameters) {
+
+	uint32_t last100msPublishTime = 0;
+
+	while (1) {
+		vTaskDelay(500);
+		float v_soc = compute_voltage_soc();
+		float i_soc = computer_current_soc();
+		IBus_Integrated = IBus_integrated;
+		VoltageSOC = v_soc;
+		CurrentSOC = i_soc;
+
+		float voltage_weight = 1.0f;
+		if (v_soc >= SOC_HIGH_VOLTAGE_SOC_CUTOFF)
+		{
+			float current_weight = (1.0f - v_soc)/(1.0f - SOC_HIGH_VOLTAGE_SOC_CUTOFF);
+			voltage_weight = 1.0f - current_weight;
+		}
+		else if(v_soc >= SOC_LOW_VOLTAGE_SOC_CUTOFF)
+		{
+			voltage_weight = 0.0f;
+		}
+		else
+		{
+			float current_weight = (v_soc - 0.0f)/(SOC_LOW_VOLTAGE_SOC_CUTOFF - 0.0f);
+			voltage_weight = 1.0f - current_weight;
+		}
+		CurrentWeight = current_weight;
+
+		if (xTaskGetTickCount() - last100msPublishTime > pdMS_TO_TICKS(SOC_BMU_PUBLISH_TIME_MS)) {
+			if (sendCAN_BMU_stateSOC() != HAL_OK) {
+				ERROR_PRINT("Failed to publish BMU state SOC.\n");
+			}else{
+				last100msPublishTime = xTaskGetTickCount();
+			}
+		}
+	}
+}
+
+// mention the fact that i recalculated v_soc in canPublish even though it was calculated 
+// @Justin do you want soc task to be moved to canpublish task so we don't have to recalculate everything. There is no Jira task for this.
