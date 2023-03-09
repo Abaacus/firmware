@@ -501,6 +501,28 @@ static const CLI_Command_Definition_t mcInitCommandDefinition =
     0 /* Number of parameters */
 };
 
+BaseType_t fakeDriver(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    HAL_StatusTypeDef rc = mcInit();
+    if (rc != HAL_OK) {
+        ERROR_PRINT("Failed to start motor controllers\n");
+        return rc;
+    }
+
+    COMMAND_OUTPUT("MCs Inited\n");
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t fakeDriverCommandDefinition =
+{
+    "fakeDriver",
+    "fakeDriver: \r\n  Simulates the driver by turing on motors and draining battery\r\n",
+    fakeDriver,
+    0 /* Number of parameters */
+};
+
 HAL_StatusTypeDef stateMachineMockInit()
 {
     if (FreeRTOS_CLIRegisterCommand(&throttleABCommandDefinition) != pdPASS) {
@@ -569,7 +591,9 @@ HAL_StatusTypeDef stateMachineMockInit()
     if (FreeRTOS_CLIRegisterCommand(&getSteeringCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-
+    if (FreeRTOS_CLIRegisterCommand(&fakeDriverCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
 
     return HAL_OK;
 }
