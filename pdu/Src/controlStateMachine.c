@@ -31,13 +31,13 @@ uint32_t motorsOff(uint32_t event);
 uint32_t motorsOn(uint32_t event);
 uint32_t motorsOffCritical(uint32_t event);
 uint32_t lvCuttoff(uint32_t event);
-uint32_t criticalFailure(uint32_t event);
+uint32_t criticalFailureShutdown(uint32_t event);
 uint32_t criticalFailureWarning(uint32_t event);
 uint32_t MainDefaultTransition(uint32_t event);
 uint32_t MotorDefaultTransition(uint32_t event);
 uint32_t mainDoNothing(uint32_t event);
 uint32_t motorDoNothing(uint32_t event);
-uint32_t emEnable(uint32_t event);
+uint32_t emEnableCooling(uint32_t event);
 uint32_t coolingOn(uint32_t event);
 uint32_t coolingOff(uint32_t event);
 uint32_t coolingCriticalFailure(uint32_t event);
@@ -55,7 +55,7 @@ HAL_StatusTypeDef startControl();
 Transition_t mainTransitions[] = {
     { MN_STATE_Boards_Off, MN_EV_Init, &runSelftTests },
     { MN_STATE_Boards_On,  MN_EV_HV_CriticalFailure, &criticalFailureWarning },
-    { MN_STATE_Warning_Critical, MN_EV_CriticalDelayElapsed, &criticalFailure },
+    { MN_STATE_Warning_Critical, MN_EV_CriticalDelayElapsed, &criticalFailureShutdown },
     { MN_STATE_Boards_On, MN_EV_LV_Cuttoff, &lvCuttoff },
     { MN_STATE_LV_Shutting_Down, MN_EV_LV_Shutdown, &lvShutdown },
     { MN_STATE_LV_Shutting_Down, MN_EV_ANY, &mainDoNothing },
@@ -76,14 +76,15 @@ Transition_t motorTransitions[] = {
 };
 
 Transition_t coolingTransitions[] = {
-    { COOL_STATE_OFF, COOL_EV_EM_ENABLE, &emEnable},
+    { COOL_STATE_OFF, COOL_EV_ENABLE, &emEnableCooling},
     { COOL_STATE_OFF, COOL_EV_OVERTEMP_WARNING, &coolingOn},
     { COOL_STATE_WAIT, COOL_EV_OVERTEMP_WARNING, &coolingOn},
     { COOL_STATE_WAIT, COOL_EV_WAIT_ELAPSED, &coolingOn},
-    { COOL_STATE_WAIT, COOL_EV_EM_DISABLE, &stopCoolingWait},
-    { COOL_STATE_ON, COOL_EV_EM_DISABLE, &coolingOff},
+    { COOL_STATE_WAIT, COOL_EV_DISABLE, &stopCoolingWait},
+    { COOL_STATE_ON, COOL_EV_DISABLE, &coolingOff},
+    { COOL_STATE_OFF, COOL_EV_DISABLE, &coolingDoNothing},
     { COOL_STATE_ON, COOL_EV_Critical, &coolingCriticalFailure },
-    { COOL_STATE_ON, COOL_EV_EM_ENABLE, &coolingDoNothing },
+    { COOL_STATE_ON, COOL_EV_ENABLE, &coolingDoNothing },
     { COOL_STATE_OFF, COOL_EV_Critical, &coolingCriticalFailure },
     { COOL_STATE_WAIT, COOL_EV_Critical, &coolingCriticalFailure },
     { COOL_STATE_ANY, COOL_EV_LV_Cuttoff, &coolingLVCuttoff },
@@ -270,7 +271,7 @@ uint32_t startCriticalFailureDelay()
 {
     if (xTimerStart(criticalDelayTimer, 100) != pdPASS) {
         ERROR_PRINT("Failed to start critical delay timer\n");
-        criticalFailure(MN_EV_CriticalDelayElapsed);
+        criticalFailureShutdown(MN_EV_CriticalDelayElapsed);
         return MN_STATE_Critical_Failure;
     }
 
@@ -285,7 +286,7 @@ uint32_t criticalFailureWarning(uint32_t event)
     return startCriticalFailureDelay();
 }
 
-uint32_t criticalFailure(uint32_t event)
+uint32_t criticalFailureShutdown(uint32_t event)
 {
     DEBUG_PRINT("Critical Failure %lu: Boards will remain on\n", event);
     fsmSendEventUrgent(&motorFsmHandle, MTR_EV_Motor_Critical, 10 /* timeout */);
@@ -433,7 +434,7 @@ void hvCriticalDelayCallback(TimerHandle_t timer)
 {
     if (fsmSendEventUrgent(&mainFsmHandle, MN_EV_CriticalDelayElapsed, 10 /* timeout */) != HAL_OK) {
         ERROR_PRINT("Failed to process critical delay elapsed event\n");
-        criticalFailure(MN_EV_CriticalDelayElapsed);
+        criticalFailureShutdown(MN_EV_CriticalDelayElapsed);
     }
 }
 void coolingDelayCallback(TimerHandle_t timer)
@@ -496,7 +497,7 @@ uint32_t coolingOn(uint32_t event) {
     return COOL_STATE_ON;
 }
 
-uint32_t emEnable(uint32_t event) {
+uint32_t emEnableCooling(uint32_t event) {
     DEBUG_PRINT("EM Enable received\n");
     if (DC_DC_state) {
         if (xTimerStart(coolingDelayTimer, 100) != pdPASS) {
@@ -516,7 +517,7 @@ uint32_t stopCoolingWait(uint32_t event)
 {
     DEBUG_PRINT("Stopping cooling timer\n");
     if (xTimerStop(coolingDelayTimer, 100) != pdPASS) {
-        ERROR_PRINT("Failed to start coolingdelay timer\n");
+        ERROR_PRINT("Failed to stop coolingdelay timer\n");
         coolingOff(COOL_EV_WAIT_ELAPSED);
     }
 

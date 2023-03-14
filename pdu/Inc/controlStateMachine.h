@@ -68,8 +68,8 @@ char PDU_Cool_States_String[][15]={
 };
 
 typedef enum CoolingControl_PDU_Events_t {
-    COOL_EV_EM_ENABLE,
-    COOL_EV_EM_DISABLE,
+    COOL_EV_ENABLE,
+    COOL_EV_DISABLE,
     COOL_EV_WAIT_ELAPSED,
     COOL_EV_OVERTEMP_WARNING,
     COOL_EV_Critical,

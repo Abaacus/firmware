@@ -1,5 +1,4 @@
 #include <stdbool.h>
-#include "motorCooling.h"
 #include "bsp.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -12,6 +11,15 @@
 #include "watchdog.h"
 #include "canReceive.h"
 #include "pdu_dtc.h"
+#include "motorCooling.h"
+
+float tempMotorRightSum;
+uint32_t numTempSamplesRight;
+float averageTempRight;
+
+float tempMotorLeftSum;
+uint32_t numTempSamplesLeft;
+float averageTempLeft;
 
 void motorCoolingTask(void *pvParameters)
 {
@@ -25,28 +33,43 @@ void motorCoolingTask(void *pvParameters)
     TempMotorLeft = 0;
     TempMotorRight = 0;
 
-    // Delay to allow system to turn on
-    vTaskDelay(100);
-
     TickType_t xLastWakeTime = xTaskGetTickCount();
     while(1)
     {
-        uint16_t tempMRight = averageTempRight;
-        uint16_t tempMLeft = averageTempLeft;
+        const bool motorOverTemp = averageTempLeft >= COOLING_START_THRESHOLD_C|| averageTempRight >= COOLING_START_THRESHOLD_C;
 
-        if( ( tempMRight >= COOLING_THRESHOLD || tempMLeft >= COOLING_THRESHOLD ) && fsmGetState(&coolingFsmHandle) != COOL_STATE_ON ){
-                fsmSendEvent(&coolingFsmHandle, COOL_EV_OVERTEMP_WARNING, portMAX_DELAY);
-        }
-        else if( ( tempMRight <= (COOLING_THRESHOLD - HYSTERESIS) || tempMLeft <= (COOLING_THRESHOLD - HYSTERESIS) ) && fsmGetState(&coolingFsmHandle) == COOL_STATE_ON ) {
-                fsmSendEvent(&coolingFsmHandle, COOL_EV_EM_DISABLE, portMAX_DELAY);
+        switch (fsmGetState(&coolingFsmHandle))
+        {
+            case COOL_STATE_ON:
+                if( !motorOverTemp ){
+                    fsmSendEvent(&coolingFsmHandle, COOL_EV_DISABLE, portMAX_DELAY);
+                }
+                break;
+            case COOL_STATE_OFF:
+                if( motorOverTemp && 
+                    fsmGetState(&motorFsmHandle) == MTR_STATE_Motors_On ){
+                    fsmSendEvent(&coolingFsmHandle, COOL_EV_OVERTEMP_WARNING, portMAX_DELAY);
+                }
+                break;
+            case COOL_STATE_WAIT:
+                break;
+            case COOL_STATE_LV_Cuttoff:
+                break;
+            case COOL_STATE_HV_CRITICAL:
+                break;
+
+            default:
+                //do nothing
+                break;
         }
 
+        //Reset all values
         tempMotorRightSum = 0;
-        rightCount = 0;
+        numTempSamplesRight = 0;
         averageTempRight = 0;
 
         tempMotorLeftSum = 0;
-        leftCount = 0;
+        numTempSamplesLeft = 0;
         averageTempLeft = 0;
 
         watchdogTaskCheckIn(COOLING_TASK_ID);

@@ -6,14 +6,7 @@
 #include "debug.h"
 #include "boardTypes.h"
 #include "canReceive.h"
-
-float tempMotorRightSum;
-uint32_t rightCount;
-float averageTempRight;
-
-float tempMotorLeftSum;
-uint32_t leftCount;
-float averageTempLeft;
+#include "motorCooling.h"
 
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
@@ -22,10 +15,9 @@ void CAN_Msg_UartOverCanConfig_Callback() {
 void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
     if (EM_Power_State_Request == EM_Power_State_Request_On) {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_ENABLE);
-        fsmSendEventISR(&coolingFsmHandle, COOL_EV_EM_ENABLE);
     } else {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_DISABLE);
-        fsmSendEventISR(&coolingFsmHandle, COOL_EV_EM_DISABLE);
+        fsmSendEventISR(&coolingFsmHandle, COOL_EV_DISABLE);
     }
 }
 
@@ -36,12 +28,12 @@ void DTC_Fatal_Callback(BoardIDs board) {
 
 void CAN_Msg_TempMotorRight_Callback() {
     tempMotorRightSum += TempMotorRight;
-    rightCount++;
-    averageTempRight = tempMotorRightSum/rightCount;
+    numTempSamplesRight++;
+    averageTempRight = tempMotorRightSum/numTempSamplesRight;
 }
 
 void CAN_Msg_TempMotorLeft_Callback() {
     tempMotorLeftSum += TempMotorLeft;
-    leftCount++;
-    averageTempLeft = tempMotorLeftSum/leftCount;
+    numTempSamplesLeft++;
+    averageTempLeft = tempMotorLeftSum/numTempSamplesLeft;
 }
