@@ -168,7 +168,7 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
 
 void canPublishTask(void *pvParameters) {
 
-	uint32_t last100msPublishTime = 0;
+	uint32_t last10000msPublishTime = 0;
 
 	while (1) {
 		vTaskDelay(500);
@@ -189,11 +189,11 @@ void canPublishTask(void *pvParameters) {
 		}
 		CurrentWeight = current_weight;
 
-		if (xTaskGetTickCount() - last100msPublishTime > pdMS_TO_TICKS(SOC_BMU_PUBLISH_TIME_MS)) {
+		if (xTaskGetTickCount() - last10000msPublishTime > pdMS_TO_TICKS(SOC_BMU_PUBLISH_TIME_MS)) {
 			if (sendCAN_BMU_stateSOC() != HAL_OK) {
 				ERROR_PRINT("Failed to publish BMU state SOC.\n");
 			}else{
-				last100msPublishTime = xTaskGetTickCount();
+				last10000msPublishTime = xTaskGetTickCount();
 			}
 		}
 	}
