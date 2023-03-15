@@ -50,6 +50,7 @@ void userInit()
       Error_Handler();
     }
 
+    HAL_Delay(100);
     DTC_History_init();
 }
 
