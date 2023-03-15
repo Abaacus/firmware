@@ -9,6 +9,7 @@
 
 #define HEARTBEAT_PERIOD_TICKS 1000
 #define HEARTBEAT_TIMEOUT_TICKS 2500
+#define WSB_HEARTBEAT 1
 
 extern bool heartbeatEnabled;
 extern bool DCU_heartbeatEnabled;

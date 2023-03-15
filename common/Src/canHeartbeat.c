@@ -13,6 +13,10 @@ uint32_t lastBMU_Heartbeat_ticks = 0;
 uint32_t lastPDU_Heartbeat_ticks = 0;
 uint32_t lastDCU_Heartbeat_ticks = 0;
 uint32_t lastVCU_F7_Heartbeat_ticks = 0;
+uint32_t lastWSBFL_Heartbeat_ticks = 0;
+uint32_t lastWSBFR_Heartbeat_ticks = 0;
+uint32_t lastWSBRL_Heartbeat_ticks = 0;
+uint32_t lastWSBRR_Heartbeat_ticks = 0;
 // For now, we don't use this, since BMU does its own checking of the heartbeat
 uint32_t lastChargeCart_Heartbeat_ticks = 0;
 
@@ -44,6 +48,22 @@ void heartbeatReceived(BoardIDs board)
                 lastChargeCart_Heartbeat_ticks = xTaskGetTickCount();
                 break;
             }
+        case ID_WSBFL:
+            {
+                lastWSBFL_Heartbeat_ticks = xTaskGetTickCount();
+            }
+        case ID_WSBFR:
+            {
+                lastWSBFR_Heartbeat_ticks = xTaskGetTickCount();
+            }
+        case ID_WSBRL:
+            {
+                lastWSBRL_Heartbeat_ticks = xTaskGetTickCount();
+            }
+        case ID_WSBRR:
+            {
+                lastWSBRR_Heartbeat_ticks = xTaskGetTickCount();
+            }
         default:
             {
                 if (xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) {
@@ -61,6 +81,10 @@ bool DCU_heartbeatEnabled = true;
 bool PDU_heartbeatEnabled = true;
 bool BMU_heartbeatEnabled = true;
 bool VCU_F7_heartbeatEnabled = true;
+bool WSBFL_heartbeatEnabled = true;
+bool WSBFR_heartbeatEnabled = true;
+bool WSBRL_heartbeatEnabled = true;
+bool WSBRR_heartbeatEnabled = true;
 
 void disableHeartbeat()
 {
@@ -77,6 +101,8 @@ HAL_StatusTypeDef checkAllHeartbeats()
 #if IS_BOARD_NUCLEO_F7
     return HAL_OK;
 #endif
+
+#if !BOARD_IS_WSB(BOARD_ID)
 
     if (heartbeatEnabled)
     {
@@ -125,7 +151,53 @@ HAL_StatusTypeDef checkAllHeartbeats()
             }
         }
 #endif
+
+#if BOARD_ID != ID_WSBFL
+        if (WSBFL_heartbeatEnabled) {
+            if (curTick - lastWSBFL_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
+            {
+                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                ERROR_PRINT("WSBFL Missed heartbeat check in\n");
+                return HAL_ERROR;
+            }
+        }
+#endif
+
+#if BOARD_ID != ID_WSBFR
+        if (WSBFR_heartbeatEnabled) {
+            if (curTick - lastWSBFR_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
+            {
+                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                ERROR_PRINT("WSBFR Missed heartbeat check in\n");
+                return HAL_ERROR;
+            }
+        }
+#endif
+
+#if BOARD_ID != ID_WSBRL
+        if (WSBRL_heartbeatEnabled) {
+            if (curTick - lastWSBRL_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
+            {
+                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                ERROR_PRINT("WSBRL Missed heartbeat check in\n");
+                return HAL_ERROR;
+            }
+        }
+#endif
+
+#if BOARD_ID != ID_WSBRR
+        if (WSBRR_heartbeatEnabled) {
+            if (curTick - lastWSBRR_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
+            {
+                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                ERROR_PRINT("WSBRR Missed heartbeat check in\n");
+                return HAL_ERROR;
+            }
+        }
+#endif
     }
+
+#endif  //!BOARD_IS_WSB(BOARD_ID)
 
     return HAL_OK;
 }
@@ -140,4 +212,8 @@ void printHeartbeatStatus()
     DEBUG_PRINT("DCU\t%lu\n", lastDCU_Heartbeat_ticks);
     DEBUG_PRINT("BMU\t%lu\n", lastBMU_Heartbeat_ticks);
     DEBUG_PRINT("VCU_F7\t%lu\n", lastVCU_F7_Heartbeat_ticks);
+    DEBUG_PRINT("WSBFL\t%lu\n", lastWSBFL_Heartbeat_ticks);
+    DEBUG_PRINT("WSBFR\t%lu\n", lastWSBFR_Heartbeat_ticks);
+    DEBUG_PRINT("WSBRL\t%lu\n", lastWSBRL_Heartbeat_ticks);
+    DEBUG_PRINT("WSBRR\t%lu\n", lastWSBRR_Heartbeat_ticks);
 }

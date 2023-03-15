@@ -65,6 +65,18 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ CurrentHVBusInverterLeft : 0|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
+BO_ 2214919947 WSBRR_Heartbeat: 1 WSBRR
+ SG_ WSBRR_Heartbeat_dummydata : 0|1@1- (1,0) [0|0] ""  VCU_F7,PDU,BMU,DCU
+
+BO_ 2214919946 WSBRL_Heartbeat: 1 WSBRL
+ SG_ WSBRL_Heartbeat_dummydata : 0|1@1- (1,0) [0|0] ""  VCU_F7,PDU,BMU,DCU
+
+BO_ 2214919945 WSBFR_Heartbeat: 1 WSBFR
+ SG_ WSBFR_Heartbeat_dummydata : 0|1@1- (1,0) [0|0] ""  VCU_F7,PDU,BMU,DCU
+
+BO_ 2214919944 WSBFL_Heartbeat: 1 WSBFL
+ SG_ WSBFL_Heartbeat_dummydata : 0|1@1- (1,0) [0|0] ""  VCU_F7,PDU,BMU,DCU
+
 BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
  SG_ SpeedMotorRightKPH : 16|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
  SG_ SpeedMotorLeftKPH : 0|16@1- (1,0) [0|0] "kph"  VCU_BeagleBone
