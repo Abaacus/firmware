@@ -41,7 +41,7 @@ DTC_FILES_GEN_SCRIPT = $(SCRIPTS_DIR)/generateDTC.py
 CURRENT_DATE = \"$(shell date +%F_%T%Z)\"
 CURRENT_TOP_BRANCH = \"$(shell git rev-parse --abbrev-ref HEAD)\"
 CURRENT_HASH = \"$(shell git rev-parse HEAD)\"
-CURRENT_BRANCH_STATUS = \"$(shell git status --porcelain | tr '\n' ' ' | tr 'M ' '-')\"
+CURRENT_BRANCH_STATUS = \"$(shell git status --porcelain | tr '\n' ',' | tr -d ' ' && echo)\" 
 
 
 COMMON_LIB_DATA_DIR = $(COMMON_LIB_DIR)/Data
