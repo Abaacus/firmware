@@ -444,9 +444,10 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
 {
     DTC_History_t * DTC_Log = get_DTC_History();
     static uint8_t DTCs_index = DTC_HISTORY_LENGTH;
+    uint8_t instructions_printed = 0;
+
     if (DTCs_index == DTC_HISTORY_LENGTH) {
-        // COMMAND_OUTPUT("Ordered from most recent DTC at the top");
-        DTCs_index = DTC_Log->tail - 1;
+        DTCs_index = (DTC_Log->tail - 1 + DTC_HISTORY_LENGTH) % DTC_HISTORY_LENGTH;
     }
 
     // If we find an empty DTC entry, we have iterated the entire log
@@ -454,9 +455,13 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
         DTCs_index = DTC_HISTORY_LENGTH;
         return pdFALSE;
     } else {
-        char int_as_str[21];
-        sprintf(int_as_str, "%lld", DTC_Log->dtcs[DTCs_index].data);
-        COMMAND_OUTPUT("DTC: %d, Data: %s\r\n", DTC_Log->dtcs[DTCs_index].code, int_as_str);
+        int32_t reduced_data = DTC_Log->dtcs[DTCs_index].data & 0xFFFFFFFF;
+        if (instructions_printed == 0) {
+             COMMAND_OUTPUT("Ordered from most recent DTC at the top\r\nDTC: %d, Data: %ld\r\n", DTC_Log->dtcs[DTCs_index].code, reduced_data);
+        } else {
+            COMMAND_OUTPUT("DTC: %d, Data: %ld\r\n", DTC_Log->dtcs[DTCs_index].code, reduced_data);
+            instructions_printed = 1;
+        }
         // If the tail is the next index, we have iterated the entire log
         if (DTCs_index == DTC_Log->tail) {
             DTCs_index = DTC_HISTORY_LENGTH;
