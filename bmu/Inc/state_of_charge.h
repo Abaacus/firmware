@@ -5,6 +5,8 @@
 
 void integrate_bus_current(float IBus, float period_ms);
 HAL_StatusTypeDef socInit(void);
-static volatile float IBus_integrated;
+float getIBusIntegrated(); //getter setter functions for Ibus_integrated called by controlStateMachine_mock.c
+float setIBusIntegrated(float IBus_integrated_input);
+
 
 #endif

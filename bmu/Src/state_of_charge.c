@@ -31,7 +31,13 @@ void integrate_bus_current(float IBus, float period_ms)
 {
 	IBus_integrated += IBus * (period_ms/1000.0);
 }
-
+float setIBusIntegrated (float IBus_integrated_input) { //setter function called in controlStateMachine_mock.c
+	IBus_integrated = IBus_integrated_input;
+	return IBus_integrated;
+}
+float getIBusIntegrated() {
+	return IBus_integrated;
+}
 
 static float compute_voltage_soc(void)
 {

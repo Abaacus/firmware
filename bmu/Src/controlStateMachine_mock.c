@@ -36,6 +36,7 @@ extern float HITL_VPACK;
 extern uint32_t brakeAndHVILVals[2];
 extern float adjustedCellIR;
 
+
 BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -52,7 +53,8 @@ static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
 };
 
 BaseType_t getIBus_integrated(char *writeBuffer, size_t writeBufferLength, const char *commandString) {
-    COMMAND_OUTPUT("IBus integrated %f", IBus_integrated);
+    float Ibus_read_value = getIBusIntegrated(); //call getter function in state_of_charge.c
+    COMMAND_OUTPUT("IBus integrated %f", Ibus_read_value);
     return pdFALSE;
 }
 static const CLI_Command_Definition_t getIBus_integratedCommandDefinition = {
@@ -70,8 +72,8 @@ BaseType_t setIBus_integrated(char *writeBuffer, size_t writeBufferLength, const
         COMMAND_OUTPUT("Invalid Input: Minimum value of 0.0f required");
     }
     else {
-        IBus_integrated = IBus_integrated_input;
-        COMMAND_OUTPUT("IBus_integrated set to %f", IBus_integrated);
+        float setValue = setIBusIntegrated(IBus_integrated_input); //call the setter function in state_of_charge.c
+        COMMAND_OUTPUT("IBus_integrated set to %f", setValue); //output the set value
     }
     return pdFALSE;
 }
