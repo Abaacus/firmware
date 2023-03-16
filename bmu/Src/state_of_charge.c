@@ -162,3 +162,17 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
 	*segmentVoltage = (temp / (float)NUM_BOARDS);
 	return ret;
 }
+
+/**
+ * @brief Set capacity startup value
+ *
+ * @param capacity The value to set for IBus, in volts
+ *
+ * @return HAL_StatusTypeDef
+ */
+HAL_StatusTypeDef setCapacityStartup(float capacity)
+{
+   capacity_startup = capacity;
+
+   return HAL_OK;
+}

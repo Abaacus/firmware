@@ -893,6 +893,42 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 }
 
 /**
+ * @brief Sets the maximum voltage for the charger
+ *
+ * @param maxVoltage The adjust factor for cell internal resistance
+ *
+ * @return HAL_StatusTypeDef
+ */
+HAL_StatusTypeDef setmaxChargeVoltage(float maxVoltage)
+{
+    //Range check
+    if (maxVoltage < 0.0 /*TODO: whats the max for max voltage*/)
+    {
+        return HAL_ERROR;
+    }
+    maxChargeVoltage = maxVoltage;
+    return HAL_OK;
+}
+
+/**
+ * @brief Sets the adjust factor for cell internal resistance
+ *
+ * @param cellIR The adjust factor for cell internal resistance
+ *
+ * @return BaseType_t
+ */
+BaseType_t setadjustedCellIR(float cellIR)
+{
+    //Range check
+    if (cellIR < 0.0 || cellIR > 0.01)
+    {
+        return pdFALSE;
+    }
+    adjustedCellIR = cellIR;
+    return pdTRUE;
+}
+
+/**
  * @brief Sends the maximum charge current and voltage to the charger and waits
  * for the charger to start charging
  *
