@@ -14,7 +14,6 @@
 #endif
 
 uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS] = {0};
-static float throttlePercentReading = 0.0f;
 
 HAL_StatusTypeDef startADCConversions()
 {

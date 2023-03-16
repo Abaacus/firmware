@@ -76,6 +76,8 @@ typedef enum ThrottleStatus_t {
     THROTTLE_FAULT // Throttle fault occured, need to enter fault state
 } ThrottleStatus_t;
 
+float throttlePercentReading = 0.0f; // needs to be in the .h for FakeDriver CLI command
+
 bool isBrakePressed();
 bool isBrakePressedHard();
 bool throttleIsZero();

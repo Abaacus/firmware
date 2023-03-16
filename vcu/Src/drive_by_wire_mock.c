@@ -504,23 +504,30 @@ static const CLI_Command_Definition_t mcInitCommandDefinition =
 BaseType_t fakeDriver(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    HAL_StatusTypeDef rc = mcInit();
-    if (rc != HAL_OK) {
-        ERROR_PRINT("Failed to start motor controllers\n");
-        return rc;
+    BaseType_t paramLen;
+    const char * toggle = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+
+    if (1 == paramLen && '1' == *toggle) {
+        throttlePercentReading = 80;
+        COMMAND_OUTPUT("Throttle turned on to 80 percent\n");
+        return pdTRUE;
+    }
+    if (1 == paramLen && '0' == *toggle) {
+        throttlePercentReading = 0;
+        COMMAND_OUTPUT("Throttle reset to 0");
+        return pdTRUE;
     }
 
-    COMMAND_OUTPUT("MCs Inited\n");
-
+    ERROR_PRINT ("Invalid argument. Pass in 1 to turn on mode, pass in 0 to turn if off\n");
     return pdFALSE;
 }
 
 static const CLI_Command_Definition_t fakeDriverCommandDefinition =
 {
     "fakeDriver",
-    "fakeDriver: \r\n  Simulates the driver by turing on motors and draining battery\r\n",
+    "fakeDriver <toggle (1/0)>: \r\n  Turns on motors to run down battery\r\n  1: toggle on\r\n  0: toggle off\r\n",
     fakeDriver,
-    0 /* Number of parameters */
+    1 /* Number of parameters */
 };
 
 HAL_StatusTypeDef stateMachineMockInit()
