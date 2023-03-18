@@ -16,7 +16,7 @@
 #include "endurance_mode.h"
 #include "traction_control.h"
 
-#include "canReceive.h"
+#include "canReceiveCommon.h"
 
 /*
  * External Board Statuses:
