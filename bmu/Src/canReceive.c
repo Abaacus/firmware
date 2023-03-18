@@ -85,7 +85,7 @@ void CAN_Msg_SetVariableBMU_Callback()
         break;
     
     case adjustedCellI_name:
-        if (setadjustedCellIR(VariableValueBMU) == pdFALSE)
+        if (setadjustedCellIR(VariableValueBMU) == HAL_ERROR)
         {
             ERROR_PRINT("Failed to update adjusted cell IR\n");
         }

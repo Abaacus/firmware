@@ -915,17 +915,17 @@ HAL_StatusTypeDef setmaxChargeVoltage(float maxVoltage)
  *
  * @param cellIR The adjust factor for cell internal resistance
  *
- * @return BaseType_t
+ * @return HAL_StatusTypeDef
  */
-BaseType_t setadjustedCellIR(float cellIR)
+HAL_StatusTypeDef setadjustedCellIR(float cellIR)
 {
     //Range check
     if (cellIR < 0.0 || cellIR > 0.01)
     {
-        return pdFALSE;
+        return HAL_ERROR;
     }
     adjustedCellIR = cellIR;
-    return pdTRUE;
+    return HAL_OK;
 }
 
 /**
