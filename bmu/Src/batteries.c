@@ -899,7 +899,7 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
  *
  * @return HAL_StatusTypeDef
  */
-HAL_StatusTypeDef setmaxChargeVoltage(float maxVoltage)
+HAL_StatusTypeDef setMaxChargeVoltage(float maxVoltage)
 {
     //Range check
     if (maxVoltage < 0.0 /*TODO: whats the max for max voltage*/)
