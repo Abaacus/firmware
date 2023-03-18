@@ -1,5 +1,6 @@
 #ifndef TRACTION_CONTROL_H
 #define TRACTION_CONTROL_H
+#include "stdbool.h"
 
 void toggle_TC(void);
 void disable_TC(void);

@@ -4,7 +4,12 @@
 
 #include "bsp.h"
 
-#define MAX_TORQUE_DEMAND_DEFAULT       30
+static float tv_deadzone_end_right = 10;
+static float tv_deadzone_end_left = -10;
+static float torque_vector_factor = 0.25f/30.0f;
+static float max_torque_demand_default = 30;
+
+#define MAX_TORQUE_DEMAND_DEFAULT       max_torque_demand_default
 #define BRAKING_TORQUE_LIMIT_DEFAULT    0
 #define SPEED_LIMIT_DEFAULT             10000
 #define REVERSE_SPEED_LIMIT_DEFAULT     0
@@ -16,7 +21,7 @@
 #define INVERTER_STOP_TIMEOUT_MS        10000   // TODO: Chose a good value for this
 #define MC_INIT_DISCHARGE_TIME_MS       1000
 
-#define TORQUE_VECTOR_FACTOR            (0.25f/30.0f)
+#define TORQUE_VECTOR_FACTOR            torque_vector_factor
 
 typedef struct MotorControllerProcanSettings {
     uint64_t InverterCommand;
@@ -41,5 +46,9 @@ HAL_StatusTypeDef setMotorControllerProcanSettings(MotorControllerProcanSettings
 HAL_StatusTypeDef setDischargeCurrentLimit(float limit);
 HAL_StatusTypeDef setForwardSpeedLimit(float limit);
 HAL_StatusTypeDef setTorqueLimit(float limit);
+void set_tv_deadzone_end_right(float tv_deadzone_end_right_value);
+void set_tv_deadzone_end_left(float tv_deadzone_end_left_value);
+void set_torque_vector_factor(float torque_vector_factor_value);
+void set_max_torque_demand_default(float max_torque_demand_default_value);
 
 #endif /* end of include guard: MOTORCONTROLLER_H */

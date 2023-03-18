@@ -15,6 +15,7 @@
 
 #include "endurance_mode.h"
 #include "traction_control.h"
+#include "motorController.h"
 
 /*
  * External Board Statuses:
@@ -193,13 +194,16 @@ void CAN_Msg_SetVariableVCU_Callback()
         set_adjustment_torque_floor(VariableValueVCU);
         break;
     case tvDeadzoneEndRight_name:
+        set_tv_deadzone_end_right(VariableValueVCU);
         break;
     case tvDeadzoneEndLeft_name:
+        set_tv_deadzone_end_left(VariableValueVCU);
         break;
     case torqueVectorFactor_name:
+        set_torque_vector_factor(VariableValueVCU);
         break;
     case maxTorqueDemandDefault_name:
-        /* code */
+        set_max_torque_demand_default(VariableValueVCU);
         break;
     default:
         break;

@@ -2,6 +2,7 @@
 #define ENDURANCE_MODE_H
 #include "stm32f7xx_hal.h"
 #include "stdint.h"
+#include "stdbool.h"
 
 // Config
 #define NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT (44)

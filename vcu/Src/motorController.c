@@ -28,8 +28,8 @@
 #define INVERTER_STATE_MASK             0x3F
 
 // Torque vectoring dead zone angle boundaries
-#define TV_DEADZONE_END_RIGHT 10
-#define TV_DEADZONE_END_LEFT -10
+#define TV_DEADZONE_END_RIGHT tv_deadzone_end_right
+#define TV_DEADZONE_END_LEFT tv_deadzone_end_left
 
 MotorControllerProcanSettings mcLeftSettings = {0};
 MotorControllerProcanSettings mcRightSettings = {0};
@@ -344,4 +344,23 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
     }
 
     return HAL_OK;
+}
+
+void set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
+{
+    tv_deadzone_end_right = tv_deadzone_end_right_value;
+}
+
+void set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
+{
+    tv_deadzone_end_left = tv_deadzone_end_left_value;
+}
+
+void set_torque_vector_factor(float torque_vector_factor_value)
+{
+    torque_vector_factor = torque_vector_factor_value;
+}
+
+void set_max_torque_demand_default(float max_torque_demand_default_value){
+    max_torque_demand_default = max_torque_demand_default_value;
 }
