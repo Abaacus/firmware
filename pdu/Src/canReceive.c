@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "boardTypes.h"
 #include "canReceive.h"
+#include "brakeLight.h"
 
 void CAN_Msg_UartOverCanConfig_Callback() {
     isUartOverCanEnabled = UartOverCanConfigSignal & 0x4;
@@ -26,3 +27,15 @@ void DTC_Fatal_Callback(BoardIDs board) {
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
 }
 
+void CAN_Msg_SetVariableBMU_Callback()
+{
+    switch (VariableEnumPDU)
+    {
+    case brake_light_on_threshold_name:
+        set_brake_light_on_threshold(VariableValuePDU);
+        break;
+    
+    default:
+        break;
+    }
+}

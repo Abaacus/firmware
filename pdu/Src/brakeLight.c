@@ -5,7 +5,9 @@
 #include "pdu_can.h"
 #include "debug.h"
 
-#define BRAKE_LIGHT_ON_THRESHOLD 15
+static float brake_light_on_threshold = 15;
+
+#define BRAKE_LIGHT_ON_THRESHOLD (brake_light_on_threshold)
 #define BRAKE_TASK_PERIOD_MS 300
 
 bool isBrakePressed(uint32_t brakePercent)
@@ -20,4 +22,9 @@ void CAN_Msg_VCU_Data_Callback()
     } else {
         BRAKE_LIGHT_DISABLE;
     }
+}
+
+void set_brake_light_on_threshold(float brake_light_on_threshold_value)
+{
+    brake_light_on_threshold = brake_light_on_threshold_value;
 }

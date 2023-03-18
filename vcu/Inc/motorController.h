@@ -4,8 +4,6 @@
 
 #include "bsp.h"
 
-static float tv_deadzone_end_right = 10;
-static float tv_deadzone_end_left = -10;
 static float torque_vector_factor = 0.25f/30.0f;
 static float max_torque_demand_default = 30;
 

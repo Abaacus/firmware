@@ -6,7 +6,7 @@
 extern uint32_t lastChargeCartHeartbeat;
 
 /* Enum for checking VariableEnumBMU*/
- typedef enum BMU_Variable_Name {
+typedef enum BMU_Variable_Name {
     maxChargeCurrent_name = 0,
     adjustedCellI_name,
     maxChargeVoltage_name,

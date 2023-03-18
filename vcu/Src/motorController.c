@@ -11,6 +11,9 @@
 // Do we need to wait to close contactors until MCs are ready?
 // How to read IDs for msgs on datasheet?
 
+static float tv_deadzone_end_right = 10;
+static float tv_deadzone_end_left = -10;
+
 /* Control Values - See 3.4.1 in ProCAN fundementals */
 #define INVERTER_NOP                    0x00
 #define INVERTER_ENABLE_BRIDGE          0x01
