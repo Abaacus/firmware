@@ -20,8 +20,8 @@ static float initial_soc = 0.0f;
 static uint32_t num_laps = 0;
 static uint32_t num_laps_to_complete = NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT*(ENDURANCE_MODE_BUFFER);
 static bool in_endurance_mode = false;
-static const float em_kP = 200.0f;
-static const float em_kI = 0.2f;
+static float em_kP = 200.0f;
+static float em_kI = 0.2f;
 extern osThreadId enduranceModeHandle;
 
 void endurance_mode_EM_callback(void)
@@ -124,4 +124,34 @@ void enduranceModeTask(void *pvParameters)
 		vTaskDelay(ENDURANCE_MODE_TASK_PERIOD);
 	}
 
+}
+
+void set_initial_soc(float initial_soc_value)
+{
+	initial_soc = initial_soc_value;
+}
+
+void set_num_laps(uint32_t num_laps_value)
+{
+	num_laps = num_laps_value;
+}
+
+void set_num_laps_complete(uint32_t num_laps_complete_value)
+{
+	num_laps_to_complete = num_laps_complete_value;
+}
+
+void set_in_endurance_mode(bool in_endurance_mode_bool)
+{
+	in_endurance_mode = in_endurance_mode_bool;
+}
+
+void set_em_kP(float em_kP_value)
+{
+	em_kP = em_kP_value;
+}
+
+void set_em_kI(float em_kI_value)
+{
+	em_kI = em_kI_value;
 }

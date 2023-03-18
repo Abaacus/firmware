@@ -157,3 +157,51 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
             break;
     }
 }
+
+void CAN_Msg_SetVariableVCU_Callback() 
+{
+    switch (VariableEnumVCU)
+    {
+    case initialSoc_name:
+        set_initial_soc(VariableValueVCU);
+        break;
+    case numLaps_name:
+        set_num_laps(VariableValueVCU);
+        break;
+    case numLapsToComplete_name:
+        set_num_laps_complete(VariableValueVCU);
+        break;
+    case inEnduranceMode_name:
+        set_in_endurance_mode(VariableValueVCU);
+        break;
+    case emkP_name:
+        set_em_kP(VariableValueVCU);
+        break;
+    case emkI_name:
+        set_em_kI(VariableValueVCU);
+        break;
+    case tcOn_name:
+        set_TC(VariableValueVCU);
+        break;
+    case tckP_name:
+        set_tc_kP(VariableValueVCU);
+        break;
+    case errorFloor_name:
+        set_error_floor(VariableValueVCU);
+        break;
+    case adjustmentTorqueFloor_name:
+        set_adjustment_torque_floor(VariableValueVCU);
+        break;
+    case tvDeadzoneEndRight_name:
+        break;
+    case tvDeadzoneEndLeft_name:
+        break;
+    case torqueVectorFactor_name:
+        break;
+    case maxTorqueDemandDefault_name:
+        /* code */
+        break;
+    default:
+        break;
+    }
+}

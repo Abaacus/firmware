@@ -50,6 +50,11 @@ void toggle_TC(void)
 	tc_on = !tc_on;
 }
 
+void set_TC(bool tc_bool)
+{
+	tc_on = tc_bool;
+}
+
 static float get_FR_speed()
 {
 	//Value comes from WSB
@@ -168,4 +173,19 @@ void tractionControlTask(void *pvParameters)
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(TRACTION_CONTROL_TASK_PERIOD_MS));
 	}
 
+}
+
+void set_tc_kP(float tc_kP_value)
+{
+    tc_kP = tc_kP_value;
+}
+
+void set_error_floor(float error_floor_value)
+{
+    error_floor = error_floor_value;
+}
+
+void set_adjustment_torque_floor(float adjustment_torque_floor_value)
+{
+    adjustment_torque_floor = adjustment_torque_floor_value;
 }
