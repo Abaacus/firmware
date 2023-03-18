@@ -2,8 +2,6 @@
 #include "controlStateMachine.h"
 #include "debug.h"
 #include "string.h"
-#include <string.h>
-#include "canReceive.h"
 #include "state_machine.h"
 #include "FreeRTOS_CLI.h"
 #include "sensors.h"

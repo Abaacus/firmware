@@ -7,6 +7,7 @@
 #include "userCan.h"
 #include "canHeartbeat.h"
 #include "canReceiveCommon.h"
+#include <stdbool.h>
 
 // Send a CLI string to the uart to be printed. Only for use by the CLI
 // buf must be of length PRINT_QUEUE_STRING_SIZE (this is always true for CLI
@@ -444,27 +445,30 @@ BaseType_t printDTCs(char *writeBuffer, size_t writeBufferLength,
 {
     DTC_History_t * DTC_Log = get_DTC_History();
     static uint8_t DTCs_index = DTC_HISTORY_LENGTH;
-    uint8_t instructions_printed = 0;
+    static bool instructions_printed = false;
 
     if (DTCs_index == DTC_HISTORY_LENGTH) {
         DTCs_index = (DTC_Log->tail - 1 + DTC_HISTORY_LENGTH) % DTC_HISTORY_LENGTH;
     }
 
     // If we find an empty DTC entry, we have iterated the entire log
-    if (DTC_Log->dtcs[DTCs_index].code == EMPTY_DTC_ENTRY) {
+    if (DTC_Log->dtcs[DTCs_index].code == EMPTY_DTC_ENTRY) { //EMPTY_DTC_CODE
         DTCs_index = DTC_HISTORY_LENGTH;
+        instructions_printed = false;
         return pdFALSE;
     } else {
         int32_t reduced_data = DTC_Log->dtcs[DTCs_index].data & 0xFFFFFFFF;
-        if (instructions_printed == 0) {
-             COMMAND_OUTPUT("Ordered from most recent DTC at the top\r\nDTC: %d, Data: %ld\r\n", DTC_Log->dtcs[DTCs_index].code, reduced_data);
+        int32_t reduced_data2 = DTC_Log->dtcs[DTCs_index].data >> 32;
+        if (instructions_printed == false) {
+            COMMAND_OUTPUT("Ordered from most recent DTC at the top\r\nDTC: %d, Data: %ld, %ld\r\n", DTC_Log->dtcs[DTCs_index].code, reduced_data2, reduced_data);
+            instructions_printed = true;
         } else {
-            COMMAND_OUTPUT("DTC: %d, Data: %ld\r\n", DTC_Log->dtcs[DTCs_index].code, reduced_data);
-            instructions_printed = 1;
+            COMMAND_OUTPUT("DTC: %d, Data: %ld, %ld\r\n", DTC_Log->dtcs[DTCs_index].code, reduced_data2, reduced_data);
         }
         // If the tail is the next index, we have iterated the entire log
         if (DTCs_index == DTC_Log->tail) {
             DTCs_index = DTC_HISTORY_LENGTH;
+            instructions_printed = false;
             return pdFALSE;
         } else {
             DTCs_index = (DTCs_index - 1 + DTC_HISTORY_LENGTH) % DTC_HISTORY_LENGTH;

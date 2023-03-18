@@ -4,7 +4,6 @@
 #include "stdbool.h"
 #include "bsp.h"
 
-#include "canReceiveCommon.h"
 
 bool getHvEnableState();
 bool getMotorControllersStatus();

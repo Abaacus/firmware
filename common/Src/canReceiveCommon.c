@@ -57,7 +57,7 @@ void CAN_Receive_Log_DTC(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Dat
         DTC_Log.dtcs[DTC_Log.tail].severity = DTC_Severity;
         DTC_Log.dtcs[DTC_Log.tail].data = DTC_Data;
         DTC_Log.tail = (DTC_Log.tail + 1) % DTC_HISTORY_LENGTH;
-    }    
+    }
 }
 #endif
 
