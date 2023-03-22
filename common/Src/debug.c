@@ -258,7 +258,7 @@ BaseType_t boardHeartbeatCommand(char *writeBuffer, size_t writeBufferLength,
         COMMAND_OUTPUT("Unkown parameter\n");
     }
 #else
-    COMMAND_OUTPUT("WSBs don't recieve a heartbeat\n");
+    COMMAND_OUTPUT("WSBs don't receive a heartbeat\n");
 #endif
 
     return pdFALSE;
