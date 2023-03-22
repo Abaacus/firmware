@@ -106,7 +106,7 @@ HAL_StatusTypeDef checkAllHeartbeats()
     return HAL_OK;
 #endif
 
-//WSBs dont recieve heartbeats, only send them
+// WSBs don't receive heartbeats, only send them
 #if !BOARD_IS_WSB(BOARD_ID)
 
     if (heartbeatEnabled)
