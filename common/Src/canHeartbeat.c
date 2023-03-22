@@ -51,18 +51,22 @@ void heartbeatReceived(BoardIDs board)
         case ID_WSBFL:
             {
                 lastWSBFL_Heartbeat_ticks = xTaskGetTickCount();
+                break;
             }
         case ID_WSBFR:
             {
                 lastWSBFR_Heartbeat_ticks = xTaskGetTickCount();
+                break;
             }
         case ID_WSBRL:
             {
                 lastWSBRL_Heartbeat_ticks = xTaskGetTickCount();
+                break;
             }
         case ID_WSBRR:
             {
                 lastWSBRR_Heartbeat_ticks = xTaskGetTickCount();
+                break;
             }
         default:
             {
@@ -83,8 +87,8 @@ bool BMU_heartbeatEnabled = true;
 bool VCU_F7_heartbeatEnabled = true;
 bool WSBFL_heartbeatEnabled = true;
 bool WSBFR_heartbeatEnabled = true;
-bool WSBRL_heartbeatEnabled = true;
-bool WSBRR_heartbeatEnabled = true;
+bool WSBRL_heartbeatEnabled = false;
+bool WSBRR_heartbeatEnabled = false;
 
 void disableHeartbeat()
 {
@@ -102,6 +106,7 @@ HAL_StatusTypeDef checkAllHeartbeats()
     return HAL_OK;
 #endif
 
+//WSBs dont recieve heartbeats, only send them
 #if !BOARD_IS_WSB(BOARD_ID)
 
     if (heartbeatEnabled)
@@ -156,7 +161,7 @@ HAL_StatusTypeDef checkAllHeartbeats()
         if (WSBFL_heartbeatEnabled) {
             if (curTick - lastWSBFL_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
             {
-                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                sendDTC_FATAL_WSBFL_MissedHeartbeat();
                 ERROR_PRINT("WSBFL Missed heartbeat check in\n");
                 return HAL_ERROR;
             }
@@ -167,7 +172,7 @@ HAL_StatusTypeDef checkAllHeartbeats()
         if (WSBFR_heartbeatEnabled) {
             if (curTick - lastWSBFR_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
             {
-                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                sendDTC_FATAL_WSBFR_MissedHeartbeat();
                 ERROR_PRINT("WSBFR Missed heartbeat check in\n");
                 return HAL_ERROR;
             }
@@ -178,7 +183,7 @@ HAL_StatusTypeDef checkAllHeartbeats()
         if (WSBRL_heartbeatEnabled) {
             if (curTick - lastWSBRL_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
             {
-                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                sendDTC_FATAL_WSBRL_MissedHeartbeat();
                 ERROR_PRINT("WSBRL Missed heartbeat check in\n");
                 return HAL_ERROR;
             }
@@ -189,7 +194,7 @@ HAL_StatusTypeDef checkAllHeartbeats()
         if (WSBRR_heartbeatEnabled) {
             if (curTick - lastWSBRR_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)
             {
-                // sendDTC_FATAL_VCU_F7_MissedHeartbeat();
+                sendDTC_FATAL_WSBRR_MissedHeartbeat();
                 ERROR_PRINT("WSBRR Missed heartbeat check in\n");
                 return HAL_ERROR;
             }

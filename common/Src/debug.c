@@ -183,7 +183,7 @@ static const CLI_Command_Definition_t heapCommandDefinition =
 BaseType_t generalHeartbeatCommand(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-#if !BOARD_IS_WSB(BOARD_ID)
+// #if !BOARD_IS_WSB(BOARD_ID)
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
@@ -196,9 +196,9 @@ BaseType_t generalHeartbeatCommand(char *writeBuffer, size_t writeBufferLength,
     } else {
         COMMAND_OUTPUT("Unkown parameter\n");
     }
-#else
-    COMMAND_OUTPUT("WSB don't have a heartbeat\n");
-#endif
+// #else
+//     COMMAND_OUTPUT("WSB don't have a heartbeat\n");
+// #endif
 
     return pdFALSE;
 }
@@ -242,11 +242,23 @@ BaseType_t boardHeartbeatCommand(char *writeBuffer, size_t writeBufferLength,
     } else if (STR_EQ(boardParam, "VCU_F7", paramLen)) {
         COMMAND_OUTPUT("Turning can heartbeat %s for VCU_F7\n", onOff?"on":"off");
         VCU_F7_heartbeatEnabled = onOff;
+    } else if (STR_EQ(boardParam, "WSBFL", paramLen)) {
+        COMMAND_OUTPUT("Turning can heartbeat %s for WSBFL\n", onOff?"on":"off");
+        WSBFL_heartbeatEnabled = onOff;
+    } else if (STR_EQ(boardParam, "WSBFR", paramLen)) {
+        COMMAND_OUTPUT("Turning can heartbeat %s for WSBFR\n", onOff?"on":"off");
+        WSBFR_heartbeatEnabled = onOff;
+    } else if (STR_EQ(boardParam, "WSBRL", paramLen)) {
+        COMMAND_OUTPUT("Turning can heartbeat %s for WSBRL\n", onOff?"on":"off");
+        WSBRL_heartbeatEnabled = onOff;
+    } else if (STR_EQ(boardParam, "WSBRR", paramLen)) {
+        COMMAND_OUTPUT("Turning can heartbeat %s for WSBRR\n", onOff?"on":"off");
+        WSBRR_heartbeatEnabled = onOff;
     } else {
         COMMAND_OUTPUT("Unkown parameter\n");
     }
 #else
-    COMMAND_OUTPUT("WSB don't have a heartbeat\n");
+    COMMAND_OUTPUT("WSBs don't recieve a heartbeat\n");
 #endif
 
     return pdFALSE;
@@ -266,7 +278,7 @@ BaseType_t boardHeartbeatInfoCommand(char *writeBuffer, size_t writeBufferLength
 #if !BOARD_IS_WSB(BOARD_ID)
     printHeartbeatStatus();
 #else 
-	COMMAND_OUTPUT("WSB does not have support for reading heartbeats");
+	COMMAND_OUTPUT("WSB does not have support for reading heartbeats\r\n");
 #endif
     return pdFALSE;
 }

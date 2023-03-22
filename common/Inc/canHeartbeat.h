@@ -16,6 +16,10 @@ extern bool DCU_heartbeatEnabled;
 extern bool PDU_heartbeatEnabled;
 extern bool BMU_heartbeatEnabled;
 extern bool VCU_F7_heartbeatEnabled;
+extern bool WSBFL_heartbeatEnabled;
+extern bool WSBFR_heartbeatEnabled;
+extern bool WSBRL_heartbeatEnabled;
+extern bool WSBRR_heartbeatEnabled;
 
 HAL_StatusTypeDef sendHeartbeat();
 void heartbeatReceived(BoardIDs boardName);
