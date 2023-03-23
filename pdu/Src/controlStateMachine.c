@@ -65,13 +65,13 @@ Transition_t mainTransitions[] = {
 };
 
 Transition_t motorTransitions[] = {
-    { MTR_STATE_Motors_Off, MTR_EV_EM_ENABLE, &motorsOn },
-    { MTR_STATE_Motors_On, MTR_EV_EM_DISABLE, &motorsOff },
-    { MTR_STATE_Motors_On, MTR_EV_Motor_Critical, &motorsOff },
-    { MTR_STATE_Motors_Off, MTR_EV_Motor_Critical, &motorsOffCritical },
+    { MTR_STATE_EM_Disable, MTR_EV_EM_ENABLE, &motorsOn },
+    { MTR_STATE_EM_Enable, MTR_EV_EM_DISABLE, &motorsOff },
+    { MTR_STATE_EM_Enable, MTR_EV_Motor_Critical, &motorsOff },
+    { MTR_STATE_EM_Disable, MTR_EV_Motor_Critical, &motorsOffCritical },
     { MTR_STATE_Critical, MTR_EV_ANY, &motorDoNothing },
-    { MTR_STATE_Motors_Off, MTR_EV_EM_DISABLE, &motorsOff },
-    { MTR_STATE_Motors_On, MTR_EV_EM_ENABLE, &motorsOn },
+    { MTR_STATE_EM_Disable, MTR_EV_EM_DISABLE, &motorsOff },
+    { MTR_STATE_EM_Enable, MTR_EV_EM_ENABLE, &motorsOn },
     { MTR_STATE_ANY, MTR_EV_ANY, &MotorDefaultTransition}
 };
 
@@ -108,7 +108,7 @@ HAL_StatusTypeDef motorControlInit()
     init.transitionTableLength = TRANS_COUNT(motorTransitions);
     init.eventQueueLength = 5;
     init.watchdogTaskId = 3;
-    if (fsmInit(MTR_STATE_Motors_Off, &init, &motorFsmHandle) != HAL_OK) {
+    if (fsmInit(MTR_STATE_EM_Disable, &init, &motorFsmHandle) != HAL_OK) {
         return HAL_ERROR;
     }
 
@@ -369,7 +369,7 @@ uint32_t motorsOn(uint32_t event)
 {
     DEBUG_PRINT("Turning motors on\n");
     if (DC_DC_state) {
-        if (fsmGetState(&motorFsmHandle) != MTR_STATE_Motors_On) {
+        if (fsmGetState(&motorFsmHandle) != MTR_STATE_EM_Enable) {
             MC_LEFT_ENABLE;
             MC_RIGHT_ENABLE;
         }
@@ -381,13 +381,13 @@ uint32_t motorsOn(uint32_t event)
             ERROR_PRINT("Failed to send pdu channel status CAN message\n");
             return motorsOff(MTR_EV_EM_DISABLE);
         }
-        return MTR_STATE_Motors_On;
+        return MTR_STATE_EM_Enable;
     } else {
         // Don't allow motors to turn on without DC-DC power
         // Lack of response to VCU will cause timeout, and then can try again
         ERROR_PRINT("Not turning on the motors because DCDC off\r\n");
         sendDTC_WARNING_PDU_EM_EN_BLOCKED_DCDC_OFF();
-        return MTR_STATE_Motors_Off;
+        return MTR_STATE_EM_Disable;
     }
 }
 
@@ -395,7 +395,7 @@ uint32_t motorsOff(uint32_t event)
 {
     DEBUG_PRINT("Turning motors off\n");
 
-    if (fsmGetState(&motorFsmHandle) != MTR_STATE_Motors_Off) {
+    if (fsmGetState(&motorFsmHandle) != MTR_STATE_EM_Disable) {
         MC_LEFT_DISABLE;
         MC_RIGHT_DISABLE;
     }
@@ -408,7 +408,7 @@ uint32_t motorsOff(uint32_t event)
     }
 
     if (event == MTR_EV_EM_DISABLE) {
-        return MTR_STATE_Motors_Off;
+        return MTR_STATE_EM_Disable;
     } else {
         return MTR_STATE_Critical;
     }

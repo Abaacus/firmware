@@ -40,7 +40,7 @@ void powerTask(void *pvParameters)
                 if(fsmGetState(&coolingFsmHandle) == COOL_STATE_ON){
                     fsmSendEvent(&motorFsmHandle, COOL_EV_DISABLE, portMAX_DELAY);
                 }
-                if(fsmGetState(&motorFsmHandle) == MTR_STATE_Motors_On){
+                if(fsmGetState(&motorFsmHandle) == MTR_STATE_EM_Enable){
                     fsmSendEvent(&motorFsmHandle, MTR_EV_EM_DISABLE, portMAX_DELAY);
                 }
                 sendDTC_ERROR_DCDC_Shutoff();

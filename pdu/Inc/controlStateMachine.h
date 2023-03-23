@@ -31,8 +31,8 @@ typedef enum MAIN_PDU_Events_t {
 } MAIN_PDU_Events_t;
 
 typedef enum MotorControl_PDU_States_t {
-    MTR_STATE_Motors_Off = 0,
-    MTR_STATE_Motors_On,
+    MTR_STATE_EM_Disable = 0,
+    MTR_STATE_EM_Enable,
     MTR_STATE_Critical,
     MTR_STATE_ANY, // Must be the last state
 } MotorControl_PDU_States_t;

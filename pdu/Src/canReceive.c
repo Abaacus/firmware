@@ -28,12 +28,10 @@ void DTC_Fatal_Callback(BoardIDs board) {
 
 void CAN_Msg_TempMotorRight_Callback() {
     tempMotorRightSum += TempMotorRight;
-    numTempSamplesRight++;
-    averageTempRight = tempMotorRightSum/numTempSamplesRight;
+    numMotorTempSamplesRight++;
 }
 
 void CAN_Msg_TempMotorLeft_Callback() {
     tempMotorLeftSum += TempMotorLeft;
-    numTempSamplesLeft++;
-    averageTempLeft = tempMotorLeftSum/numTempSamplesLeft;
+    numMotorTempSamplesLeft++;
 }
