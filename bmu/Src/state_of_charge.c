@@ -169,14 +169,13 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
 void canPublishTask(void *pvParameters) {
 
 	uint32_t last10000msPublishTime = 0;
-
 	while (1) {
 		vTaskDelay(500);
 		float v_soc = compute_voltage_soc();
 		float i_soc = compute_current_soc();
 		IBus_Integrated = IBus_integrated;
-		VoltageSOC = v_soc;
-		CurrentSOC = i_soc;
+		VoltageSOC = v_soc * 100;
+		CurrentSOC = i_soc * 100;
 
 		float current_weight;
 		if (v_soc >= SOC_HIGH_VOLTAGE_SOC_CUTOFF)
