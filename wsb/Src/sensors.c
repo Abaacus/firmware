@@ -78,11 +78,11 @@ void pollSensorsTask(void const * argument)
 static void transmit_encoder(void)
 {	
 #if (BOARD_ID == ID_WSBFL)
-	FL_Speed = sensors_data.encoder_speed;
+	FL_Speed_RAD_S = sensors_data.encoder_speed;
 	FL_WheelDistance = sensors_data.encoder_mm;
 	sendCAN_WSBFL_Sensors();
 #elif (BOARD_ID == ID_WSBFR)
-	FR_Speed = sensors_data.encoder_speed;
+	FR_Speed_RAD_S = sensors_data.encoder_speed;
 	FR_WheelDistance = sensors_data.encoder_mm;
 	sendCAN_WSBFR_Sensors();
 #endif

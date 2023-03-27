@@ -11,6 +11,7 @@
 #include "bsp.h"
 #include "motorController.h"
 #include "beaglebone.h"
+#include "traction_control.h"
 
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
@@ -286,10 +287,6 @@ static const CLI_Command_Definition_t emToggleCommandDefinition =
     0 /* Number of parameters */
 };
 
-extern float tc_kP;
-extern float error_floor;
-extern float adjustment_torque_floor;
-
 BaseType_t setTcKp(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
@@ -317,9 +314,9 @@ BaseType_t setErrorFloor(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    sscanf(param, "%f", &adjustment_torque_floor);
+    sscanf(param, "%f", &error_floor_rad_s);
 
-    COMMAND_OUTPUT("setting error floor %f\n", adjustment_torque_floor);
+    COMMAND_OUTPUT("setting error floor rad/s %f\n", error_floor_rad_s);
     return pdFALSE;
 }
 static const CLI_Command_Definition_t setErrorFloorCommandDefinition =
@@ -330,22 +327,31 @@ static const CLI_Command_Definition_t setErrorFloorCommandDefinition =
     1 /* Number of parameters */
 };
 
-BaseType_t setAdjustmentFloor(char *writeBuffer, size_t writeBufferLength,
+BaseType_t setTorqueDemandFloor(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    float new_torque_demand_floor = 0.0f;
 
-    sscanf(param, "%f", &error_floor);
-
-    COMMAND_OUTPUT("setting error floor %f\n", error_floor);
+    sscanf(param, "%f", &new_torque_demand_floor);
+    
+    if (new_torque_demand_floor <= 0 || new_torque_demand_floor > MAX_TORQUE_DEMAND_DEFAULT)
+    {
+        COMMAND_OUTPUT("invalid torque demand floor. Must be (0,30]. You gave: %f\n", new_torque_demand_floor);
+    }
+    else
+    {
+        torque_demand_floor = new_torque_demand_floor;
+        COMMAND_OUTPUT("set error floor %f\n", torque_demand_floor);
+    }
     return pdFALSE;
 }
-static const CLI_Command_Definition_t setAdjustmentFloorCommandDefinition =
+static const CLI_Command_Definition_t setTorqueDemandFloorCommandDefinition =
 {
-    "setAdjustmentFloor",
-    "setAdjustmentFloor <adjFloor>:\r\n set TC adjustment floor value\r\n",
-    setAdjustmentFloor,
+    "setTorqueDemandFloor",
+    "setTorqueDemandFloor <torqueDemand>:\r\n set TC torque demand floor value\r\n",
+    setTorqueDemandFloor,
     1 /* Number of parameters */
 };
 
@@ -524,7 +530,7 @@ HAL_StatusTypeDef stateMachineMockInit()
     if (FreeRTOS_CLIRegisterCommand(&setErrorFloorCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-    if (FreeRTOS_CLIRegisterCommand(&setAdjustmentFloorCommandDefinition) != pdPASS) {
+    if (FreeRTOS_CLIRegisterCommand(&setTorqueDemandFloorCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&hvStateCommandDefinition) != pdPASS) {
