@@ -4,10 +4,9 @@
 
 #include "bsp.h"
 
-static float torque_vector_factor = 0.25f/30.0f;
-static float max_torque_demand_default = 30;
 
-#define MAX_TORQUE_DEMAND_DEFAULT       max_torque_demand_default
+
+#define MAX_TORQUE_DEMAND_DEFAULT       30
 #define BRAKING_TORQUE_LIMIT_DEFAULT    0
 #define SPEED_LIMIT_DEFAULT             10000
 #define REVERSE_SPEED_LIMIT_DEFAULT     0
@@ -19,8 +18,12 @@ static float max_torque_demand_default = 30;
 #define INVERTER_STOP_TIMEOUT_MS        10000   // TODO: Chose a good value for this
 #define MC_INIT_DISCHARGE_TIME_MS       1000
 
-#define TORQUE_VECTOR_FACTOR            torque_vector_factor
+#define TORQUE_VECTOR_FACTOR            0.25f/30.0f
 
+ float torque_vector_factor = TORQUE_VECTOR_FACTOR;
+ float max_torque_demand_default = MAX_TORQUE_DEMAND_DEFAULT;
+// static float torque_vector_factor = TORQUE_VECTOR_FACTOR;
+// static float max_torque_demand_default = MAX_TORQUE_DEMAND_DEFAULT;
 typedef struct MotorControllerProcanSettings {
     uint64_t InverterCommand;
     float DriveTorqueLimit;

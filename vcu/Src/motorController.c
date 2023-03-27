@@ -11,8 +11,7 @@
 // Do we need to wait to close contactors until MCs are ready?
 // How to read IDs for msgs on datasheet?
 
-static float tv_deadzone_end_right = 10;
-static float tv_deadzone_end_left = -10;
+
 
 /* Control Values - See 3.4.1 in ProCAN fundementals */
 #define INVERTER_NOP                    0x00
@@ -31,8 +30,11 @@ static float tv_deadzone_end_left = -10;
 #define INVERTER_STATE_MASK             0x3F
 
 // Torque vectoring dead zone angle boundaries
-#define TV_DEADZONE_END_RIGHT tv_deadzone_end_right
-#define TV_DEADZONE_END_LEFT tv_deadzone_end_left
+#define TV_DEADZONE_END_RIGHT 10
+#define TV_DEADZONE_END_LEFT -10
+
+static float tv_deadzone_end_right = TV_DEADZONE_END_RIGHT;
+static float tv_deadzone_end_left = TV_DEADZONE_END_LEFT;
 
 MotorControllerProcanSettings mcLeftSettings = {0};
 MotorControllerProcanSettings mcRightSettings = {0};
@@ -67,7 +69,7 @@ HAL_StatusTypeDef mcLeftCommand(uint16_t commandVal)
 HAL_StatusTypeDef initMotorControllerProcanSettings()
 {
     mcLeftSettings.InverterCommand = 0;
-    mcLeftSettings.DriveTorqueLimit = MAX_TORQUE_DEMAND_DEFAULT;
+    mcLeftSettings.DriveTorqueLimit = max_torque_demand_default;
     mcLeftSettings.BrakingTorqueLimit = BRAKING_TORQUE_LIMIT_DEFAULT;
     mcLeftSettings.ForwardSpeedLimit = SPEED_LIMIT_DEFAULT;
     mcLeftSettings.ReverseSpeedLimit = SPEED_LIMIT_DEFAULT;
@@ -75,10 +77,10 @@ HAL_StatusTypeDef initMotorControllerProcanSettings()
     mcLeftSettings.ChargeCurrentLimit = CHARGE_CURRENT_LIMIT_DEFAULT;
     mcLeftSettings.HighVoltageLimit = HIGH_VOLTAGE_LIMIT_DEFAULT;
     mcLeftSettings.LowVoltageLimit = LOW_VOLTAGE_LIMIT_DEFAULT;
-    mcLeftSettings.MaxTorqueDemand = MAX_TORQUE_DEMAND_DEFAULT;
+    mcLeftSettings.MaxTorqueDemand = max_torque_demand_default;
 
     mcRightSettings.InverterCommand = 0;
-    mcRightSettings.DriveTorqueLimit = MAX_TORQUE_DEMAND_DEFAULT;
+    mcRightSettings.DriveTorqueLimit = max_torque_demand_default;
     mcRightSettings.BrakingTorqueLimit = BRAKING_TORQUE_LIMIT_DEFAULT;
     mcRightSettings.ForwardSpeedLimit = SPEED_LIMIT_DEFAULT;
     mcRightSettings.ReverseSpeedLimit = SPEED_LIMIT_DEFAULT;
@@ -86,7 +88,7 @@ HAL_StatusTypeDef initMotorControllerProcanSettings()
     mcRightSettings.ChargeCurrentLimit = CHARGE_CURRENT_LIMIT_DEFAULT;
     mcRightSettings.HighVoltageLimit = HIGH_VOLTAGE_LIMIT_DEFAULT;
     mcRightSettings.LowVoltageLimit = LOW_VOLTAGE_LIMIT_DEFAULT;
-    mcRightSettings.MaxTorqueDemand = MAX_TORQUE_DEMAND_DEFAULT;
+    mcRightSettings.MaxTorqueDemand = max_torque_demand_default;
 
     return HAL_OK;
 }
@@ -245,8 +247,8 @@ float limit(float in, float min, float max)
 }
 
 bool is_wheel_within_deadzone(int steeringAngle) {
-    if (steeringAngle >= TV_DEADZONE_END_LEFT && 
-        steeringAngle <= TV_DEADZONE_END_RIGHT) {
+    if (steeringAngle >= tv_deadzone_end_left && 
+        steeringAngle <= tv_deadzone_end_right) {
             return true;
     }
     return false;
@@ -262,8 +264,8 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
     // Throttle adjustments for torque vectoring (only if steeringAngle is outside the dead zone)
     // Assumes that positive angle => CW rotation (right turn), negative angle => CCW rotation (left turn)
     if (!is_wheel_within_deadzone(steeringAngle)) {
-            throttleRight -= (throttle * steeringAngle * TORQUE_VECTOR_FACTOR);
-            throttleLeft += (throttle * steeringAngle * TORQUE_VECTOR_FACTOR);
+            throttleRight -= (throttle * steeringAngle * torque_vector_factor);
+            throttleLeft += (throttle * steeringAngle * torque_vector_factor);
         }
 
     float torqueDemandR = map_range_float(throttleRight, 0, 100, 0, maxTorqueDemand);
