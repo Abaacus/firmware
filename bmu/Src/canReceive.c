@@ -85,16 +85,9 @@ void CAN_Msg_SetVariableBMU_Callback()
         break;
     
     case BMU_CAN_CONFIGURED_ADJUSTED_CELLI:
-        if (setadjustedCellIR(VariableValueBMU) == HAL_ERROR)
+        if (setAdjustedCellIR(VariableValueBMU) == HAL_ERROR)
         {
             ERROR_PRINT("Failed to update adjusted cell IR\n");
-        }
-        break;
-
-    case BMU_CAN_CONFIGURED_MAX_CHARGE_VOLTAGE:
-        if (setMaxChargeVoltage(VariableValueBMU) == HAL_ERROR)
-        {
-            ERROR_PRINT("Failed to update max charge voltage\n");
         }
         break;
 

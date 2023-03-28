@@ -61,12 +61,12 @@ extern osThreadId BatteryTaskHandle;
 /// Charging current limit
 float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
 
-float adjustedCellIR = ADJUSTED_CELL_IR_DEFAULT;
+float cellIR = CELL_IR_DEFAULT;
 
 /**
  * Charging voltage limit to be sent to charger. Charging is actually stopped based on min cell SoC as specified by @ref CHARGE_STOP_SOC
  */
-float maxChargeVoltage = DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS;
+const float maxChargeVoltage = DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS;
 
 /**
  * Set to true if we've already sent a high temperature warning for this cell to
@@ -524,7 +524,7 @@ void enterAdjustedCellVoltages(void)
 	getIBus(&bus_current_A);
 	for (int cell = 0; cell < NUM_VOLTAGE_CELLS; cell++)
 	{
-		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * adjustedCellIR);
+		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * cellIR);
 	}
 }
 /**
@@ -875,9 +875,9 @@ HAL_StatusTypeDef initPackVoltageQueue()
 /**
  * @brief Sets the maximum current for the charger
  *
- * @param maxCurrent The maximum current, in Amps
+ * @param maxCurrent: The maximum current, in Amps
  *
- * @return HAL_StatusTypeDef
+ * @return Return HAL_OK when maxCurrent is from 0 ~ 100, return HAL_ERROR otherwise
  */
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 {
@@ -893,38 +893,20 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 }
 
 /**
- * @brief Sets the maximum voltage for the charger
- *
- * @param maxVoltage The adjust factor for cell internal resistance
- *
- * @return HAL_StatusTypeDef
- */
-HAL_StatusTypeDef setMaxChargeVoltage(float maxVoltage)
-{
-    //Range check
-    if (maxVoltage < 0.0 /*TODO: whats the max for max voltage*/)
-    {
-        return HAL_ERROR;
-    }
-    maxChargeVoltage = maxVoltage;
-    return HAL_OK;
-}
-
-/**
  * @brief Sets the adjust factor for cell internal resistance
  *
- * @param cellIR The adjust factor for cell internal resistance
+ * @param cellIR: The adjust factor for cell internal resistance
  *
- * @return HAL_StatusTypeDef
+ * @return Return HAL_OK when cellIR is from 0 ~ 0.01, return HAL_ERROR otherwise
  */
-HAL_StatusTypeDef setadjustedCellIR(float cellIR)
+HAL_StatusTypeDef setAdjustedCellIR(float cellIR_v)
 {
-    //Range check
-    if (cellIR < 0.0 || cellIR > 0.01)
+    // Range check
+    if (cellIR_v < 0.0 || cellIR_v > 0.01)
     {
         return HAL_ERROR;
     }
-    adjustedCellIR = cellIR;
+    cellIR = cellIR_v;
     return HAL_OK;
 }
 
