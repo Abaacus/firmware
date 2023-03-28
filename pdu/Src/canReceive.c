@@ -27,15 +27,16 @@ void DTC_Fatal_Callback(BoardIDs board) {
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
 }
 
-void CAN_Msg_SetVariableBMU_Callback()
+void CAN_Msg_SetVariablePDU_Callback()
 {
     switch (VariableEnumPDU)
     {
-    case PDU_CAN_CONFIGURED_BRAKE_LIGHT_ON_THRESHHOLD:
-        set_brake_light_on_threshold(VariableValuePDU);
-        break;
-    
-    default:
-        break;
+        case PDU_CAN_CONFIGURED_BRAKE_LIGHT_ON_THRESHHOLD:
+            set_brake_light_on_threshold(VariableValuePDU);
+            break;
+        
+        default:
+            DEBUG_PRINT("Default case. Nothing get processed in CAN_Msg_SetVariablePDU_Callback function ");
+            break;
     }
 }

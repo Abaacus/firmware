@@ -164,7 +164,7 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
 }
 
 /**
- * @brief Set capacity startup value
+ * @brief Set startup capacity value
  *
  * @param capacity The value to set for IBus, in volts
  *
@@ -172,7 +172,13 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
  */
 HAL_StatusTypeDef setCapacityStartup(float capacity)
 {
-   capacity_startup = capacity;
+	if(capacity < 0 || capacity > TOTAL_CAPACITY)
+	{
+		ERROR_PRINT("Failed to set startup capacity\n");
+		ERROR_PRINT("New startup capacity value out of range. Should be from 0 to %f\n", TOTAL_CAPACITY);
+		return HAL_ERROR;
+	}
+	capacity_startup = capacity;
 
-   return HAL_OK;
+	return HAL_OK;
 }

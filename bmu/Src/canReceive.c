@@ -77,40 +77,29 @@ void CAN_Msg_SetVariableBMU_Callback()
 {
     switch (VariableEnumBMU)
     {
-    case BMU_CAN_CONFIGURED_MAX_CHARGE_CURRENT:
-        if (setMaxChargeCurrent(VariableValueBMU) == HAL_ERROR)
-        {
-            ERROR_PRINT("Failed to update max charge current\n");
-        }
-        break;
-    
-    case BMU_CAN_CONFIGURED_ADJUSTED_CELLI:
-        if (setAdjustedCellIR(VariableValueBMU) == HAL_ERROR)
-        {
-            ERROR_PRINT("Failed to update adjusted cell IR\n");
-        }
-        break;
+        case BMU_CAN_CONFIGURED_MAX_CHARGE_CURRENT:
+            setMaxChargeCurrent(VariableValueBMU);
+            break;
+        
+        case BMU_CAN_CONFIGURED_ADJUSTED_CELLI:
+            setAdjustedCellIR(VariableValueBMU);
+            break;
 
-    case BMU_CAN_CONFIGURED_STATE_BUS_HV_SEND_PERIOD:
-    /* TODO: do we need check anything for send period ?*/
-        cliSetStateBusHVSendPeriod(VariableValueBMU);
-        break;
+        case BMU_CAN_CONFIGURED_STATE_BUS_HV_SEND_PERIOD:
+        /* TODO: do we need check anything for send period ?*/
+            cliSetStateBusHVSendPeriod(VariableValueBMU);
+            break;
 
-    case BMU_CAN_CONFIGURED_CAPACITY_STARTUP:
-        if (setCapacityStartup(VariableValueBMU) != HAL_OK)
-        {
-            ERROR_PRINT("Failed to update startup capacity value\n");
+        case BMU_CAN_CONFIGURED_CAPACITY_STARTUP:
+            setCapacityStartup(VariableValueBMU);
+            break;
+
+        case BMU_CAN_CONFIGURED_IBUS_INTEGRATED:
+            cliSetIBus(VariableValueBMU);
+            break;
+
+        default:
+            DEBUG_PRINT("Default case. Nothing get processed in CAN_Msg_SetVariableBMU_Callback function ");
+            break;
         }
-        break;
-
-    case BMU_CAN_CONFIGURED_IBUS_INTEGRATED:
-        if (cliSetIBus(VariableValueBMU) != HAL_OK)
-        {
-            ERROR_PRINT("Failed to update startup capacity value\n");
-        }
-        break;
-
-    default:
-        break;
-    }
 }
