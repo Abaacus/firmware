@@ -32,7 +32,7 @@ void CAN_Msg_SetVariablePDU_Callback()
     switch (VariableEnumPDU)
     {
         case PDU_CAN_CONFIGURED_BRAKE_LIGHT_ON_THRESHHOLD:
-            set_brake_light_on_threshold(VariableValuePDU);
+            setBrakeLightOnThreshold(VariableValuePDU);
             break;
         
         default:

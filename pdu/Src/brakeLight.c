@@ -24,7 +24,7 @@ void CAN_Msg_VCU_Data_Callback()
     }
 }
 
-void set_brake_light_on_threshold(float brake_light_on_threshold_value)
+void setBrakeLightOnThreshold(float brake_light_on_threshold_value)
 {
     brake_light_on_threshold = brake_light_on_threshold_value;
 }
