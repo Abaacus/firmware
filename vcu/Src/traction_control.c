@@ -92,8 +92,9 @@ void tractionControlTask(void *pvParameters)
 		ERROR_PRINT("ERROR: Failed to init traction control task, suspending traction control task\n");
 		while(1);
 	}
-
-	float torque_max = max_torque_demand_default;
+    
+	float max_torque_demand = get_max_torque_demand();
+	float torque_max = max_torque_demand;
 	float torque_adjustment = adjustment_torque_floor;
 	float FR_speed = 0.0f; //front right wheel speed
 	float FL_speed = 0.0f; //front left wheel speed
@@ -109,7 +110,7 @@ void tractionControlTask(void *pvParameters)
 
 	while(1)
 	{
-		torque_max = max_torque_demand_default;
+		torque_max = max_torque_demand;
 
 		FR_speed = get_FR_speed(); 
 		FL_speed = get_FL_speed(); 
@@ -152,15 +153,15 @@ void tractionControlTask(void *pvParameters)
 			sendCAN_TC_Torque_Adjustment_Right();
 
 			//clamp values
-			torque_max = max_torque_demand_default - torque_adjustment;
+			torque_max = max_torque_demand - torque_adjustment;
 			if(torque_max < adjustment_torque_floor)
 			{
 				torque_max = adjustment_torque_floor;
 			}
-			else if(torque_max > max_torque_demand_default)
+			else if(torque_max > max_torque_demand)
 			{
 				// Whoa error in TC (front wheel is spinning faster than rear)
-				torque_max = max_torque_demand_default;
+				torque_max = max_torque_demand;
 			}
 			Torque_Max = (uint32_t)torque_max;
 			sendCAN_TC_Torque_Max();

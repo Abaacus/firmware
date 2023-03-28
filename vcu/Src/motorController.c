@@ -11,8 +11,6 @@
 // Do we need to wait to close contactors until MCs are ready?
 // How to read IDs for msgs on datasheet?
 
-
-
 /* Control Values - See 3.4.1 in ProCAN fundementals */
 #define INVERTER_NOP                    0x00
 #define INVERTER_ENABLE_BRIDGE          0x01
@@ -35,6 +33,8 @@
 
 static float tv_deadzone_end_right = TV_DEADZONE_END_RIGHT;
 static float tv_deadzone_end_left = TV_DEADZONE_END_LEFT;
+static float torque_vector_factor = TORQUE_VECTOR_FACTOR;
+static float max_torque_demand = MAX_TORQUE_DEMAND_DEFAULT;
 
 MotorControllerProcanSettings mcLeftSettings = {0};
 MotorControllerProcanSettings mcRightSettings = {0};
@@ -69,7 +69,7 @@ HAL_StatusTypeDef mcLeftCommand(uint16_t commandVal)
 HAL_StatusTypeDef initMotorControllerProcanSettings()
 {
     mcLeftSettings.InverterCommand = 0;
-    mcLeftSettings.DriveTorqueLimit = max_torque_demand_default;
+    mcLeftSettings.DriveTorqueLimit = max_torque_demand;
     mcLeftSettings.BrakingTorqueLimit = BRAKING_TORQUE_LIMIT_DEFAULT;
     mcLeftSettings.ForwardSpeedLimit = SPEED_LIMIT_DEFAULT;
     mcLeftSettings.ReverseSpeedLimit = SPEED_LIMIT_DEFAULT;
@@ -77,10 +77,10 @@ HAL_StatusTypeDef initMotorControllerProcanSettings()
     mcLeftSettings.ChargeCurrentLimit = CHARGE_CURRENT_LIMIT_DEFAULT;
     mcLeftSettings.HighVoltageLimit = HIGH_VOLTAGE_LIMIT_DEFAULT;
     mcLeftSettings.LowVoltageLimit = LOW_VOLTAGE_LIMIT_DEFAULT;
-    mcLeftSettings.MaxTorqueDemand = max_torque_demand_default;
+    mcLeftSettings.MaxTorqueDemand = max_torque_demand;
 
     mcRightSettings.InverterCommand = 0;
-    mcRightSettings.DriveTorqueLimit = max_torque_demand_default;
+    mcRightSettings.DriveTorqueLimit = max_torque_demand;
     mcRightSettings.BrakingTorqueLimit = BRAKING_TORQUE_LIMIT_DEFAULT;
     mcRightSettings.ForwardSpeedLimit = SPEED_LIMIT_DEFAULT;
     mcRightSettings.ReverseSpeedLimit = SPEED_LIMIT_DEFAULT;
@@ -88,7 +88,7 @@ HAL_StatusTypeDef initMotorControllerProcanSettings()
     mcRightSettings.ChargeCurrentLimit = CHARGE_CURRENT_LIMIT_DEFAULT;
     mcRightSettings.HighVoltageLimit = HIGH_VOLTAGE_LIMIT_DEFAULT;
     mcRightSettings.LowVoltageLimit = LOW_VOLTAGE_LIMIT_DEFAULT;
-    mcRightSettings.MaxTorqueDemand = max_torque_demand_default;
+    mcRightSettings.MaxTorqueDemand = max_torque_demand;
 
     return HAL_OK;
 }
@@ -351,14 +351,26 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
     return HAL_OK;
 }
 
-void set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
+HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 {
+    if (tv_deadzone_end_right_value < 35 && tv_deadzone_end_right_value > 3660)
+    {
+        ERROR_PRINT("Failed to set tv_deadzone_end_right\nValue should be from 35 to 3660");
+        return HAL_ERROR;
+    }
     tv_deadzone_end_right = tv_deadzone_end_right_value;
+    return HAL_OK;
 }
 
-void set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
+HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
 {
+    if (tv_deadzone_end_left_value < 35 && tv_deadzone_end_left_value > 3660)
+    {
+        ERROR_PRINT("Failed to set tv_deadzone_end_left\nValue should be from 35 to 3660");
+        return HAL_ERROR;
+    }
     tv_deadzone_end_left = tv_deadzone_end_left_value;
+    return HAL_OK;
 }
 
 void set_torque_vector_factor(float torque_vector_factor_value)
@@ -367,5 +379,25 @@ void set_torque_vector_factor(float torque_vector_factor_value)
 }
 
 void set_max_torque_demand_default(float max_torque_demand_default_value){
-    max_torque_demand_default = max_torque_demand_default_value;
+    max_torque_demand = max_torque_demand_default_value;
+}
+
+float get_torque_vector_factor()
+{
+    return torque_vector_factor;
+}
+
+float get_max_torque_demand()
+{
+    return max_torque_demand;
+}
+
+float get_tv_deadzone_end_right()
+{
+    return tv_deadzone_end_right;
+}
+
+float get_tv_deadzone_end_left()
+{
+    return tv_deadzone_end_left;
 }
