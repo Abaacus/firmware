@@ -136,6 +136,7 @@ typedef enum Charge_Notifications_t {
 HAL_StatusTypeDef getIBus(float *IBus);
 HAL_StatusTypeDef getVBatt(float *VBatt);
 HAL_StatusTypeDef getVBus(float *VBus);
+float getMaxChargeCurrent();
 
 HAL_StatusTypeDef initBusVoltagesAndCurrentQueues();
 HAL_StatusTypeDef balance_cell(int cell, bool set);

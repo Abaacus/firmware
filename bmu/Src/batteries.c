@@ -59,7 +59,7 @@
 extern osThreadId BatteryTaskHandle;
 
 /// Charging current limit
-float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
+static float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
 
 float cellIR = CELL_IR_DEFAULT;
 
@@ -912,6 +912,16 @@ HAL_StatusTypeDef setAdjustedCellIR(float cellIR_v)
     }
     cellIR = cellIR_v;
     return HAL_OK;
+}
+
+
+/**
+ * @brief Return the value of maxChargeCurrent
+ * 
+ */
+float getMaxChargeCurrent()
+{
+    return maxChargeCurrent;
 }
 
 /**
