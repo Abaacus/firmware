@@ -84,6 +84,13 @@ static HAL_StatusTypeDef compute_discharge_limit(float * current_limit)
 	float output_current = last_output_current - (error*em_kP + error_accum*em_kI);
 	*current_limit = clamp_motor_current(output_current);	
 	last_output_current = *current_limit;
+
+	Endurance_Error_I = error_accum;
+	Endurance_SOC_Error = error;
+	Endurance_Current_Limit = *current_limit;
+	Endurance_Expected_SOC = expected_soc;
+	Endurance_Laps_Completed = num_laps;
+	sendCAN_VCU_EnduranceMode_Debug();
 	return HAL_OK;
 }
 
@@ -120,6 +127,8 @@ void enduranceModeTask(void *pvParameters)
 		{
 			// The flag was never actually set, we just hit the timeout	
 		}
+
+
 		watchdogTaskCheckIn(ENDURANCE_MODE_TASK_ID);
 		vTaskDelay(ENDURANCE_MODE_TASK_PERIOD);
 	}

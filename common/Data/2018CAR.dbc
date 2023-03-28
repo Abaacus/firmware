@@ -65,6 +65,13 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ CurrentHVBusInverterLeft : 0|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
+BO_ 2282032130 VCU_EnduranceMode_Debug: 8 VCU_F7
+ SG_ Endurance_SOC_Error : 40|8@1- (0.25,0) [-32|31.75] "" Vector__XXX
+ SG_ Endurance_Expected_SOC : 32|8@1+ (0.5,0) [0|127.5] "" Vector__XXX
+ SG_ Endurance_Error_I : 16|16@1- (0.1,0) [-3276.8|3276.7] ""  VCU_BeagleBone
+ SG_ Endurance_Current_Limit : 8|8@1+ (0.15,0) [0|38.25] ""  VCU_BeagleBone
+ SG_ Endurance_Laps_Completed : 0|8@1+ (1,0) [0|0] ""  VCU_BeagleBone
+
 BO_ 2281966594 TractionControl_Debug: 8 VCU_F7
  SG_ TC_AbsErrorRight_RAD_S : 24|16@1+ (1,0) [0|0] "" Vector__XXX
  SG_ TC_AbsErrorLeft_RAD_S : 8|16@1+ (1,0) [0|0] "" Vector__XXX
