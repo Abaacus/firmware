@@ -2,9 +2,8 @@
 
 #define CANRECEIVE_H
 
-/* Enum for checking VariableEnumPDU*/
-typedef enum PDU_Variable_Name {
-    brake_light_on_threshold_name = 0,
-} PDU_Variable_Name;
+typedef enum {
+    PDU_CAN_CONFIGURED_BRAKE_LIGHT_ON_THRESHHOLD = 0U,
+} PDU_CAN_CONFIGURED_E;
 
 #endif /* end of include guard: CANRECEIVE_H */

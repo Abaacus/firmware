@@ -77,40 +77,40 @@ void CAN_Msg_SetVariableBMU_Callback()
 {
     switch (VariableEnumBMU)
     {
-    case maxChargeCurrent_name:
+    case BMU_CAN_CONFIGURED_MAX_CHARGE_CURRENT:
         if (setMaxChargeCurrent(VariableValueBMU) == HAL_ERROR)
         {
             ERROR_PRINT("Failed to update max charge current\n");
         }
         break;
     
-    case adjustedCellI_name:
+    case BMU_CAN_CONFIGURED_ADJUSTED_CELLI:
         if (setadjustedCellIR(VariableValueBMU) == HAL_ERROR)
         {
             ERROR_PRINT("Failed to update adjusted cell IR\n");
         }
         break;
 
-    case maxChargeVoltage_name:
+    case BMU_CAN_CONFIGURED_MAX_CHARGE_VOLTAGE:
         if (setMaxChargeVoltage(VariableValueBMU) == HAL_ERROR)
         {
             ERROR_PRINT("Failed to update max charge voltage\n");
         }
         break;
 
-    case stateBusHVSendPeriod_name:
+    case BMU_CAN_CONFIGURED_STATE_BUS_HV_SEND_PERIOD:
     /* TODO: do we need check anything for send period ?*/
         cliSetStateBusHVSendPeriod(VariableValueBMU);
         break;
 
-    case capacityStartup_name:
+    case BMU_CAN_CONFIGURED_CAPACITY_STARTUP:
         if (setCapacityStartup(VariableValueBMU) != HAL_OK)
         {
             ERROR_PRINT("Failed to update startup capacity value\n");
         }
         break;
 
-    case iBusIntegrated_name:
+    case BMU_CAN_CONFIGURED_IBUS_INTEGRATED:
         if (cliSetIBus(VariableValueBMU) != HAL_OK)
         {
             ERROR_PRINT("Failed to update startup capacity value\n");

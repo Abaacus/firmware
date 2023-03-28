@@ -5,14 +5,13 @@
 
 extern uint32_t lastChargeCartHeartbeat;
 
-/* Enum for checking VariableEnumBMU*/
-typedef enum BMU_Variable_Name {
-    maxChargeCurrent_name = 0,
-    adjustedCellI_name,
-    maxChargeVoltage_name,
-    stateBusHVSendPeriod_name,
-    capacityStartup_name,
-    iBusIntegrated_name,
-} BMU_Variable_Name;
+typedef enum {
+    BMU_CAN_CONFIGURED_MAX_CHARGE_CURRENT = 0U,
+    BMU_CAN_CONFIGURED_ADJUSTED_CELLI,
+    BMU_CAN_CONFIGURED_MAX_CHARGE_VOLTAGE,
+    BMU_CAN_CONFIGURED_STATE_BUS_HV_SEND_PERIOD,
+    BMU_CAN_CONFIGURED_CAPACITY_STARTUP,
+    BMU_CAN_CONFIGURED_IBUS_INTEGRATED,
+} BMU_CAN_CONFIGURED_E;
 
 #endif /* USER_CAN_H_ */

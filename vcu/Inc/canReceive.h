@@ -7,21 +7,21 @@
 bool getHvEnableState();
 bool getMotorControllersStatus();
 uint32_t lastBrakeValReceiveTimeTicks;
-typedef enum VCU_Variable_Name {
-    initialSoc_name = 0,
-    numLaps_name,
-    numLapsToComplete_name,
-    inEnduranceMode_name,
-    emkP_name,
-    emkI_name,
-    tcOn_name,
-    tckP_name,
-    errorFloor_name,
-    adjustmentTorqueFloor_name,
-    tvDeadzoneEndRight_name,
-    tvDeadzoneEndLeft_name,
-    torqueVectorFactor_name,
-    maxTorqueDemandDefault_name,
-} VCU_Variable_Name;
+typedef enum {
+    VCU_CAN_CONFIGURED_INITIAL_SOC = 0U,
+    VCU_CAN_CONFIGURED_NUM_LAPS,
+    VCU_CAN_CONFIGURED_NUM_LAPS_TO_COMPLETE,
+    VCU_CAN_CONFIGURED_IN_ENDURANCE_MODE,
+    VCU_CAN_CONFIGURED_EM_KP,
+    VCU_CAN_CONFIGURED_EM_KI,
+    VCU_CAN_CONFIGURED_TC_ON,
+    VCU_CAN_CONFIGURED_TC_KP,
+    VCU_CAN_CONFIGURED_ERROR_FLOOR,
+    VCU_CAN_CONFIGURED_ADJUSTMENT_TORQUE_FLOOR,
+    VCU_CAN_CONFIGURED_TV_DEAD_ZONE_END_RIGHT,
+    VCU_CAN_CONFIGURED_TV_DEAD_ZONE_END_LEFT,
+    VCU_CAN_CONFIGURED_TORQUE_VECTOR_FACTOR,
+    VCU_CAN_CONFIGURED_MAX_TORQUE_DEMAND_DEFAULT,
+} VCU_CAN_CONFIGURED_E;
 
 #endif /* USER_CAN_H_ */

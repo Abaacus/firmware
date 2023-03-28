@@ -31,7 +31,7 @@ void CAN_Msg_SetVariableBMU_Callback()
 {
     switch (VariableEnumPDU)
     {
-    case brake_light_on_threshold_name:
+    case PDU_CAN_CONFIGURED_BRAKE_LIGHT_ON_THRESHHOLD:
         set_brake_light_on_threshold(VariableValuePDU);
         break;
     

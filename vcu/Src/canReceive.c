@@ -163,46 +163,46 @@ void CAN_Msg_SetVariableVCU_Callback()
 {
     switch (VariableEnumVCU)
     {
-    case initialSoc_name:
+    case VCU_CAN_CONFIGURED_INITIAL_SOC:
         set_initial_soc(VariableValueVCU);
         break;
-    case numLaps_name:
+    case VCU_CAN_CONFIGURED_NUM_LAPS:
         set_num_laps(VariableValueVCU);
         break;
-    case numLapsToComplete_name:
+    case VCU_CAN_CONFIGURED_NUM_LAPS_TO_COMPLETE:
         set_num_laps_complete(VariableValueVCU);
         break;
-    case inEnduranceMode_name:
+    case VCU_CAN_CONFIGURED_IN_ENDURANCE_MODE:
         set_in_endurance_mode(VariableValueVCU);
         break;
-    case emkP_name:
+    case VCU_CAN_CONFIGURED_EM_KP:
         set_em_kP(VariableValueVCU);
         break;
-    case emkI_name:
+    case VCU_CAN_CONFIGURED_EM_KI:
         set_em_kI(VariableValueVCU);
         break;
-    case tcOn_name:
+    case VCU_CAN_CONFIGURED_TC_ON:
         set_TC(VariableValueVCU);
         break;
-    case tckP_name:
+    case VCU_CAN_CONFIGURED_TC_KP:
         set_tc_kP(VariableValueVCU);
         break;
-    case errorFloor_name:
+    case VCU_CAN_CONFIGURED_ERROR_FLOOR:
         set_error_floor(VariableValueVCU);
         break;
-    case adjustmentTorqueFloor_name:
+    case VCU_CAN_CONFIGURED_ADJUSTMENT_TORQUE_FLOOR:
         set_adjustment_torque_floor(VariableValueVCU);
         break;
-    case tvDeadzoneEndRight_name:
+    case VCU_CAN_CONFIGURED_TV_DEAD_ZONE_END_RIGHT:
         set_tv_deadzone_end_right(VariableValueVCU);
         break;
-    case tvDeadzoneEndLeft_name:
+    case VCU_CAN_CONFIGURED_TV_DEAD_ZONE_END_LEFT:
         set_tv_deadzone_end_left(VariableValueVCU);
         break;
-    case torqueVectorFactor_name:
+    case VCU_CAN_CONFIGURED_TORQUE_VECTOR_FACTOR:
         set_torque_vector_factor(VariableValueVCU);
         break;
-    case maxTorqueDemandDefault_name:
+    case VCU_CAN_CONFIGURED_MAX_TORQUE_DEMAND_DEFAULT:
         set_max_torque_demand_default(VariableValueVCU);
         break;
     default:
