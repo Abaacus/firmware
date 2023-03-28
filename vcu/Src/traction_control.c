@@ -176,17 +176,35 @@ void tractionControlTask(void *pvParameters)
 
 }
 
-void set_tc_kP(float tc_kP_value)
+HAL_StatusTypeDef set_tc_kP(float tc_kP_value)
 {
+	if(tc_kP_value < 0 || tc_kP_value > 1)
+	{
+		ERROR_PRINT("Failed to set tc_kP value\nThe range is from 0 to 1\n");
+		return HAL_ERROR;
+	}
     tc_kP = tc_kP_value;
+	return HAL_OK;
 }
 
-void set_error_floor(float error_floor_value)
+HAL_StatusTypeDef set_error_floor(float error_floor_value)
 {
+	if(error_floor_value < 0)
+	{
+		ERROR_PRINT("Failed to set error_floor value\nIt can't be smaller than 0\n");
+		return HAL_ERROR;
+	}
     error_floor = error_floor_value;
+	return HAL_OK;
 }
 
-void set_adjustment_torque_floor(float adjustment_torque_floor_value)
+HAL_StatusTypeDef set_adjustment_torque_floor(float adjustment_torque_floor_value)
 {
+	if(adjustment_torque_floor_value < 0 || adjustment_torque_floor_value >30)
+	{
+		ERROR_PRINT("Failed to set adjustment_torque_floor value\n The range is from 0 to 30\n");
+		return HAL_ERROR;
+	}
     adjustment_torque_floor = adjustment_torque_floor_value;
+	return HAL_OK;
 }

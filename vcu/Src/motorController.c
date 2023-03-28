@@ -355,7 +355,7 @@ HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 {
     if (tv_deadzone_end_right_value < 35 && tv_deadzone_end_right_value > 3660)
     {
-        ERROR_PRINT("Failed to set tv_deadzone_end_right\nValue should be from 35 to 3660");
+        ERROR_PRINT("Failed to set tv_deadzone_end_right\nValue should be from 35 to 3660\n");
         return HAL_ERROR;
     }
     tv_deadzone_end_right = tv_deadzone_end_right_value;
@@ -366,7 +366,7 @@ HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
 {
     if (tv_deadzone_end_left_value < 35 && tv_deadzone_end_left_value > 3660)
     {
-        ERROR_PRINT("Failed to set tv_deadzone_end_left\nValue should be from 35 to 3660");
+        ERROR_PRINT("Failed to set tv_deadzone_end_left\nValue should be from 35 to 3660\n");
         return HAL_ERROR;
     }
     tv_deadzone_end_left = tv_deadzone_end_left_value;
