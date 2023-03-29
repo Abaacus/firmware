@@ -28,11 +28,8 @@ class WfeDashboardUI : public QWidget {
         //std::shared_ptr<QTimer> timer;
 
         // Display instances
-        std::shared_ptr<TextDisplay> modeDisplay;
+        std::shared_ptr<TextDisplay> lapDisplay;
         std::shared_ptr<TextDisplay> batteryDisplay;
-        std::shared_ptr<TextDisplay> speedDisplay;
-        std::shared_ptr<TextDisplay> tempDisplay;
-        std::shared_ptr<TextDisplay> voltageDisplay;
         std::shared_ptr<ErrorDisplay> errorDisplay;
 
         // Dial instances

@@ -23,11 +23,8 @@ WfeDashboardUI::WfeDashboardUI(QApplication& app, std::shared_ptr<QueueData> dat
     this->setPalette(pal);
 
     // Initialize display instances
-    modeDisplay = std::make_shared<TextDisplay>(this, "Mode: Norm", Qt::white, Qt::AlignLeft);
+    lapDisplay = std::make_shared<TextDisplay>(this, "Laps: 0", Qt::white, Qt::AlignLeft);
     batteryDisplay = std::make_shared<TextDisplay>(this, "Battery: 100%", Qt::green, Qt::AlignRight);
-    speedDisplay = std::make_shared<TextDisplay>(this, "Speed: 0 kph", QColor(44, 197, 239), Qt::AlignHCenter);
-    tempDisplay = std::make_shared<TextDisplay>(this, "Temp: N/A", QColor(255, 204, 0), Qt::AlignLeft, 22, 45);
-    voltageDisplay = std::make_shared<TextDisplay>(this, "Voltage: 0 V", QColor(181, 124, 255), Qt::AlignRight, 22, 45);
     errorDisplay = std::make_shared<ErrorDisplay>(this, Qt::AlignBottom);
 
     // Initialize dial instances
@@ -39,7 +36,7 @@ WfeDashboardUI::WfeDashboardUI(QApplication& app, std::shared_ptr<QueueData> dat
 
     voltageDial = std::make_shared<Dial>(this, QColor(181, 124, 255), Qt::red, WIDTH-90-RSMALL, 200, RSMALL,
                                          15, -20, 60, OVERVOLTAGE, -30, 140, "V", 20);
-    //speedDial->setValue(100);
+    speedDial->setValue(0);
     voltageDial->setValue(0);
     tempDial->setValue(0);
 
@@ -48,7 +45,6 @@ WfeDashboardUI::WfeDashboardUI(QApplication& app, std::shared_ptr<QueueData> dat
     timer->setInterval(10);
     connect(timer, &QTimer::timeout, this, &WfeDashboardUI::update);
     timer->start();
-    //update();
     this->show();
 }
 
@@ -79,9 +75,7 @@ void WfeDashboardUI::update() {
         batteryDisplay->setColour(Qt::red);
     }
 
-    speedDisplay->setText("Speed: " + toXDecimalString(data->speed, 2) + " kph");
-    tempDisplay->setText("Temp: "+ toXDecimalString(data->temperature, 2) +"°C");
-    voltageDisplay->setText("Voltage: "+ toXDecimalString(data->voltage, 2) +" V");
+    lapDisplay->setText("Laps: " + std::to_string(data->laps_completed));
     speedDial->setValue(data->speed);
     tempDial->setValue(data->temperature);
     voltageDial->setValue(data->voltage);
@@ -90,11 +84,8 @@ void WfeDashboardUI::update() {
 
 void WfeDashboardUI::paintEvent(QPaintEvent *) {
         QPainter qp(this);
-        modeDisplay->draw(qp);
+        lapDisplay->draw(qp);
         batteryDisplay->draw(qp);
-        speedDisplay->draw(qp);
-        tempDisplay->draw(qp);
-        voltageDisplay->draw(qp);
         errorDisplay->draw(qp);
         speedDial->draw(qp);
         tempDial->draw(qp);
