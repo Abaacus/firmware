@@ -61,7 +61,7 @@ extern osThreadId BatteryTaskHandle;
 /// Charging current limit
 static float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
 
-float cellIR = CELL_IR_DEFAULT;
+float seriesCellIR = SERIES_CELL_IR_DEFAULT;
 
 /**
  * Charging voltage limit to be sent to charger. Charging is actually stopped based on min cell SoC as specified by @ref CHARGE_STOP_SOC
@@ -524,7 +524,7 @@ void enterAdjustedCellVoltages(void)
 	getIBus(&bus_current_A);
 	for (int cell = 0; cell < NUM_VOLTAGE_CELLS; cell++)
 	{
-		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * cellIR);
+		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * seriesCellIR);
 	}
 }
 /**
@@ -901,7 +901,7 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
  *
  * @return Return HAL_OK when cellIR is from 0 ~ 0.01, return HAL_ERROR otherwise
  */
-HAL_StatusTypeDef setAdjustedCellIR(float cellIR_v)
+HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
 {
     // Range check
     if (cellIR_v < 0.0 || cellIR_v > 0.01)
@@ -910,7 +910,7 @@ HAL_StatusTypeDef setAdjustedCellIR(float cellIR_v)
         ERROR_PRINT("New cellIR value out of range. Range should be from 0 to 0.01\n");
         return HAL_ERROR;
     }
-    cellIR = cellIR_v;
+    seriesCellIR = cellIR_v;
     return HAL_OK;
 }
 

@@ -54,7 +54,7 @@ volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 // A constant which defines how much we adjust our AdjustedCellVoltage factoring in the cell's Internal Resistance
 // This is a very conservative number of 3mOhms. This is not the measured cell internal resistance.
 // Our current pack is 70s7p. So this assumption factors in that IBus is total current from cells and the current gets divided by 7
-#define CELL_IR_DEFAULT (0.00286F)
+#define SERIES_CELL_IR_DEFAULT (0.00286F)
 
 /** Maximum allowable cell temperature, will send critical DTC if surpassed */
 #define CELL_OVERTEMP (CELL_MAX_TEMP_C)
@@ -144,7 +144,7 @@ HAL_StatusTypeDef getPackVoltage(float *packVoltage);
 HAL_StatusTypeDef initPackVoltageQueue();
 float map_range_float(float in, float low, float high, float low_out, float high_out);
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent);
-HAL_StatusTypeDef setAdjustedCellIR(float cellIR);
+HAL_StatusTypeDef setSeriesCellIR(float cellIR);
 void setSendOnlyOneCell(int cellIdx);
 void clearSendOnlyOneCell();
 HAL_StatusTypeDef cliSetVBatt(float VBatt);

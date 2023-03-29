@@ -33,7 +33,7 @@
 extern bool HITL_Precharge_Mode;
 extern float HITL_VPACK;
 extern uint32_t brakeAndHVILVals[2];
-extern float cellIR;
+extern float seriesCellIR;
 
 BaseType_t debugUartOverCan(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -1010,7 +1010,7 @@ static const CLI_Command_Definition_t socCommandDefinition =
 BaseType_t getCellIRCommand(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-	COMMAND_OUTPUT("AdjustedCellIR: %f (default %f)\n", cellIR, CELL_IR_DEFAULT);
+	COMMAND_OUTPUT("AdjustedCellIR: %f (default %f)\n", seriesCellIR, SERIES_CELL_IR_DEFAULT);
     return pdFALSE;
 }
 
@@ -1034,7 +1034,7 @@ BaseType_t setCellIRCommand(char *writeBuffer, size_t writeBufferLength,
     if (cellIR_v < 0.0 || cellIR_v > 0.01){
         COMMAND_OUTPUT("invalid cell IR [0,0.01]\r\n");
     }else{
-	    cellIR = cellIR_v;
+	    seriesCellIR = cellIR_v;
     }
 
     return pdFALSE;

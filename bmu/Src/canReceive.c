@@ -82,7 +82,7 @@ void CAN_Msg_SetVariableBMU_Callback()
             break;
         
         case BMU_CAN_CONFIGURED_ADJUSTED_CELLI:
-            setAdjustedCellIR(VariableValueBMU);
+            setSeriesCellIR(VariableValueBMU);
             break;
 
         case BMU_CAN_CONFIGURED_STATE_BUS_HV_SEND_PERIOD:
