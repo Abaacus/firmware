@@ -180,7 +180,7 @@ HAL_StatusTypeDef setCapacityStartup(float capacity)
 		return HAL_ERROR;
 	}
 	capacity_startup = capacity;
-
+	DEBUG_PRINT("Setting capacity_startup to: %f, the capacity_startup is now: %f\n", capacity, capacity_startup);
 	return HAL_OK;
 }
 

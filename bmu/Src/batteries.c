@@ -896,7 +896,7 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 /**
  * @brief Sets the adjust factor for cell internal resistance
  *
- * @param cellIR: The adjust factor for cell internal resistance
+ * @param cellIR_v: The adjust factor for cell internal resistance
  *
  * @return Return HAL_OK when cellIR is from 0 ~ 0.01, return HAL_ERROR otherwise
  */
@@ -909,6 +909,7 @@ HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
         return HAL_ERROR;
     }
     seriesCellIR = cellIR_v;
+    DEBUG_PRINT("Setting seriesCellIR to: %f, the seriesCellIR is now: %f\n", cellIR_v, seriesCellIR);
     return HAL_OK;
 }
 
