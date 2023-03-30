@@ -61,7 +61,7 @@ extern osThreadId BatteryTaskHandle;
 /// Charging current limit
 static float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
 
-float seriesCellIR = SERIES_CELL_IR_DEFAULT;
+static float seriesCellIR = SERIES_CELL_IR_DEFAULT;
 
 /**
  * Charging voltage limit to be sent to charger. Charging is actually stopped based on min cell SoC as specified by @ref CHARGE_STOP_SOC
@@ -912,6 +912,16 @@ HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
     }
     seriesCellIR = cellIR_v;
     return HAL_OK;
+}
+
+/**
+ * @brief Return the value of adjust factor for cell internal resistance
+ *
+ */
+
+float getSeriesCellIR( void )
+{
+    return seriesCellIR;
 }
 
 
