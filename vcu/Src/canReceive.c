@@ -206,7 +206,7 @@ void CAN_Msg_SetVariableVCU_Callback()
             set_max_torque_demand_default(VariableValueVCU);
             break;
         default:
-            DEBUG_PRINT("Default case. Nothing get processed in CAN_Msg_SetVariableVCU_Callback function ");
+            DEBUG_PRINT("VCU variable %llu not supported\r\n", VariableEnumVCU);
             break;
         }
 }

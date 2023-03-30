@@ -86,7 +86,6 @@ void CAN_Msg_SetVariableBMU_Callback()
             break;
 
         case BMU_CAN_CONFIGURED_STATE_BUS_HV_SEND_PERIOD:
-        /* TODO: do we need check anything for send period ?*/
             cliSetStateBusHVSendPeriod(VariableValueBMU);
             break;
 
@@ -99,7 +98,7 @@ void CAN_Msg_SetVariableBMU_Callback()
             break;
 
         default:
-            DEBUG_PRINT("Default case. Nothing get processed in CAN_Msg_SetVariableBMU_Callback function ");
+            DEBUG_PRINT("BMU variable %llu not supported\r\n", VariableEnumBMU);
             break;
         }
 }

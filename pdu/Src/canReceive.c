@@ -36,7 +36,7 @@ void CAN_Msg_SetVariablePDU_Callback()
             break;
         
         default:
-            DEBUG_PRINT("Default case. Nothing get processed in CAN_Msg_SetVariablePDU_Callback function ");
+            DEBUG_PRINT("PDU variable %llu not supported\r\n", VariableEnumPDU);
             break;
     }
 }

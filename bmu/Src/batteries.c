@@ -919,7 +919,7 @@ HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
  *
  */
 
-float getSeriesCellIR( void )
+float getSeriesCellIR(void)
 {
     return seriesCellIR;
 }
@@ -929,7 +929,7 @@ float getSeriesCellIR( void )
  * @brief Return the value of maxChargeCurrent
  * 
  */
-float getMaxChargeCurrent()
+float getMaxChargeCurrent(void)
 {
     return maxChargeCurrent;
 }
