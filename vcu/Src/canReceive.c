@@ -219,7 +219,7 @@ void CAN_Msg_SetVariableVCU_Callback()
             break;
 
         default:
-            DEBUG_PRINT("VCU variable %llu not supported\r\n", VariableEnumVCU);
+            DEBUG_PRINT("VCU variable %lu not supported\r\n", (uint32_t) VariableEnumVCU);
             break;
         }
 }

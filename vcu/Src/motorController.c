@@ -395,7 +395,7 @@ float get_torque_vector_factor()
 
 float get_max_torque_demand()
 {
-    DEBUG_PRINT("Max_torque_demand: %f (default %d)\n", max_torque_demand, MAX_TORQUE_DEMAND_DEFAULT);
+    // DEBUG_PRINT("Max_torque_demand: %f (default %d)\n", max_torque_demand, MAX_TORQUE_DEMAND_DEFAULT);
     return max_torque_demand;
 }
 

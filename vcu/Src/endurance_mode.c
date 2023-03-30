@@ -21,7 +21,7 @@
 #define EM_KI_DEFAULT (0.2f)
 
 static float initial_soc = INITIAL_SOC_DEFAULT;
-static uint8_t num_laps = NUM_LAPS_DEFAULT;
+static float num_laps = NUM_LAPS_DEFAULT;
 static uint8_t num_laps_to_complete = NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT*(ENDURANCE_MODE_BUFFER);
 static bool in_endurance_mode = false;
 static float em_kP = EM_KP_DEFAULT;
@@ -142,7 +142,7 @@ HAL_StatusTypeDef set_initial_soc(float initial_soc_value)
 	return HAL_OK;
 }
 
-HAL_StatusTypeDef set_num_laps(uint8_t num_laps_value)
+HAL_StatusTypeDef set_num_laps(float num_laps_value)
 {
 	if(num_laps_value < 0 || num_laps_value > num_laps_to_complete)
 	{
@@ -150,7 +150,7 @@ HAL_StatusTypeDef set_num_laps(uint8_t num_laps_value)
 		return HAL_ERROR;
 	}
 	num_laps = num_laps_value;
-	DEBUG_PRINT("Setting num_laps to: %u, the num_laps is now: %u\n", num_laps_value, num_laps);
+	DEBUG_PRINT("Setting num_laps to: %f, the num_laps is now: %f\n", num_laps_value, num_laps);
 	return HAL_OK;
 }
 
@@ -186,7 +186,7 @@ float get_initial_soc(void)
 
 uint32_t get_num_laps(void)
 {
-	DEBUG_PRINT("Num_laps: %u (default %u)\n", num_laps, NUM_LAPS_DEFAULT);
+	DEBUG_PRINT("Num_laps: %f (default %u)\n", num_laps, NUM_LAPS_DEFAULT);
 	return num_laps;
 }
 
