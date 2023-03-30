@@ -11,7 +11,6 @@
 #include "bsp.h"
 #include "motorController.h"
 #include "beaglebone.h"
-#include <stdlib.h>
 
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
@@ -513,16 +512,16 @@ BaseType_t fakeDriver(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    for (int i = 0; param[i] != '\0'; ++i) {
-        if (param[i] < '0' || param[i] > '9' || i >= 3) {
-            // first 2 conditions check if param[i] is a digit
-            // 3rd condition ensures number is <= 100
-            COMMAND_OUTPUT("Invalid argument. Pass in a percentage from 0-100\n");
-            return pdFALSE;
-        }
+    uint32_t percent;
+    sscanf(param, "%lu", &percent);
+    if (percent > 100)
+    {
+        COMMAND_OUTPUT("Invalid argument. Pass in a percent from 0-100\n");
+        return pdFALSE;
     }
-    throttlePercentReading = (float)atoi(param);
-    if (0 == throttlePercentReading) 
+
+    throttlePercentReading = (float)percent;
+    if (percent == 0) 
     {
         COMMAND_OUTPUT("Throttle turned off.\n");
     }
