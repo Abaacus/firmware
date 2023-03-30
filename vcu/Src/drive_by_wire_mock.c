@@ -512,15 +512,15 @@ BaseType_t fakeDriver(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    uint32_t percent;
-    sscanf(param, "%lu", &percent);
+    float percent;
+    sscanf(param, "%f", &percent);
     if (percent > 100)
     {
         COMMAND_OUTPUT("Invalid argument. Pass in a percent from 0-100\n");
         return pdFALSE;
     }
 
-    throttlePercentReading = (float)percent;
+    throttlePercentReading = percent;
     if (percent == 0) 
     {
         COMMAND_OUTPUT("Throttle turned off.\n");
