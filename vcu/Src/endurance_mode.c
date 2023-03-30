@@ -15,13 +15,17 @@
 #define DISCHARGE_CURRENT_MAX_A (30.0f)
 #define DISCHARGE_CURRENT_MIN_A (5.0f)
 #define SATURATION_INTEGRAL_BUFFER (2.0f)
+#define INITIAL_SOC_DEFAULT (0.0f)
+#define NUM_LAPS_DEFAULT (0)
+#define EM_KP_DEFAULT (200.0f)
+#define EM_KI_DEFAULT (0.2f)
 
-static float initial_soc = 0.0f;
-static uint32_t num_laps = 0;
+static float initial_soc = INITIAL_SOC_DEFAULT;
+static uint32_t num_laps = NUM_LAPS_DEFAULT;
 static uint32_t num_laps_to_complete = NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT*(ENDURANCE_MODE_BUFFER);
 static bool in_endurance_mode = false;
-static float em_kP = 200.0f;
-static float em_kI = 0.2f;
+static float em_kP = EM_KP_DEFAULT;
+static float em_kI = EM_KI_DEFAULT;
 extern osThreadId enduranceModeHandle;
 
 void endurance_mode_EM_callback(void)
@@ -154,4 +158,40 @@ void set_em_kP(float em_kP_value)
 void set_em_kI(float em_kI_value)
 {
 	em_kI = em_kI_value;
+}
+
+float get_initial_soc(void)
+{
+	DEBUG_PRINT("Initial_soc: %f (default %f)\n", initial_soc, INITIAL_SOC_DEFAULT);
+	return initial_soc;
+}
+
+uint32_t get_num_laps(void)
+{
+	DEBUG_PRINT("Num_laps: %u (default %u)\n", num_laps, NUM_LAPS_DEFAULT);
+	return num_laps;
+}
+
+uint32_t get_num_laps_complete(void)
+{
+	DEBUG_PRINT("Num_laps_complete: %u (default %u)\n", num_laps_to_complete, NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT);
+	return num_laps_to_complete;
+}
+
+bool get_in_endurance_mode(void)
+{
+	DEBUG_PRINT("In_endurance_mode: %d (default false)\n", in_endurance_mode);
+	return in_endurance_mode;
+}
+
+float get_em_kP(void)
+{
+	DEBUG_PRINT("Em_kP: %f (default %f)\n", em_kP, EM_KP_DEFAULT);
+	return em_kP;
+}
+
+float get_em_kI(void)
+{
+	DEBUG_PRINT("Em_kI: %f (default %f)\n", em_kI, EM_KI_DEFAULT);
+	return em_kI;
 }

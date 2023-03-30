@@ -93,7 +93,7 @@ volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 #define CHARGE_CART_HEARTBEAT_MAX_PERIOD (1000)
 
 /// Default charging current limit (Amps)
-#define CHARGE_DEFAULT_MAX_CURRENT 5
+#define CHARGE_DEFAULT_MAX_CURRENT (5.0f)
 
 /**
  * Period at which cell SoCs are checked to determine which cells to balance.

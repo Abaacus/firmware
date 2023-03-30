@@ -11,6 +11,7 @@
 #include "bsp.h"
 #include "motorController.h"
 #include "beaglebone.h"
+#include "traction_control.h"
 
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
@@ -286,9 +287,6 @@ static const CLI_Command_Definition_t emToggleCommandDefinition =
     0 /* Number of parameters */
 };
 
-extern float tc_kP;
-extern float error_floor;
-extern float adjustment_torque_floor;
 
 BaseType_t setTcKp(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
@@ -298,7 +296,8 @@ BaseType_t setTcKp(char *writeBuffer, size_t writeBufferLength,
 
     float tmpKp = 0.0f;
     sscanf(param, "%f", &tmpKp);
-    tc_kP = tmpKp;
+    set_tc_kP(tmpKp);
+    float tc_kP = get_tc_kP();
 
     COMMAND_OUTPUT("Setting kP %f\n", tc_kP);
     return pdFALSE;
@@ -316,8 +315,10 @@ BaseType_t setErrorFloor(char *writeBuffer, size_t writeBufferLength,
 {
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    float adjustment_torque_floor = get_adjustment_torque_floor();
 
     sscanf(param, "%f", &adjustment_torque_floor);
+    set_adjustment_torque_floor(adjustment_torque_floor);
 
     COMMAND_OUTPUT("setting error floor %f\n", adjustment_torque_floor);
     return pdFALSE;
@@ -335,8 +336,9 @@ BaseType_t setAdjustmentFloor(char *writeBuffer, size_t writeBufferLength,
 {
     BaseType_t paramLen;
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
-
+    float error_floor = get_error_floor();
     sscanf(param, "%f", &error_floor);
+    set_error_floor(error_floor);
 
     COMMAND_OUTPUT("setting error floor %f\n", error_floor);
     return pdFALSE;

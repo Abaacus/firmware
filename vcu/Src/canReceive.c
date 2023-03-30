@@ -202,8 +202,8 @@ void CAN_Msg_SetVariableVCU_Callback()
         case VCU_CAN_CONFIGURED_TORQUE_VECTOR_FACTOR:
             set_torque_vector_factor(VariableValueVCU);
             break;
-        case VCU_CAN_CONFIGURED_MAX_TORQUE_DEMAND_DEFAULT:
-            set_max_torque_demand_default(VariableValueVCU);
+        case VCU_CAN_CONFIGURED_MAX_TORQUE_DEMAND:
+            set_max_torque_demand(VariableValueVCU);
             break;
         default:
             DEBUG_PRINT("VCU variable %llu not supported\r\n", VariableEnumVCU);

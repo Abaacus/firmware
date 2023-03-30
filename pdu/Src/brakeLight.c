@@ -5,7 +5,7 @@
 #include "pdu_can.h"
 #include "debug.h"
 
-#define BRAKE_LIGHT_ON_THRESHOLD_DEFAULT 15
+#define BRAKE_LIGHT_ON_THRESHOLD_DEFAULT (15.0f)
 #define BRAKE_TASK_PERIOD_MS 300
 
 static float brake_light_on_threshold = BRAKE_LIGHT_ON_THRESHOLD_DEFAULT;
@@ -27,4 +27,10 @@ void CAN_Msg_VCU_Data_Callback()
 void setBrakeLightOnThreshold(float brake_light_on_threshold_value)
 {
     brake_light_on_threshold = brake_light_on_threshold_value;
+}
+
+float getBrakeLightOnThreshold(void)
+{
+    DEBUG_PRINT("Brake_light_on_threshold: %f (default %f)\n", brake_light_on_threshold, BRAKE_LIGHT_ON_THRESHOLD_DEFAULT);
+    return brake_light_on_threshold;
 }

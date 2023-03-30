@@ -55,6 +55,12 @@ void set_TC(bool tc_bool)
 	tc_on = tc_bool;
 }
 
+bool get_TC(void)
+{
+	DEBUG_PRINT("TC_ON: %d (default false)\n", tc_on);
+	return tc_on;
+}
+
 static float get_FR_speed()
 {
 	//Value comes from WSB
@@ -81,9 +87,9 @@ static float get_RL_speed()
 	return RPM_TO_RADS(val - MC_ENCODER_OFFSET);
 }
 
-float tc_kP = TC_kP_DEFAULT;
-float error_floor = ERROR_FLOOR_RADS_DEFAULT;
-float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
+static float tc_kP = TC_kP_DEFAULT;
+static float error_floor = ERROR_FLOOR_RADS_DEFAULT;
+static float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
 
 void tractionControlTask(void *pvParameters)
 {
@@ -207,4 +213,22 @@ HAL_StatusTypeDef set_adjustment_torque_floor(float adjustment_torque_floor_valu
 	}
     adjustment_torque_floor = adjustment_torque_floor_value;
 	return HAL_OK;
+}
+
+float get_tc_kP(void)
+{
+	DEBUG_PRINT("TC_kP: %f (default %f)\n", tc_kP, TC_kP_DEFAULT);
+	return tc_kP;
+}
+
+float get_error_floor(void)
+{
+	DEBUG_PRINT("Error_floor: %f (default %f)\n", error_floor, ERROR_FLOOR_RADS_DEFAULT);
+	return error_floor;
+}
+
+float get_adjustment_torque_floor(void)
+{
+	DEBUG_PRINT("Adjusment_torque_floor: %f (default %f)\n", adjustment_torque_floor, ADJUSTMENT_TORQUE_FLOOR_DEFAULT);
+	return adjustment_torque_floor;
 }

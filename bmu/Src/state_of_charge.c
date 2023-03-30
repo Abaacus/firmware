@@ -14,11 +14,13 @@
 #define SOC_HIGH_VOLTAGE_SOC_CUTOFF (0.942f) // Ramp up to around all cells 4V
 #define SOC_LOW_VOLTAGE_SOC_CUTOFF (0.06144f) // Ramp down when all cells around 3V
 
+#define CAPACITY_STARTUP (1.0f)
+
 
 // Units A-s
 static const float TOTAL_CAPACITY = 74700.0f;
 
-static float capacity_startup = 1.0f;
+static float capacity_startup = CAPACITY_STARTUP;
 
 // Units A-s
 static volatile float IBus_integrated = 0.0f;
@@ -174,11 +176,21 @@ HAL_StatusTypeDef setCapacityStartup(float capacity)
 {
 	if(capacity < 0 || capacity > TOTAL_CAPACITY)
 	{
-		ERROR_PRINT("Failed to set startup capacity\n");
 		ERROR_PRINT("New startup capacity value out of range. Should be from 0 to %f\n", TOTAL_CAPACITY);
 		return HAL_ERROR;
 	}
 	capacity_startup = capacity;
 
 	return HAL_OK;
+}
+
+/**
+ * @brief Return the value of startup capacity value
+ *
+ */
+
+float getCapacityStartup(void)
+{
+	DEBUG_PRINT("Capacity_startup: %f (default %f)\n", capacity_startup, CAPACITY_STARTUP);
+	return capacity_startup;
 }

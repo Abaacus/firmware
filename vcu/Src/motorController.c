@@ -378,26 +378,30 @@ void set_torque_vector_factor(float torque_vector_factor_value)
     torque_vector_factor = torque_vector_factor_value;
 }
 
-void set_max_torque_demand_default(float max_torque_demand_default_value){
+void set_max_torque_demand(float max_torque_demand_default_value){
     max_torque_demand = max_torque_demand_default_value;
 }
 
 float get_torque_vector_factor()
 {
+    DEBUG_PRINT("Torque_vector_factor: %f (default %f)\n", torque_vector_factor, TORQUE_VECTOR_FACTOR);
     return torque_vector_factor;
 }
 
 float get_max_torque_demand()
 {
+    DEBUG_PRINT("Max_torque_demand: %f (default %f)\n", max_torque_demand, MAX_TORQUE_DEMAND_DEFAULT);
     return max_torque_demand;
 }
 
 float get_tv_deadzone_end_right()
 {
+    DEBUG_PRINT("Tv_deadzone_end_right: %f (default %f)\n", tv_deadzone_end_right, TV_DEADZONE_END_RIGHT);
     return tv_deadzone_end_right;
 }
 
 float get_tv_deadzone_end_left()
 {
+    DEBUG_PRINT("Tv_deadzone_end_left: %f (default %f)\n", tv_deadzone_end_left, TV_DEADZONE_END_LEFT);
     return tv_deadzone_end_left;
 }

@@ -884,7 +884,6 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
   // Range check, arbitrary max that probable will never need to be changed
   if (maxCurrent <= 0 || maxCurrent >= 100)
   {
-    ERROR_PRINT("Failed to update max charge current\n");
     ERROR_PRINT("New max current value out of range. Range should be from 0 to 100\n");
     return HAL_ERROR;
   }
@@ -906,7 +905,6 @@ HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
     // Range check
     if (cellIR_v < 0.0 || cellIR_v > 0.01)
     {
-        ERROR_PRINT("Failed to update cellIR\n");
         ERROR_PRINT("New cellIR value out of range. Range should be from 0 to 0.01\n");
         return HAL_ERROR;
     }
@@ -921,6 +919,7 @@ HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
 
 float getSeriesCellIR(void)
 {
+    DEBUG_PRINT("SeriesCellIR: %f (default %f)\n", seriesCellIR, SERIES_CELL_IR_DEFAULT);
     return seriesCellIR;
 }
 
@@ -931,6 +930,7 @@ float getSeriesCellIR(void)
  */
 float getMaxChargeCurrent(void)
 {
+    DEBUG_PRINT("MaxChargeCurrent: %f (default %f)\n", maxChargeCurrent, CHARGE_DEFAULT_MAX_CURRENT);
     return maxChargeCurrent;
 }
 

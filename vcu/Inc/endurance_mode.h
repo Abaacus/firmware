@@ -18,5 +18,11 @@ void set_num_laps_complete(uint32_t num_laps_complete_value);
 void set_in_endurance_mode(bool in_endurance_mode_bool);
 void set_em_kP(float em_kP_value);
 void set_em_kI(float em_kI_value);
+float get_initial_soc(void);
+uint32_t get_num_laps(void);
+uint32_t get_num_laps_complete(void);
+bool get_in_endurance_mode(void);
+float get_em_kP(void);
+float get_em_kI(void);
 
 #endif

@@ -44,7 +44,7 @@ HAL_StatusTypeDef setTorqueLimit(float limit);
 HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value);
 HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value);
 void set_torque_vector_factor(float torque_vector_factor_value);
-void set_max_torque_demand_default(float max_torque_demand_default_value);
+void set_max_torque_demand(float max_torque_demand_default_value);
 float get_torque_vector_factor();
 float get_max_torque_demand();
 float get_tv_deadzone_end_right();

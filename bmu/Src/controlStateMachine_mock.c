@@ -1010,7 +1010,7 @@ BaseType_t getCellIRCommand(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     float seriesCellIR = getSeriesCellIR();
-	COMMAND_OUTPUT("AdjustedCellIR: %f (default %f)\n", seriesCellIR, SERIES_CELL_IR_DEFAULT);
+	COMMAND_OUTPUT("SeriesCellIR: %f (default %f)\n", seriesCellIR, SERIES_CELL_IR_DEFAULT);
     return pdFALSE;
 }
 
@@ -1031,9 +1031,12 @@ BaseType_t setCellIRCommand(char *writeBuffer, size_t writeBufferLength,
     float cellIR_v;
     sscanf(newCellIR, "%f", &cellIR_v);
 
-    if (cellIR_v < 0.0 || cellIR_v > 0.01){
+    if (cellIR_v < 0.0 || cellIR_v > 0.01)
+    {
         COMMAND_OUTPUT("invalid cell IR [0,0.01]\r\n");
-    }else{
+    }
+    else
+    {
         setSeriesCellIR(cellIR_v);
     }
 

@@ -6,5 +6,6 @@
 void integrate_bus_current(float IBus, float period_ms);
 HAL_StatusTypeDef socInit(void);
 HAL_StatusTypeDef setCapacityStartup(float capacity);
+float getCapacityStartup(void);
 
 #endif
