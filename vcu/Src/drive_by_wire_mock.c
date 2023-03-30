@@ -11,6 +11,7 @@
 #include "bsp.h"
 #include "motorController.h"
 #include "beaglebone.h"
+#include <stdlib.h>
 
 extern osThreadId driveByWireHandle;
 extern uint32_t brakeThrottleSteeringADCVals[NUM_ADC_CHANNELS];
@@ -504,28 +505,38 @@ static const CLI_Command_Definition_t mcInitCommandDefinition =
 BaseType_t fakeDriver(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
+    if (fsmGetState(&fsmHandle) != STATE_EM_Enable) 
+    {
+        COMMAND_OUTPUT("EM mode disabled. Car must be in EM mode to turn on motors.\n");
+        return pdFALSE;
+    }
     BaseType_t paramLen;
-    const char * toggle = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    if (1 == paramLen && '1' == *toggle) {
-        throttlePercentReading = 80;
-        COMMAND_OUTPUT("Throttle turned on to 80 percent\n");
-        return pdTRUE;
+    for (int i = 0; param[i] != '\0'; ++i) {
+        if (param[i] < '0' || param[i] > '9' || i >= 3) {
+            // first 2 conditions check if param[i] is a digit
+            // 3rd condition ensures number is <= 100
+            COMMAND_OUTPUT("Invalid argument. Pass in a percentage from 0-100\n");
+            return pdFALSE;
+        }
     }
-    if (1 == paramLen && '0' == *toggle) {
-        throttlePercentReading = 0;
-        COMMAND_OUTPUT("Throttle reset to 0");
-        return pdTRUE;
+    throttlePercentReading = (float)atoi(param);
+    if (0 == throttlePercentReading) 
+    {
+        COMMAND_OUTPUT("Throttle turned off.\n");
     }
-
-    ERROR_PRINT ("Invalid argument. Pass in 1 to turn on mode, pass in 0 to turn if off\n");
-    return pdFALSE;
+    else
+    {
+        COMMAND_OUTPUT("Throttle turned on.\n");
+    }
+    return pdTRUE;
 }
 
 static const CLI_Command_Definition_t fakeDriverCommandDefinition =
 {
     "fakeDriver",
-    "fakeDriver <toggle (1/0)>: \r\n  Turns on motors to run down battery\r\n  1: toggle on\r\n  0: toggle off\r\n",
+    "fakeDriver <percentage>: \r\n  Turns on motors to given percentage to run down battery. Pass in \'0\' to stop motor.\r\n",
     fakeDriver,
     1 /* Number of parameters */
 };
