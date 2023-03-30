@@ -116,6 +116,7 @@ void tractionControlTask(void *pvParameters)
 
 	while(1)
 	{
+		max_torque_demand = get_max_torque_demand();
 		torque_max = max_torque_demand;
 
 		FR_speed = get_FR_speed(); 
@@ -206,7 +207,7 @@ HAL_StatusTypeDef set_tc_error_floor(float error_floor_value)
 
 HAL_StatusTypeDef set_adjustment_torque_floor(float adjustment_torque_floor_value)
 {
-	if(adjustment_torque_floor_value < 0 || adjustment_torque_floor_value >30)
+	if(adjustment_torque_floor_value < 0 || adjustment_torque_floor_value > 30)
 	{
 		ERROR_PRINT("Failed to set adjustment_torque_floor value\n The range is from 0 to 30\n");
 		return HAL_ERROR;

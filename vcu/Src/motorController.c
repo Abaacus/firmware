@@ -6,6 +6,7 @@
 #include "string.h"
 #include "inttypes.h"
 #include "drive_by_wire.h"
+#include "brakeAndThrottle.h"
 
 // MC Questions:
 // Do we need to wait to close contactors until MCs are ready?
@@ -353,7 +354,7 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
 
 HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 {
-    if (tv_deadzone_end_right_value < 35 && tv_deadzone_end_right_value > 3660)
+    if (tv_deadzone_end_right_value < STEERING_POT_LOW && tv_deadzone_end_right_value > STEERING_POT_HIGH)
     {
         ERROR_PRINT("Failed to set tv_deadzone_end_right\nValue should be from 35 to 3660\n");
         return HAL_ERROR;
@@ -364,7 +365,7 @@ HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 
 HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
 {
-    if (tv_deadzone_end_left_value < 35 && tv_deadzone_end_left_value > 3660)
+    if (tv_deadzone_end_left_value < STEERING_POT_LOW && tv_deadzone_end_left_value > STEERING_POT_CENTER)
     {
         ERROR_PRINT("Failed to set tv_deadzone_end_left\nValue should be from 35 to 3660\n");
         return HAL_ERROR;
@@ -390,18 +391,18 @@ float get_torque_vector_factor()
 
 float get_max_torque_demand()
 {
-    DEBUG_PRINT("Max_torque_demand: %f (default %f)\n", max_torque_demand, MAX_TORQUE_DEMAND_DEFAULT);
+    DEBUG_PRINT("Max_torque_demand: %f (default %d)\n", max_torque_demand, MAX_TORQUE_DEMAND_DEFAULT);
     return max_torque_demand;
 }
 
 float get_tv_deadzone_end_right()
 {
-    DEBUG_PRINT("Tv_deadzone_end_right: %f (default %f)\n", tv_deadzone_end_right, TV_DEADZONE_END_RIGHT);
+    DEBUG_PRINT("Tv_deadzone_end_right: %f (default %d)\n", tv_deadzone_end_right, TV_DEADZONE_END_RIGHT);
     return tv_deadzone_end_right;
 }
 
 float get_tv_deadzone_end_left()
 {
-    DEBUG_PRINT("Tv_deadzone_end_left: %f (default %f)\n", tv_deadzone_end_left, TV_DEADZONE_END_LEFT);
+    DEBUG_PRINT("Tv_deadzone_end_left: %f (default %d)\n", tv_deadzone_end_left, TV_DEADZONE_END_LEFT);
     return tv_deadzone_end_left;
 }
