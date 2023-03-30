@@ -53,6 +53,7 @@ void toggle_TC(void)
 void set_TC_enabled(bool tc_bool)
 {
 	tc_on = tc_bool;
+	DEBUG_PRINT("Setting tc_on to: %d, the tc_on is now: %d\n", tc_bool, tc_on);
 }
 
 bool get_TC(void)
@@ -191,6 +192,7 @@ HAL_StatusTypeDef set_tc_kP(float tc_kP_value)
 		return HAL_ERROR;
 	}
     tc_kP = tc_kP_value;
+	DEBUG_PRINT("Setting tc_kP to: %f, the tc_kP is now: %f\n", tc_kP_value, tc_kP);
 	return HAL_OK;
 }
 
@@ -202,6 +204,7 @@ HAL_StatusTypeDef set_tc_error_floor(float error_floor_value)
 		return HAL_ERROR;
 	}
     error_floor = error_floor_value;
+	DEBUG_PRINT("Setting error_floor to: %f, the error_floorr is now: %f\n", error_floor_value, error_floor);
 	return HAL_OK;
 }
 
@@ -213,6 +216,7 @@ HAL_StatusTypeDef set_adjustment_torque_floor(float adjustment_torque_floor_valu
 		return HAL_ERROR;
 	}
     adjustment_torque_floor = adjustment_torque_floor_value;
+	DEBUG_PRINT("Setting adjustment_torque_floor to: %f, the adjustment_torque_floor is now: %f\n", adjustment_torque_floor_value, adjustment_torque_floor);
 	return HAL_OK;
 }
 

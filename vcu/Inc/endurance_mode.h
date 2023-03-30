@@ -14,7 +14,7 @@ void trigger_lap(void);
 void toggle_endurance_mode(void);
 HAL_StatusTypeDef set_initial_soc(float initial_soc_value);
 HAL_StatusTypeDef set_num_laps(uint8_t num_laps_value);
-void set_num_laps_complete(uint32_t num_laps_complete_value);
+void set_num_laps_complete(uint8_t num_laps_complete_value);
 void set_in_endurance_mode(bool in_endurance_mode_bool);
 void set_em_kP(float em_kP_value);
 void set_em_kI(float em_kI_value);

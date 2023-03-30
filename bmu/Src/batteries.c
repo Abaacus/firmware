@@ -59,7 +59,7 @@
 extern osThreadId BatteryTaskHandle;
 
 /// Charging current limit
-static float maxChargeCurrent = CHARGE_DEFAULT_MAX_CURRENT;
+static float maxChargeCurrent = CHARGE_MAX_CURRENT_DEFAULT;
 
 static float seriesCellIR = SERIES_CELL_IR_DEFAULT;
 
@@ -887,7 +887,7 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
     ERROR_PRINT("New max current value out of range. Range should be from 0 to 100\n");
     return HAL_ERROR;
   }
-
+  DEBUG_PRINT("Setting maxChargeCurrent to: %f, the maxChargeCurrent is now: %f\n", maxCurrent, maxChargeCurrent);
   maxChargeCurrent = maxCurrent;
 
   return HAL_OK;
@@ -930,7 +930,7 @@ float getSeriesCellIR(void)
  */
 float getMaxChargeCurrent(void)
 {
-    DEBUG_PRINT("MaxChargeCurrent: %f (default %f)\n", maxChargeCurrent, CHARGE_DEFAULT_MAX_CURRENT);
+    DEBUG_PRINT("MaxChargeCurrent: %f (default %f)\n", maxChargeCurrent, CHARGE_MAX_CURRENT_DEFAULT);
     return maxChargeCurrent;
 }
 

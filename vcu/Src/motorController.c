@@ -360,6 +360,7 @@ HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
         return HAL_ERROR;
     }
     tv_deadzone_end_right = tv_deadzone_end_right_value;
+    DEBUG_PRINT("Setting tv_deadzone_end_right to: %f, the tv_deadzone_end_right is now: %f\n", tv_deadzone_end_right_value, tv_deadzone_end_right);
     return HAL_OK;
 }
 
@@ -371,16 +372,19 @@ HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
         return HAL_ERROR;
     }
     tv_deadzone_end_left = tv_deadzone_end_left_value;
+    DEBUG_PRINT("Setting tv_deadzone_end_left to: %f, the tv_deadzone_end_left is now: %f\n", tv_deadzone_end_left_value, tv_deadzone_end_left);
     return HAL_OK;
 }
 
 void set_torque_vector_factor(float torque_vector_factor_value)
 {
     torque_vector_factor = torque_vector_factor_value;
+    DEBUG_PRINT("Setting torque_vector_factor to: %f, the torque_vector_factor is now: %f\n", torque_vector_factor_value, torque_vector_factor);
 }
 
 void set_max_torque_demand(float max_torque_demand_default_value){
     max_torque_demand = max_torque_demand_default_value;
+    DEBUG_PRINT("Setting max_torque_demand to: %f, the max_torque_demand is now: %f\n", max_torque_demand_default_value, max_torque_demand);
 }
 
 float get_torque_vector_factor()

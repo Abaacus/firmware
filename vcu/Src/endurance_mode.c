@@ -21,8 +21,8 @@
 #define EM_KI_DEFAULT (0.2f)
 
 static float initial_soc = INITIAL_SOC_DEFAULT;
-static uint32_t num_laps = NUM_LAPS_DEFAULT;
-static uint32_t num_laps_to_complete = NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT*(ENDURANCE_MODE_BUFFER);
+static uint8_t num_laps = NUM_LAPS_DEFAULT;
+static uint8_t num_laps_to_complete = NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT*(ENDURANCE_MODE_BUFFER);
 static bool in_endurance_mode = false;
 static float em_kP = EM_KP_DEFAULT;
 static float em_kI = EM_KI_DEFAULT;
@@ -138,6 +138,7 @@ HAL_StatusTypeDef set_initial_soc(float initial_soc_value)
 		return HAL_ERROR;
 	}
 	initial_soc = initial_soc_value;
+	DEBUG_PRINT("Setting initial_soc to: %f, the initial_soc is now: %f\n", initial_soc_value, initial_soc);
 	return HAL_OK;
 }
 
@@ -145,31 +146,36 @@ HAL_StatusTypeDef set_num_laps(uint8_t num_laps_value)
 {
 	if(num_laps_value < 0 || num_laps_value > num_laps_to_complete)
 	{
-		ERROR_PRINT("Failed to set num_laps\nValue should be from 0 to %lu\n", num_laps_to_complete);
+		ERROR_PRINT("Failed to set num_laps\nValue should be from 0 to %u\n", num_laps_to_complete);
 		return HAL_ERROR;
 	}
 	num_laps = num_laps_value;
+	DEBUG_PRINT("Setting num_laps to: %u, the num_laps is now: %u\n", num_laps_value, num_laps);
 	return HAL_OK;
 }
 
-void set_num_laps_complete(uint32_t num_laps_complete_value)
+void set_num_laps_complete(uint8_t num_laps_complete_value)
 {
 	num_laps_to_complete = num_laps_complete_value;
+	DEBUG_PRINT("Setting num_laps_to_complete to: %u, the num_laps_to_complete is now: %u\n", num_laps_complete_value, num_laps_to_complete);
 }
 
 void set_in_endurance_mode(bool in_endurance_mode_bool)
 {
 	in_endurance_mode = in_endurance_mode_bool;
+	DEBUG_PRINT("Setting in_endurance_mode to: %d, the initial_soc is now: %d\n", in_endurance_mode_bool, in_endurance_mode);
 }
 
 void set_em_kP(float em_kP_value)
 {
 	em_kP = em_kP_value;
+	DEBUG_PRINT("Setting em_kP to: %f, the em_kP is now: %f\n", em_kP_value, em_kP);
 }
 
 void set_em_kI(float em_kI_value)
 {
 	em_kI = em_kI_value;
+	DEBUG_PRINT("Setting em_kI to: %f, the em_kI is now: %f\n", em_kI_value, em_kI);
 }
 
 float get_initial_soc(void)
@@ -180,13 +186,13 @@ float get_initial_soc(void)
 
 uint32_t get_num_laps(void)
 {
-	DEBUG_PRINT("Num_laps: %lu (default %u)\n", num_laps, NUM_LAPS_DEFAULT);
+	DEBUG_PRINT("Num_laps: %u (default %u)\n", num_laps, NUM_LAPS_DEFAULT);
 	return num_laps;
 }
 
 uint32_t get_num_laps_complete(void)
 {
-	DEBUG_PRINT("Num_laps_complete: %lu (default %u)\n", num_laps_to_complete, NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT);
+	DEBUG_PRINT("Num_laps_complete: %u (default %u)\n", num_laps_to_complete, NUMBER_OF_LAPS_TO_COMPLETE_DEFAULT);
 	return num_laps_to_complete;
 }
 
