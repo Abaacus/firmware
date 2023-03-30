@@ -73,5 +73,5 @@ void CAN_Msg_UartOverCanConfig_Callback()
 }
 
 void CAN_Msg_PDU_DTC_Callback(int16_t DTC_Code, uint8_t DTC_Severity, int64_t DTC_Data) {
-    CAN_Receive_Log_DTC(DTC_CODE, DTC_Severity, DTC_Data);
+    CAN_Receive_Log_DTC(DTC_Code, DTC_Severity, DTC_Data);
 }

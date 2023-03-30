@@ -308,6 +308,7 @@ void canTask(void *pvParameters)
             continue;
         }
 
+        memset(&msg, 0, sizeof(CAN_Message));
         /*DEBUG_PRINT("Got a CAN message\n");*/
 
         if (HAL_CAN_GetTxMailboxesFreeLevel(&CAN_HANDLE) == 0) {
