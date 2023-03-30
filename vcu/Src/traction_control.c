@@ -50,7 +50,7 @@ void toggle_TC(void)
 	tc_on = !tc_on;
 }
 
-void set_TC(bool tc_bool)
+void set_TC_enabled(bool tc_bool)
 {
 	tc_on = tc_bool;
 }
@@ -193,7 +193,7 @@ HAL_StatusTypeDef set_tc_kP(float tc_kP_value)
 	return HAL_OK;
 }
 
-HAL_StatusTypeDef set_error_floor(float error_floor_value)
+HAL_StatusTypeDef set_tc_error_floor(float error_floor_value)
 {
 	if(error_floor_value < 0)
 	{

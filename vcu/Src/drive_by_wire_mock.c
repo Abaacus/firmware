@@ -338,7 +338,7 @@ BaseType_t setAdjustmentFloor(char *writeBuffer, size_t writeBufferLength,
     const char * param = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
     float error_floor = get_error_floor();
     sscanf(param, "%f", &error_floor);
-    set_error_floor(error_floor);
+    set_tc_error_floor(error_floor);
 
     COMMAND_OUTPUT("setting error floor %f\n", error_floor);
     return pdFALSE;

@@ -16,7 +16,7 @@
 #define INVERTER_STOP_TIMEOUT_MS        10000   // TODO: Chose a good value for this
 #define MC_INIT_DISCHARGE_TIME_MS       1000
 
-#define TORQUE_VECTOR_FACTOR            1.0f/120.0f
+#define TORQUE_VECTOR_FACTOR            (0.25f/30.0f)
 
 typedef struct MotorControllerProcanSettings {
     uint64_t InverterCommand;
