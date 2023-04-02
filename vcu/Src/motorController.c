@@ -356,7 +356,7 @@ HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 {
     if (tv_deadzone_end_right_value < STEERING_POT_LOW && tv_deadzone_end_right_value > STEERING_POT_HIGH)
     {
-        ERROR_PRINT("Failed to set tv_deadzone_end_right\nValue should be from 35 to 3660\n");
+        ERROR_PRINT("Failed to set tv_deadzone_end_right\nThe range is [%u, %u]\n", STEERING_POT_LOW, STEERING_POT_HIGH);
         return HAL_ERROR;
     }
     tv_deadzone_end_right = tv_deadzone_end_right_value;
@@ -368,7 +368,7 @@ HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
 {
     if (tv_deadzone_end_left_value < STEERING_POT_LOW && tv_deadzone_end_left_value > STEERING_POT_CENTER)
     {
-        ERROR_PRINT("Failed to set tv_deadzone_end_left\nValue should be from 35 to 3660\n");
+        ERROR_PRINT("Failed to set tv_deadzone_end_left\nThe range is [%u, %d]\n", STEERING_POT_LOW, STEERING_POT_CENTER);
         return HAL_ERROR;
     }
     tv_deadzone_end_left = tv_deadzone_end_left_value;

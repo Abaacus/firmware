@@ -22,8 +22,8 @@
 #define BRAKE_POS_LOW (1117)
 #define BRAKE_POS_HIGH (1410)
 
-#define STEERING_POT_LOW (35) //Pot value when the wheel is all the way to the left
-#define STEERING_POT_HIGH (3660) //Pot value when the wheel is all the way to the right
+#define STEERING_POT_LOW (35U) //Pot value when the wheel is all the way to the left
+#define STEERING_POT_HIGH (3660U) //Pot value when the wheel is all the way to the right
 
 #define STEERING_POT_CENTER (((STEERING_POT_HIGH-STEERING_POT_LOW)/2) + STEERING_POT_LOW) //The pot value while the wheel is neutral
 #define STEERING_SCALE_DIVIDER (STEERING_POT_CENTER/(100)) //Scale the pot value to range (-100,100) 

@@ -134,7 +134,7 @@ HAL_StatusTypeDef set_initial_soc(float initial_soc_value)
 {
 	if(initial_soc_value < 0 || initial_soc_value > 1)
 	{
-		ERROR_PRINT("Failed to set initial_soc\nValue should be from 0 to 1\n");
+		ERROR_PRINT("Failed to set initial_soc\nValue should be [0, 1]]\n");
 		return HAL_ERROR;
 	}
 	initial_soc = initial_soc_value;
@@ -146,7 +146,7 @@ HAL_StatusTypeDef set_num_laps(float num_laps_value)
 {
 	if(num_laps_value < 0 || num_laps_value > num_laps_to_complete)
 	{
-		ERROR_PRINT("Failed to set num_laps\nValue should be from 0 to %u\n", num_laps_to_complete);
+		ERROR_PRINT("Failed to set num_laps\nValue should be [0, %u]\n", num_laps_to_complete);
 		return HAL_ERROR;
 	}
 	num_laps = num_laps_value;

@@ -330,6 +330,7 @@ HAL_StatusTypeDef cliSetIBus(float IBus)
 void cliSetStateBusHVSendPeriod(uint32_t period)
 {
     StateBusHVSendPeriod = period;
+    DEBUG_PRINT("Setting StateBusHVSendPeriod to: %ld, the StateBusHVSendPeriod is now: %ld\n", period, StateBusHVSendPeriod);
 }
 
 /**
@@ -884,7 +885,7 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
   // Range check, arbitrary max that probable will never need to be changed
   if (maxCurrent <= 0 || maxCurrent >= 100)
   {
-    ERROR_PRINT("New max current value out of range. Range should be from 0 to 100\n");
+    ERROR_PRINT("New max current value out of range. Range should be [0, 100]\n");
     return HAL_ERROR;
   }
   DEBUG_PRINT("Setting maxChargeCurrent to: %f, the maxChargeCurrent is now: %f\n", maxCurrent, maxChargeCurrent);
@@ -905,7 +906,7 @@ HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
     // Range check
     if (cellIR_v < 0.0 || cellIR_v > 0.01)
     {
-        ERROR_PRINT("New cellIR value out of range. Range should be from 0 to 0.01\n");
+        ERROR_PRINT("New cellIR value out of range. Range should be [0, 0.01]]\n");
         return HAL_ERROR;
     }
     seriesCellIR = cellIR_v;

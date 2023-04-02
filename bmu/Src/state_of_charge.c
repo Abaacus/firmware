@@ -176,7 +176,7 @@ HAL_StatusTypeDef setCapacityStartup(float capacity)
 {
 	if(capacity < 0 || capacity > TOTAL_CAPACITY)
 	{
-		ERROR_PRINT("New startup capacity value out of range. Should be from 0 to %f\n", TOTAL_CAPACITY);
+		ERROR_PRINT("New startup capacity value out of range. Should be [0, %f]\n", TOTAL_CAPACITY);
 		return HAL_ERROR;
 	}
 	capacity_startup = capacity;
