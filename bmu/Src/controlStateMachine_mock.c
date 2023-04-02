@@ -609,7 +609,11 @@ BaseType_t IMDStatusCommand(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
 #if IS_BOARD_F7
-    COMMAND_OUTPUT("IMD Status %d\n", get_imd_status());
+    IMDStatus_E imdStatus = IMDSTATUS_SNA;
+    if (is_imd_faulted(&imdStatus) == pdFALSE)
+    {
+        COMMAND_OUTPUT("No IMD Fault Detected\r\n");
+    }
 #else
     COMMAND_OUTPUT("IMD Disabled (batt monitoring hardware disabled)\n");
 #endif

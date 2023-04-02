@@ -114,6 +114,7 @@ QueueHandle_t PackVoltageQueue;
  * IMD Task defines and variables
  */
 #define IMD_TASK_PERIOD_MS 1000
+#define IMD_STATUS_PERIOD_MS 10000
 #define IMD_TASK_ID 5
 
 /// Array is used to store the filtered voltages
@@ -409,81 +410,54 @@ void HVMeasureTask(void *pvParamaters)
 void imdTask(void *pvParamaters)
 {
 #if IS_BOARD_F7 && defined(ENABLE_IMD)
-   IMDStatus imdStatus;
+   IMDStatus_E imdStatus = IMDSTATUS_SNA;
 
-   if (begin_imd_measurement() != HAL_OK) {
+    if (begin_imd_measurement() != HAL_OK) {
       ERROR_PRINT("Failed to start IMD measurement\n");
       Error_Handler();
-   }
+    }
 
-   // Wait for IMD to startup
-   DEBUG_PRINT("Waiting for IMD...");
-   do {
-      imdStatus = get_imd_status();
-      vTaskDelay(100);
-   } while (!(imdStatus == IMDSTATUS_Normal || imdStatus == IMDSTATUS_SST_Good));
+    // Wait for IMD to startup
+    DEBUG_PRINT("Waiting for IMD...");
+    while (is_imd_faulted(NULL) == pdTRUE)
+    {
+        vTaskDelay(100);
+    }
 
-   // Notify control fsm that IMD is ready
-   fsmSendEvent(&fsmHandle, EV_IMD_Ready, portMAX_DELAY);
+    DEBUG_PRINT("IMD Ready\r\n");
+    // Notify control fsm that IMD is ready
+    fsmSendEvent(&fsmHandle, EV_IMD_Ready, portMAX_DELAY);
 
-   if (registerTaskToWatch(IMD_TASK_ID, 2*pdMS_TO_TICKS(IMD_TASK_PERIOD_MS), false, NULL) != HAL_OK)
-   {
-     ERROR_PRINT("Failed to register imd task with watchdog!\n");
-     Error_Handler();
-   }
-   TickType_t xLastWakeTime = xTaskGetTickCount();
-   while (1) {
-      imdStatus =  get_imd_status();
+    if (registerTaskToWatch(IMD_TASK_ID, 2*pdMS_TO_TICKS(IMD_TASK_PERIOD_MS), false, NULL) != HAL_OK)
+    {
+        ERROR_PRINT("Failed to register imd task with watchdog!\n");
+        Error_Handler();
+    }
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    TickType_t lastIMDStatusMsg = xTaskGetTickCount();
+    while (1) {
+        if (is_imd_faulted(&imdStatus) == pdTRUE)
+        {
+            sendDTC_FATAL_IMD_Failure(imdStatus);
+            fsmSendEventUrgentISR(&fsmHandle, EV_HV_Fault);
+        }
 
-      switch (imdStatus) {
-         case IMDSTATUS_Normal:
-         case IMDSTATUS_SST_Good:
-            // All good
-            break;
-         case IMDSTATUS_Invalid:
-            ERROR_PRINT_ISR("Invalid IMD measurement\n");
-            break;
-         case IMDSTATUS_Undervoltage:
-            ERROR_PRINT_ISR("IMD Status: Undervoltage\n");
-            sendDTC_FATAL_IMD_Failure(imdStatus);
-            break;
-         case IMDSTATUS_SST_Bad:
-            ERROR_PRINT_ISR("IMD Status: SST_Bad\n");
-            sendDTC_FATAL_IMD_Failure(imdStatus);
-            break;
-         case IMDSTATUS_Device_Error:
-            ERROR_PRINT_ISR("IMD Status: Device Error\n");
-            sendDTC_FATAL_IMD_Failure(imdStatus);
-            break;
-         case IMDSTATUS_Fault_Earth:
-            ERROR_PRINT_ISR("IMD Status: Fault Earth\n");
-            sendDTC_FATAL_IMD_Failure(imdStatus);
-            break;
-         case IMDSTATUS_HV_Short:
-            ERROR_PRINT_ISR("IMD Status: fault hv short\n");
-            sendDTC_FATAL_IMD_Failure(imdStatus);
-            break;
-         default:
-            ERROR_PRINT_ISR("Unkown IMD Status\n");
-            sendDTC_FATAL_IMD_Failure(imdStatus);
-            break;
-      }
+        const TickType_t currentTicks = xTaskGetTickCount();
+        if (portTICK_RATE_MS*(currentTicks - lastIMDStatusMsg) > IMD_STATUS_PERIOD_MS)
+        {
+            publishIMDStatus();
+            lastIMDStatusMsg = currentTicks;
+        }
 
-      if (!(imdStatus == IMDSTATUS_Normal || imdStatus == IMDSTATUS_SST_Good))
-      {
-         // ERROR!!!
-         fsmSendEventUrgentISR(&fsmHandle, EV_HV_Fault);
-      }
-
-      watchdogTaskCheckIn(IMD_TASK_ID);
-      vTaskDelayUntil(&xLastWakeTime, IMD_TASK_PERIOD_MS);
-   }
+        watchdogTaskCheckIn(IMD_TASK_ID);
+        vTaskDelayUntil(&xLastWakeTime, IMD_TASK_PERIOD_MS);
+    }
 #else
-   // Notify control fsm that IMD is ready
-   fsmSendEvent(&fsmHandle, EV_IMD_Ready, portMAX_DELAY);
-   while (1) {
-      vTaskDelay(IMD_TASK_PERIOD_MS);
-   }
+    // Notify control fsm that IMD is ready
+    fsmSendEvent(&fsmHandle, EV_IMD_Ready, portMAX_DELAY);
+    while (1) {
+        vTaskDelay(IMD_TASK_PERIOD_MS);
+    }
 #endif
 }
 
