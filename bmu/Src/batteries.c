@@ -330,7 +330,8 @@ HAL_StatusTypeDef cliSetIBus(float IBus)
 void cliSetStateBusHVSendPeriod(uint32_t period)
 {
     StateBusHVSendPeriod = period;
-    DEBUG_PRINT("Setting StateBusHVSendPeriod to: %ld, the StateBusHVSendPeriod is now: %ld\n", period, StateBusHVSendPeriod);
+    DEBUG_PRINT("Setting StateBusHVSendPeriod to: %ld, the StateBusHVSendPeriod is now: %ld\r\n",
+                 period, StateBusHVSendPeriod);
 }
 
 /**
@@ -885,10 +886,10 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
   // Range check, arbitrary max that probable will never need to be changed
   if (maxCurrent <= 0 || maxCurrent >= 100)
   {
-    ERROR_PRINT("New max current value out of range. Range should be [0, 100]\n");
+    ERROR_PRINT("New max current value out of range. Range should be [0, 100]\r\n");
     return HAL_ERROR;
   }
-  DEBUG_PRINT("Setting maxChargeCurrent to: %f, the maxChargeCurrent is now: %f\n", maxCurrent, maxChargeCurrent);
+  DEBUG_PRINT("Setting maxChargeCurrent to: %f, the maxChargeCurrent is now: %f\r\n", maxCurrent, maxChargeCurrent);
   maxChargeCurrent = maxCurrent;
 
   return HAL_OK;
@@ -899,18 +900,18 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
  *
  * @param cellIR_v: The adjust factor for cell internal resistance
  *
- * @return Return HAL_OK when cellIR is from 0 ~ 0.01, return HAL_ERROR otherwise
+ * @return Return HAL_OK when cellIR_v is from 0 ~ 0.01, return HAL_ERROR otherwise
  */
 HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
 {
     // Range check
     if (cellIR_v < 0.0 || cellIR_v > 0.01)
     {
-        ERROR_PRINT("New cellIR value out of range. Range should be [0, 0.01]]\n");
+        ERROR_PRINT("New cellIR value out of range. Range should be [0, 0.01]]\r\n");
         return HAL_ERROR;
     }
     seriesCellIR = cellIR_v;
-    DEBUG_PRINT("Setting seriesCellIR to: %f, the seriesCellIR is now: %f\n", cellIR_v, seriesCellIR);
+    DEBUG_PRINT("Setting seriesCellIR to: %f, the seriesCellIR is now: %f\r\n", cellIR_v, seriesCellIR);
     return HAL_OK;
 }
 
@@ -921,7 +922,7 @@ HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
 
 float getSeriesCellIR(void)
 {
-    DEBUG_PRINT("SeriesCellIR: %f (default %f)\n", seriesCellIR, SERIES_CELL_IR_DEFAULT);
+    DEBUG_PRINT("SeriesCellIR: %f (default %f)\r\n", seriesCellIR, SERIES_CELL_IR_DEFAULT);
     return seriesCellIR;
 }
 
@@ -932,7 +933,7 @@ float getSeriesCellIR(void)
  */
 float getMaxChargeCurrent(void)
 {
-    DEBUG_PRINT("MaxChargeCurrent: %f (default %f)\n", maxChargeCurrent, CHARGE_MAX_CURRENT_DEFAULT);
+    DEBUG_PRINT("MaxChargeCurrent: %f (default %f)\r\n", maxChargeCurrent, CHARGE_MAX_CURRENT_DEFAULT);
     return maxChargeCurrent;
 }
 

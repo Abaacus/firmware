@@ -53,12 +53,12 @@ void toggle_TC(void)
 void set_TC_enabled(bool tc_bool)
 {
 	tc_on = tc_bool;
-	DEBUG_PRINT("Setting tc_on to: %d, the tc_on is now: %d\n", tc_bool, tc_on);
+	DEBUG_PRINT("Setting tc_on to: %d, the tc_on is now: %d\r\n", tc_bool, tc_on);
 }
 
 bool get_TC(void)
 {
-	DEBUG_PRINT("TC_ON: %d (default false)\n", tc_on);
+	DEBUG_PRINT("TC_ON: %d (default false)\r\n", tc_on);
 	return tc_on;
 }
 
@@ -188,11 +188,11 @@ HAL_StatusTypeDef set_tc_kP(float tc_kP_value)
 {
 	if(tc_kP_value < 0 || tc_kP_value > 1)
 	{
-		ERROR_PRINT("Failed to set tc_kP value\nThe range is [0, 1]]\n");
+		ERROR_PRINT("Failed to set tc_kP value\nThe range is [0, 1]]\r\n");
 		return HAL_ERROR;
 	}
     tc_kP = tc_kP_value;
-	DEBUG_PRINT("Setting tc_kP to: %f, the tc_kP is now: %f\n", tc_kP_value, tc_kP);
+	DEBUG_PRINT("Setting tc_kP to: %f, the tc_kP is now: %f\r\n", tc_kP_value, tc_kP);
 	return HAL_OK;
 }
 
@@ -200,40 +200,39 @@ HAL_StatusTypeDef set_tc_error_floor(float error_floor_value)
 {
 	if(error_floor_value < 0)
 	{
-		ERROR_PRINT("Failed to set error_floor value\nThe range is [0,infinity)\n");
+		ERROR_PRINT("Failed to set error_floor value\nThe range is [0,infinity)\r\n");
 		return HAL_ERROR;
 	}
     error_floor = error_floor_value;
-	DEBUG_PRINT("Setting error_floor to: %f, the error_floorr is now: %f\n", error_floor_value, error_floor);
+	DEBUG_PRINT("Setting error_floor to: %f, the error_floorr is now: %f\r\n", error_floor_value, error_floor);
 	return HAL_OK;
 }
 
 HAL_StatusTypeDef set_adjustment_torque_floor(float adjustment_torque_floor_value)
 {
-	if(adjustment_torque_floor_value < 0 || adjustment_torque_floor_value > 30)
+	if(adjustment_torque_floor_value < 1 || adjustment_torque_floor_value > 30)
 	{
-		ERROR_PRINT("Failed to set adjustment_torque_floor value\n The range is [0, 30]\n");
+		ERROR_PRINT("Failed to set adjustment_torque_floor value\n The range is [1, 30]\r\n");
 		return HAL_ERROR;
 	}
     adjustment_torque_floor = adjustment_torque_floor_value;
-	DEBUG_PRINT("Setting adjustment_torque_floor to: %f, the adjustment_torque_floor is now: %f\n", adjustment_torque_floor_value, adjustment_torque_floor);
+	DEBUG_PRINT("Setting adjustment_torque_floor to: %f, the adjustment_torque_floor is now: %f\r\n", adjustment_torque_floor_value, adjustment_torque_floor);
 	return HAL_OK;
 }
 
 float get_tc_kP(void)
 {
-	DEBUG_PRINT("TC_kP: %f (default %f)\n", tc_kP, TC_kP_DEFAULT);
+	DEBUG_PRINT("TC_kP: %f (default %f)\r\n", tc_kP, TC_kP_DEFAULT);
 	return tc_kP;
 }
 
 float get_error_floor(void)
 {
-	DEBUG_PRINT("Error_floor: %f (default %f)\n", error_floor, ERROR_FLOOR_RADS_DEFAULT);
 	return error_floor;
 }
 
 float get_adjustment_torque_floor(void)
 {
-	DEBUG_PRINT("Adjusment_torque_floor: %f (default %f)\n", adjustment_torque_floor, ADJUSTMENT_TORQUE_FLOOR_DEFAULT);
+	DEBUG_PRINT("Adjusment_torque_floor: %f (default %f)\r\n", adjustment_torque_floor, ADJUSTMENT_TORQUE_FLOOR_DEFAULT);
 	return adjustment_torque_floor;
 }

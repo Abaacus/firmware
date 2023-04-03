@@ -356,11 +356,13 @@ HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 {
     if (tv_deadzone_end_right_value < STEERING_POT_LOW && tv_deadzone_end_right_value > STEERING_POT_HIGH)
     {
-        ERROR_PRINT("Failed to set tv_deadzone_end_right\nThe range is [%u, %u]\n", STEERING_POT_LOW, STEERING_POT_HIGH);
+        ERROR_PRINT("Failed to set tv_deadzone_end_right\nThe range is [%u, %u]\r\n", 
+                    STEERING_POT_LOW, STEERING_POT_HIGH);
         return HAL_ERROR;
     }
     tv_deadzone_end_right = tv_deadzone_end_right_value;
-    DEBUG_PRINT("Setting tv_deadzone_end_right to: %f, the tv_deadzone_end_right is now: %f\n", tv_deadzone_end_right_value, tv_deadzone_end_right);
+    DEBUG_PRINT("Setting tv_deadzone_end_right to: %f, the tv_deadzone_end_right is now: %f\r\n", 
+                tv_deadzone_end_right_value, tv_deadzone_end_right);
     return HAL_OK;
 }
 
@@ -368,28 +370,32 @@ HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
 {
     if (tv_deadzone_end_left_value < STEERING_POT_LOW && tv_deadzone_end_left_value > STEERING_POT_CENTER)
     {
-        ERROR_PRINT("Failed to set tv_deadzone_end_left\nThe range is [%u, %d]\n", STEERING_POT_LOW, STEERING_POT_CENTER);
+        ERROR_PRINT("Failed to set tv_deadzone_end_left\nThe range is [%u, %d]\r\n", 
+                    STEERING_POT_LOW, STEERING_POT_CENTER);
         return HAL_ERROR;
     }
     tv_deadzone_end_left = tv_deadzone_end_left_value;
-    DEBUG_PRINT("Setting tv_deadzone_end_left to: %f, the tv_deadzone_end_left is now: %f\n", tv_deadzone_end_left_value, tv_deadzone_end_left);
+    DEBUG_PRINT("Setting tv_deadzone_end_left to: %f, the tv_deadzone_end_left is now: %f\r\n", 
+                tv_deadzone_end_left_value, tv_deadzone_end_left);
     return HAL_OK;
 }
 
 void set_torque_vector_factor(float torque_vector_factor_value)
 {
     torque_vector_factor = torque_vector_factor_value;
-    DEBUG_PRINT("Setting torque_vector_factor to: %f, the torque_vector_factor is now: %f\n", torque_vector_factor_value, torque_vector_factor);
+    DEBUG_PRINT("Setting torque_vector_factor to: %f, the torque_vector_factor is now: %f\r\n", 
+                torque_vector_factor_value, torque_vector_factor);
 }
 
 void set_max_torque_demand(float max_torque_demand_default_value){
     max_torque_demand = max_torque_demand_default_value;
-    DEBUG_PRINT("Setting max_torque_demand to: %f, the max_torque_demand is now: %f\n", max_torque_demand_default_value, max_torque_demand);
+    DEBUG_PRINT("Setting max_torque_demand to: %f, the max_torque_demand is now: %f\r\n", 
+                max_torque_demand_default_value, max_torque_demand);
 }
 
 float get_torque_vector_factor()
 {
-    DEBUG_PRINT("Torque_vector_factor: %f (default %f)\n", torque_vector_factor, TORQUE_VECTOR_FACTOR);
+    DEBUG_PRINT("Torque_vector_factor: %f (default %f)\r\n", torque_vector_factor, TORQUE_VECTOR_FACTOR);
     return torque_vector_factor;
 }
 
@@ -401,12 +407,12 @@ float get_max_torque_demand()
 
 float get_tv_deadzone_end_right()
 {
-    DEBUG_PRINT("Tv_deadzone_end_right: %f (default %d)\n", tv_deadzone_end_right, TV_DEADZONE_END_RIGHT);
+    DEBUG_PRINT("Tv_deadzone_end_right: %f (default %d)\r\n", tv_deadzone_end_right, TV_DEADZONE_END_RIGHT);
     return tv_deadzone_end_right;
 }
 
 float get_tv_deadzone_end_left()
 {
-    DEBUG_PRINT("Tv_deadzone_end_left: %f (default %d)\n", tv_deadzone_end_left, TV_DEADZONE_END_LEFT);
+    DEBUG_PRINT("Tv_deadzone_end_left: %f (default %d)\r\n", tv_deadzone_end_left, TV_DEADZONE_END_LEFT);
     return tv_deadzone_end_left;
 }

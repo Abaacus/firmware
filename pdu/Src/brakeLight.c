@@ -24,13 +24,20 @@ void CAN_Msg_VCU_Data_Callback()
     }
 }
 
-void setBrakeLightOnThreshold(float brake_light_on_threshold_value)
+HAL_StatusTypeDef setBrakeLightOnThreshold(float brake_light_on_threshold_unit)
 {
-    brake_light_on_threshold = brake_light_on_threshold_value;
+    if(brake_light_on_threshold_unit < 0 || brake_light_on_threshold_unit > 100)
+	{
+		ERROR_PRINT("New brake light on threshhold value out of range. Should be [0, 100]\r\n");
+		return HAL_ERROR;
+	}
+    brake_light_on_threshold = brake_light_on_threshold_unit;
+    DEBUG_PRINT("Setting brake_light_on_threshold to: %f, the brake_light_on_threshold is now: %f\r\n", 
+                brake_light_on_threshold, brake_light_on_threshold);
+	return HAL_OK;
 }
 
 float getBrakeLightOnThreshold(void)
 {
-    DEBUG_PRINT("Brake_light_on_threshold: %f (default %f)\n", brake_light_on_threshold, BRAKE_LIGHT_ON_THRESHOLD_DEFAULT);
     return brake_light_on_threshold;
 }

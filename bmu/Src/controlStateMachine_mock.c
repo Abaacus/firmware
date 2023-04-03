@@ -1028,17 +1028,9 @@ BaseType_t setCellIRCommand(char *writeBuffer, size_t writeBufferLength,
     BaseType_t paramLen;
     const char *newCellIR = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
 
-    float cellIR_v;
+    float cellIR_v = 0;
     sscanf(newCellIR, "%f", &cellIR_v);
-
-    if (cellIR_v < 0.0 || cellIR_v > 0.01)
-    {
-        COMMAND_OUTPUT("invalid cell IR [0,0.01]\r\n");
-    }
-    else
-    {
-        setSeriesCellIR(cellIR_v);
-    }
+    setSeriesCellIR(cellIR_v);
 
     return pdFALSE;
 }
