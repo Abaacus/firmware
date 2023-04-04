@@ -24,6 +24,7 @@ void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
 void DTC_Fatal_Callback(BoardIDs board) {
     DEBUG_PRINT_ISR("DTC Receieved from board %lu \n", board);
     fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
+    eventPDU = FATAL_DTC_EV;
 }
 
 void CAN_Msg_TempMotorRight_Callback() {

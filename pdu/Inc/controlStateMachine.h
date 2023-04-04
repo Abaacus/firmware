@@ -9,7 +9,7 @@ typedef enum Main_PDU_States_t {
     MN_STATE_Boards_On,
     MN_STATE_Warning_Critical,
     MN_STATE_LV_Shutting_Down,
-    MN_STATE_Critical_Failure,
+    MN_STATE_Fatal_Failure,
     MN_STATE_ANY, // Must be the last state
 } Main_PDU_States_t;
 
@@ -24,7 +24,7 @@ char PDU_Main_States_String[][25]={
 typedef enum MAIN_PDU_Events_t {
     MN_EV_Init = 0,
     MN_EV_HV_CriticalFailure,
-    MN_EV_CriticalDelayElapsed,
+    MN_EV_FatalDelayElapsed,
     MN_EV_LV_Cuttoff,
     MN_EV_LV_Shutdown,
     MN_EV_ANY, // Must be the last event

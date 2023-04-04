@@ -6,6 +6,7 @@
 #include "FreeRTOS_CLI.h"
 #include "sensors.h"
 #include "pdu_can.h"
+#include "motorCooling.h"
 
 extern uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
 
@@ -119,6 +120,7 @@ BaseType_t mockCritical(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     fsmSendEvent(&mainFsmHandle, MN_EV_HV_CriticalFailure, portMAX_DELAY);
+    eventPDU = FATAL_DTC_EV;
     return pdFALSE;
 }
 static const CLI_Command_Definition_t criticalCommandDefinition =
@@ -134,6 +136,7 @@ BaseType_t mockLVCuttoff(char *writeBuffer, size_t writeBufferLength,
 {
     COMMAND_OUTPUT("Sending lv cuttoff\n");
     fsmSendEventISR(&mainFsmHandle, MN_EV_LV_Cuttoff);
+    eventPDU = LV_CUTTOFF_EV;
     return pdFALSE;
 }
 static const CLI_Command_Definition_t lvCuttoffCommandDefinition =
@@ -451,48 +454,56 @@ static const CLI_Command_Definition_t controlPumpsCommandDefinition =
     1 /* Number of parameters */
 };
 
-BaseType_t setMotorTempRight(char *writeBuffer, size_t writeBufferLength,
+BaseType_t setAverageMotorTempRight(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     BaseType_t paramLen;
-	const char * motorTempRightParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
-	float motorTempRight = 0;
+	const char * motorTempRightSumParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    const char * numMotorTempSamplesRightParam = FreeRTOS_CLIGetParameter(commandString, 2, &paramLen);
+	float motorTempRightSum = 0;
+    uint32_t motorTempSamplesRight = 0;
 
-    sscanf(motorTempRightParam, "%f", &motorTempRight);
-
-    TempMotorRight = motorTempRight;
+    sscanf(motorTempRightSumParam, "%f", &motorTempRightSum);
+    sscanf(numMotorTempSamplesRightParam, "%ld", &motorTempSamplesRight);
+    
+    tempMotorRightSum = motorTempRightSum;
+    numMotorTempSamplesRight = motorTempSamplesRight;
 
     return pdFALSE;
 }
 
-static const CLI_Command_Definition_t setMotorTempRightDefinition =
+static const CLI_Command_Definition_t setAverageMotorTempRightDefinition =
 {
-    "setMotorTempRight",
-    "setMotorTempRight: \r\n Manually sets the temperature of the right motor\r\n",
-    setMotorTempRight,
-    1 /* Number of parameters*/
+    "setAverageMotorTempRight",
+    "setAverageMotorTempRight: \r\n Manually sets tempMotorRightSum and numMotorTempSamplesRight to set averageTempMotorRight\r\n",
+    setAverageMotorTempRight,
+    2 /* Number of parameters*/
 };
 
-BaseType_t setMotorTempLeft(char *writeBuffer, size_t writeBufferLength,
+BaseType_t setAverageMotorTempLeft(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     BaseType_t paramLen;
-	const char * motorTempLeftParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
-	float motorTempLeft = 0;
+	const char * motorTempLeftSumParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+    const char * numMotorTempSamplesLeftParam = FreeRTOS_CLIGetParameter(commandString, 2, &paramLen);
+	float motorTempLeftSum = 0;
+    uint32_t motorTempSamplesLeft= 0;
 
-    sscanf(motorTempLeftParam, "%f", &motorTempLeft);
-
-    TempMotorLeft = motorTempLeft;
+    sscanf(motorTempLeftSumParam, "%f", &motorTempLeftSum);
+    sscanf(numMotorTempSamplesLeftParam, "%ld", &motorTempSamplesLeft);
+    
+    tempMotorLeftSum = motorTempLeftSum;
+    numMotorTempSamplesLeft = motorTempSamplesLeft;
 
     return pdFALSE;
 }
 
-static const CLI_Command_Definition_t setMotorTempLeftDefinition =
+static const CLI_Command_Definition_t setAverageMotorTempLeftDefinition =
 {
-    "setMotorTempLeft",
-    "setMotorTempLeft: \r\n Manually sets the temperature of the left motor\r\n",
-    setMotorTempLeft,
-    1 /* Number of parameters*/
+    "setAverageMotorTempLeft",
+    "setAverageMotorTempLeft: \r\n Manually sets tempMotorLeftSum and numMotorTempSamplesLeft to set averageTempMotorLeft\r\n",
+    setAverageMotorTempLeft,
+    2 /* Number of parameters*/
 };
 
 HAL_StatusTypeDef mockStateMachineInit()
@@ -545,10 +556,10 @@ HAL_StatusTypeDef mockStateMachineInit()
     if (FreeRTOS_CLIRegisterCommand(&controlFansCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-    if (FreeRTOS_CLIRegisterCommand(&setMotorTempRightDefinition) != pdPASS) {
+    if (FreeRTOS_CLIRegisterCommand(&setAverageMotorTempRightDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-    if (FreeRTOS_CLIRegisterCommand(&setMotorTempLeftDefinition) != pdPASS) {
+    if (FreeRTOS_CLIRegisterCommand(&setAverageMotorTempLeftDefinition) != pdPASS) {
         return HAL_ERROR;
     }
 

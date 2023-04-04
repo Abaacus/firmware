@@ -20,7 +20,7 @@
 FSM_Handle_Struct mainFsmHandle;
 FSM_Handle_Struct motorFsmHandle;
 FSM_Handle_Struct coolingFsmHandle;
-TimerHandle_t criticalDelayTimer;
+TimerHandle_t fatalDelayTimer;
 TimerHandle_t coolingDelayTimer;
 TimerHandle_t lvShutdownDelayTimer;
 
@@ -31,8 +31,8 @@ uint32_t motorsOff(uint32_t event);
 uint32_t motorsOn(uint32_t event);
 uint32_t motorsOffCritical(uint32_t event);
 uint32_t lvCuttoff(uint32_t event);
-uint32_t criticalFailureShutdown(uint32_t event);
-uint32_t criticalFailureWarning(uint32_t event);
+uint32_t fatalFailureShutdown(uint32_t event);
+uint32_t fatalFailureWarning(uint32_t event);
 uint32_t MainDefaultTransition(uint32_t event);
 uint32_t MotorDefaultTransition(uint32_t event);
 uint32_t mainDoNothing(uint32_t event);
@@ -40,7 +40,7 @@ uint32_t motorDoNothing(uint32_t event);
 uint32_t emEnableCooling(uint32_t event);
 uint32_t coolingOn(uint32_t event);
 uint32_t coolingOff(uint32_t event);
-uint32_t coolingCriticalFailure(uint32_t event);
+uint32_t coolingFatalFailure(uint32_t event);
 uint32_t coolingLVCuttoff(uint32_t event);
 uint32_t startLVCuttoffDelay();
 uint32_t lvShutdown(uint32_t event);
@@ -54,12 +54,12 @@ HAL_StatusTypeDef startControl();
 
 Transition_t mainTransitions[] = {
     { MN_STATE_Boards_Off, MN_EV_Init, &runSelftTests },
-    { MN_STATE_Boards_On,  MN_EV_HV_CriticalFailure, &criticalFailureWarning },
-    { MN_STATE_Warning_Critical, MN_EV_CriticalDelayElapsed, &criticalFailureShutdown },
+    { MN_STATE_Boards_On,  MN_EV_HV_CriticalFailure, &fatalFailureWarning },
+    { MN_STATE_Warning_Critical, MN_EV_FatalDelayElapsed, &fatalFailureShutdown },
     { MN_STATE_Boards_On, MN_EV_LV_Cuttoff, &lvCuttoff },
     { MN_STATE_LV_Shutting_Down, MN_EV_LV_Shutdown, &lvShutdown },
     { MN_STATE_LV_Shutting_Down, MN_EV_ANY, &mainDoNothing },
-    { MN_STATE_Critical_Failure, MN_EV_ANY, &mainDoNothing },
+    { MN_STATE_Fatal_Failure, MN_EV_ANY, &mainDoNothing },
     { MN_STATE_Warning_Critical, MN_EV_ANY, &mainDoNothing },
     { MN_STATE_ANY, MN_EV_ANY, &MainDefaultTransition}
 };
@@ -76,22 +76,22 @@ Transition_t motorTransitions[] = {
 };
 
 Transition_t coolingTransitions[] = {
-    { COOL_STATE_OFF, COOL_EV_ENABLE, &emEnableCooling},
-    { COOL_STATE_OFF, COOL_EV_OVERTEMP_WARNING, &coolingOn},
-    { COOL_STATE_WAIT, COOL_EV_OVERTEMP_WARNING, &coolingOn},
-    { COOL_STATE_WAIT, COOL_EV_WAIT_ELAPSED, &coolingOn},
-    { COOL_STATE_WAIT, COOL_EV_DISABLE, &stopCoolingWait},
-    { COOL_STATE_ON, COOL_EV_DISABLE, &coolingOff},
-    { COOL_STATE_OFF, COOL_EV_DISABLE, &coolingDoNothing},
-    { COOL_STATE_ON, COOL_EV_Critical, &coolingCriticalFailure },
-    { COOL_STATE_ON, COOL_EV_ENABLE, &coolingDoNothing },
-    { COOL_STATE_OFF, COOL_EV_Critical, &coolingCriticalFailure },
-    { COOL_STATE_WAIT, COOL_EV_Critical, &coolingCriticalFailure },
-    { COOL_STATE_ANY, COOL_EV_LV_Cuttoff, &coolingLVCuttoff },
-    { COOL_STATE_LV_Cuttoff, COOL_EV_ANY, &coolingDoNothing },
-    { COOL_STATE_HV_CRITICAL, COOL_EV_ANY, &coolingDoNothing },
-    { COOL_STATE_ON, COOL_EV_OVERTEMP_WARNING, &coolingDoNothing },
-    { COOL_STATE_ANY, COOL_EV_ANY, &CoolDefaultTransition}
+    { COOL_STATE_OFF, COOL_EV_ENABLE, &emEnableCooling},        
+    { COOL_STATE_OFF, COOL_EV_OVERTEMP_WARNING, &coolingOn}, 
+    { COOL_STATE_WAIT, COOL_EV_OVERTEMP_WARNING, &coolingOn},   
+    { COOL_STATE_WAIT, COOL_EV_WAIT_ELAPSED, &coolingOn},       
+    { COOL_STATE_WAIT, COOL_EV_DISABLE, &stopCoolingWait},      
+    { COOL_STATE_ON, COOL_EV_DISABLE, &coolingOff},             
+    { COOL_STATE_OFF, COOL_EV_DISABLE, &coolingDoNothing},      
+    { COOL_STATE_ON, COOL_EV_Critical, &coolingFatalFailure }, 
+    { COOL_STATE_ON, COOL_EV_ENABLE, &coolingDoNothing },       
+    { COOL_STATE_OFF, COOL_EV_Critical, &coolingFatalFailure }, 
+    { COOL_STATE_WAIT, COOL_EV_Critical, &coolingFatalFailure }, 
+    { COOL_STATE_ANY, COOL_EV_LV_Cuttoff, &coolingLVCuttoff }, 
+    { COOL_STATE_LV_Cuttoff, COOL_EV_ANY, &coolingDoNothing }, 
+    { COOL_STATE_HV_CRITICAL, COOL_EV_ANY, &coolingDoNothing }, 
+    { COOL_STATE_ON, COOL_EV_OVERTEMP_WARNING, &coolingDoNothing }, 
+    { COOL_STATE_ANY, COOL_EV_ANY, &CoolDefaultTransition}      
 };
 
 
@@ -159,13 +159,13 @@ HAL_StatusTypeDef maincontrolInit()
 {
     FSM_Init_Struct init;
 
-    criticalDelayTimer = xTimerCreate("HV_CRITICAL_DELAY",
+    fatalDelayTimer = xTimerCreate("HV_CRITICAL_DELAY",
                                        pdMS_TO_TICKS(HV_CRITICAL_MAIN_DELAY_TIME_MS),
                                        pdFALSE /* Auto Reload */,
                                        0,
                                        hvCriticalDelayCallback);
 
-    if (criticalDelayTimer == NULL) {
+    if (fatalDelayTimer == NULL) {
         ERROR_PRINT("Failed to create software timer\n");
         return HAL_ERROR;
     }
@@ -267,31 +267,31 @@ HAL_StatusTypeDef startControl()
     return fsmSendEvent(&mainFsmHandle, MN_EV_Init, portMAX_DELAY /* timeout */); // Force run of self checks
 }
 
-uint32_t startCriticalFailureDelay()
+uint32_t startFatalFailureDelay()
 {
-    if (xTimerStart(criticalDelayTimer, 100) != pdPASS) {
-        ERROR_PRINT("Failed to start critical delay timer\n");
-        criticalFailureShutdown(MN_EV_CriticalDelayElapsed);
-        return MN_STATE_Critical_Failure;
+    if (xTimerStart(fatalDelayTimer, 100) != pdPASS) {
+        ERROR_PRINT("Failed to start fatal delay timer\n");
+        fatalFailureShutdown(MN_EV_FatalDelayElapsed);
+        return MN_STATE_Fatal_Failure;
     }
 
     return MN_STATE_Warning_Critical;
 }
 
-uint32_t criticalFailureWarning(uint32_t event)
+uint32_t fatalFailureWarning(uint32_t event)
 {
     DEBUG_PRINT("About to turn boards off!\n");
     sendDTC_FATAL_PDU_HV_Critical();
 
-    return startCriticalFailureDelay();
+    return startFatalFailureDelay();
 }
 
-uint32_t criticalFailureShutdown(uint32_t event)
+uint32_t fatalFailureShutdown(uint32_t event)
 {
-    DEBUG_PRINT("Critical Failure %lu: Boards will remain on\n", event);
+    DEBUG_PRINT("Fatal Failure %lu: Boards will remain on\n", event);
     fsmSendEventUrgent(&motorFsmHandle, MTR_EV_Motor_Critical, 10 /* timeout */);
     fsmSendEventUrgent(&coolingFsmHandle, COOL_EV_Critical, 10 /* timeout */);
-    return MN_STATE_Critical_Failure;
+    return MN_STATE_Fatal_Failure;
 }
 
 uint32_t lvCuttoff(uint32_t event)
@@ -334,7 +334,7 @@ uint32_t MainDefaultTransition(uint32_t event)
 {
     ERROR_PRINT("Main FSM: No transition function registered for state %lu, event %lu\n",
                 fsmGetState(&mainFsmHandle), event);
-    return startCriticalFailureDelay();
+    return startFatalFailureDelay();
 }
 
 uint32_t MotorDefaultTransition(uint32_t event)
@@ -432,16 +432,16 @@ uint32_t mainDoNothing(uint32_t event)
 
 void hvCriticalDelayCallback(TimerHandle_t timer)
 {
-    if (fsmSendEventUrgent(&mainFsmHandle, MN_EV_CriticalDelayElapsed, 10 /* timeout */) != HAL_OK) {
+    if (fsmSendEventUrgent(&mainFsmHandle, MN_EV_FatalDelayElapsed, 10 /* timeout */) != HAL_OK) {
         ERROR_PRINT("Failed to process critical delay elapsed event\n");
-        criticalFailureShutdown(MN_EV_CriticalDelayElapsed);
+        fatalFailureShutdown(MN_EV_FatalDelayElapsed);
     }
 }
 void coolingDelayCallback(TimerHandle_t timer)
 {
     if (fsmSendEvent(&coolingFsmHandle, COOL_EV_WAIT_ELAPSED, 10 /* timeout */) != HAL_OK) {
         ERROR_PRINT("Failed to process cooling delay elapsed event\n");
-        coolingCriticalFailure(COOL_EV_WAIT_ELAPSED);
+        coolingFatalFailure(COOL_EV_WAIT_ELAPSED);
     }
 }
 void lvShutdownDelayCallback(TimerHandle_t timer){
@@ -454,7 +454,7 @@ void lvShutdownDelayCallback(TimerHandle_t timer){
 uint32_t CoolDefaultTransition(uint32_t event) {
     ERROR_PRINT("Cooling FSM: No transition function registered for state %lu, event %lu\n",
                 fsmGetState(&coolingFsmHandle), event);
-    return coolingCriticalFailure(event);
+    return coolingFatalFailure(event);
 }
 
 uint32_t coolingDoNothing(uint32_t event) {
@@ -467,10 +467,10 @@ uint32_t coolingLVCuttoff(uint32_t event) {
     coolingOff(event);
     return COOL_STATE_LV_Cuttoff;
 }
-uint32_t coolingCriticalFailure(uint32_t event) {
+uint32_t coolingFatalFailure(uint32_t event) {
 	coolingOff(event);
     if (fsmGetState(&coolingFsmHandle) != COOL_STATE_HV_CRITICAL) {
-        DEBUG_PRINT("Cooling critical failure\n");
+        DEBUG_PRINT("Cooling fatal failure\n");
         // TODO: What to do here? Should turn off, or leave on cooling
     } else {
         DEBUG_PRINT("Cooling Already critical\n");
