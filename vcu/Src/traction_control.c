@@ -98,8 +98,11 @@ void tractionControlTask(void *pvParameters)
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 
 	//initialized variables so that speed is 0 on startup 
+	SpeedMotorRight = MC_ENCODER_OFFSET;
+	SpeedMotorLeft = MC_ENCODER_OFFSET; 
+
 	wheel_speed_RR_RAD_S = MC_ENCODER_OFFSET;
-	wheel_speed_RL_RAD_S = MC_ENCODER_OFFSET; 
+	wheel_speed_RL_RAD_S = MC_ENCODER_OFFSET;
 
 	while(1)
 	{
