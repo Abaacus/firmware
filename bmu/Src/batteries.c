@@ -45,6 +45,8 @@
 #include "imdDriver.h"
 #endif
 
+#define CHARGE_BALANCE_START_CLEAR_BITS ((1<<CHARGE_START_NOTIFICATION) | (1<<BALANCE_START_NOTIFICATION))
+#define CHARGE_BALANCE_STOP_CLEAR_BITS ((1<<CHARGE_START_NOTIFICATION) | (1<<BATTERY_STOP_NOTIFICATION))
 
 /*
  * Defines to enable/disable different functionality for testing purposes
@@ -1179,7 +1181,6 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
             if (boundedContinue()) { continue; }
         }
 
-
         /*
          * Safety checks for cells
          */
@@ -1201,33 +1202,26 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
                 > pdMS_TO_TICKS(BALANCE_RECHECK_PERIOD_MS))
             {
                 balancingCells = false;
-
-                /*DEBUG_PRINT("Starting balance\n");*/
-                /*DEBUG_PRINT("Voltages:\n");*/
-                /*for (int cell = 0; cell < NUM_VOLTAGE_CELLS; cell++) {*/
-                    /*DEBUG_PRINT("%d: %f,", cell, VoltageCell[cell]);*/
-                /*}*/
-                /*DEBUG_PRINT("\n");*/
-                float minCellSOC = getSOCFromVoltage(VoltageCellMin);
-                float maxCellSOC = getSOCFromVoltage(VoltageCellMax);
-                DEBUG_PRINT("Voltage min %f (SOC %f), max %f (SOC %f)\n\n", VoltageCellMin, minCellSOC, VoltageCellMax, maxCellSOC);
+                DEBUG_PRINT("Voltage min %f, max %f\n\n", VoltageCellMin, VoltageCellMax);
                 for (int cell=0; cell < NUM_VOLTAGE_CELLS; cell++) {
-                    float cellSOC = getSOCFromVoltage(AdjustedVoltageCell[cell]);
                     watchdogTaskCheckIn(BATTERY_TASK_ID);
-                    /*DEBUG_PRINT("Cell %d SOC: %f\n", cell, cellSOC);*/
-
-                    if (cellSOC - minCellSOC > BALANCE_MIN_SOC_DELTA) {
+                    // Compare against adjustedVoltageCell bc thats whats used to set VoltageCellMin
+                    if (AdjustedVoltageCell[cell] - VoltageCellMin > BALANCE_MIN_VOLTAGE_DELTA) {
                         DEBUG_PRINT("Balancing cell %d\n", cell);
 #if IS_BOARD_F7
                         batt_balance_cell(cell);
 #endif
                         balancingCells = true;
                     } else {
-                      DEBUG_PRINT("Not balancing cell %d\n", cell);
 #if IS_BOARD_F7
                       batt_stop_balance_cell(cell);
 #endif
                     }
+                }
+
+                if (balancingCells == false)
+                {
+                    DEBUG_PRINT("Cells are all within %f of the min cell voltage (%f)\n", BALANCE_MIN_VOLTAGE_DELTA, VoltageCellMin);
                 }
 
                 DEBUG_PRINT("\n\n\n");
@@ -1239,7 +1233,6 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
                     return CHARGE_ERROR;
                 }
 #endif
-
                 lastBalanceCheck = xTaskGetTickCount();
             }
         } else {
@@ -1265,11 +1258,10 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
         /*
          * Check if we should stop charge mode
          */
-        BaseType_t rc = xTaskNotifyWait( 0x00, /* Don't clear any notification bits on entry. */
-                         UINT32_MAX, /* Reset the notification value to 0 on exit. */
-                         &dbwTaskNotifications, /* Notified value pass out in
-                                                   dbwTaskNotifications. */
-                         0);                    /* Timeout */
+        BaseType_t rc = xTaskNotifyWait( CHARGE_BALANCE_STOP_CLEAR_BITS, /* Don't clear any notification bits on entry. */
+                                         UINT32_MAX, /* Reset the notification value to 0 on exit. */
+                                         &dbwTaskNotifications, /* Notified value pass out in dbwTaskNotifications. */
+                                         0);                    /* Timeout */
 
         if (rc == pdTRUE) {
             if (dbwTaskNotifications & (1<<BATTERY_STOP_NOTIFICATION)) {
@@ -1379,11 +1371,10 @@ void batteryTask(void *pvParameter)
         /*
          * Check if we should start charging
          */
-        BaseType_t rc = xTaskNotifyWait( 0x00, /* Don't clear any notification bits on entry. */
-                         UINT32_MAX, /* Reset the notification value to 0 on exit. */
-                         &dbwTaskNotifications, /* Notified value pass out in
-                                                   dbwTaskNotifications. */
-                         0);                    /* Timeout */
+        BaseType_t rc = xTaskNotifyWait(CHARGE_BALANCE_START_CLEAR_BITS, 
+                                        UINT32_MAX,             /* Reset the notification value to 0 on exit. */
+                                        &dbwTaskNotifications,  /* Notified value pass out in dbwTaskNotifications. */
+                                        0);                     /* Timeout */
 
         if (rc == pdTRUE) {
             if (dbwTaskNotifications & ((1<<CHARGE_START_NOTIFICATION) | (1<<BALANCE_START_NOTIFICATION))) {
