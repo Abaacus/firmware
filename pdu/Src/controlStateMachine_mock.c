@@ -116,18 +116,18 @@ static const CLI_Command_Definition_t setBusVoltageCommandDefinition =
     1 /* Number of parameters */
 };
 
-BaseType_t mockCritical(char *writeBuffer, size_t writeBufferLength,
+BaseType_t mockFatalDTC(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    fsmSendEvent(&mainFsmHandle, MN_EV_HV_CriticalFailure, portMAX_DELAY);
-    eventPDU = FATAL_DTC_EV;
+    fsmSendEvent(&mainFsmHandle, MN_EV_HV_FatalFailure, portMAX_DELAY);
+    sendCoolingEvent(COOLING_EVENT_FATAL_DTC);
     return pdFALSE;
 }
-static const CLI_Command_Definition_t criticalCommandDefinition =
+static const CLI_Command_Definition_t fatalCommandDefinition =
 {
-    "critical",
-    "critical:\r\n  Generates a HV critical failure event\r\n",
-    mockCritical,
+    "fatal",
+    "fatal:\r\n  Generates a HV fatal failure event\r\n",
+    mockFatalDTC,
     0 /* Number of parameters */
 };
 
@@ -136,7 +136,7 @@ BaseType_t mockLVCuttoff(char *writeBuffer, size_t writeBufferLength,
 {
     COMMAND_OUTPUT("Sending lv cuttoff\n");
     fsmSendEventISR(&mainFsmHandle, MN_EV_LV_Cuttoff);
-    eventPDU = LV_CUTTOFF_EV;
+    sendCoolingEvent(COOLING_EVENT_LV_CUTOFF);
     return pdFALSE;
 }
 static const CLI_Command_Definition_t lvCuttoffCommandDefinition =
@@ -459,15 +459,12 @@ BaseType_t setAverageMotorTempRight(char *writeBuffer, size_t writeBufferLength,
 {
     BaseType_t paramLen;
 	const char * motorTempRightSumParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
-    const char * numMotorTempSamplesRightParam = FreeRTOS_CLIGetParameter(commandString, 2, &paramLen);
 	float motorTempRightSum = 0;
-    uint32_t motorTempSamplesRight = 0;
 
     sscanf(motorTempRightSumParam, "%f", &motorTempRightSum);
-    sscanf(numMotorTempSamplesRightParam, "%ld", &motorTempSamplesRight);
     
     tempMotorRightSum = motorTempRightSum;
-    numMotorTempSamplesRight = motorTempSamplesRight;
+    numMotorTempSamplesRight = 1;
 
     return pdFALSE;
 }
@@ -475,9 +472,9 @@ BaseType_t setAverageMotorTempRight(char *writeBuffer, size_t writeBufferLength,
 static const CLI_Command_Definition_t setAverageMotorTempRightDefinition =
 {
     "setAverageMotorTempRight",
-    "setAverageMotorTempRight: \r\n Manually sets tempMotorRightSum and numMotorTempSamplesRight to set averageTempMotorRight\r\n",
+    "setAverageMotorTempRight: \r\n Manually sets tempMotorRightSum\r\n",
     setAverageMotorTempRight,
-    2 /* Number of parameters*/
+    1 /* Number of parameters*/
 };
 
 BaseType_t setAverageMotorTempLeft(char *writeBuffer, size_t writeBufferLength,
@@ -485,15 +482,12 @@ BaseType_t setAverageMotorTempLeft(char *writeBuffer, size_t writeBufferLength,
 {
     BaseType_t paramLen;
 	const char * motorTempLeftSumParam = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
-    const char * numMotorTempSamplesLeftParam = FreeRTOS_CLIGetParameter(commandString, 2, &paramLen);
 	float motorTempLeftSum = 0;
-    uint32_t motorTempSamplesLeft= 0;
 
     sscanf(motorTempLeftSumParam, "%f", &motorTempLeftSum);
-    sscanf(numMotorTempSamplesLeftParam, "%ld", &motorTempSamplesLeft);
     
     tempMotorLeftSum = motorTempLeftSum;
-    numMotorTempSamplesLeft = motorTempSamplesLeft;
+    numMotorTempSamplesLeft = 1;
 
     return pdFALSE;
 }
@@ -501,9 +495,9 @@ BaseType_t setAverageMotorTempLeft(char *writeBuffer, size_t writeBufferLength,
 static const CLI_Command_Definition_t setAverageMotorTempLeftDefinition =
 {
     "setAverageMotorTempLeft",
-    "setAverageMotorTempLeft: \r\n Manually sets tempMotorLeftSum and numMotorTempSamplesLeft to set averageTempMotorLeft\r\n",
+    "setAverageMotorTempLeft: \r\n Manually sets tempMotorLeftSum \r\n",
     setAverageMotorTempLeft,
-    2 /* Number of parameters*/
+    1 /* Number of parameters*/
 };
 
 HAL_StatusTypeDef mockStateMachineInit()
@@ -511,7 +505,7 @@ HAL_StatusTypeDef mockStateMachineInit()
     if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-    if (FreeRTOS_CLIRegisterCommand(&criticalCommandDefinition) != pdPASS) {
+    if (FreeRTOS_CLIRegisterCommand(&fatalCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&lvCuttoffCommandDefinition) != pdPASS) {

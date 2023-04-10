@@ -17,14 +17,14 @@ void CAN_Msg_VCU_EM_Power_State_Request_Callback() {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_ENABLE);
     } else {
         fsmSendEventISR(&motorFsmHandle, MTR_EV_EM_DISABLE);
-        fsmSendEventISR(&coolingFsmHandle, COOL_EV_DISABLE);
+        sendCoolingEvent(COOLING_EVENT_DISABLE);
     }
 }
 
 void DTC_Fatal_Callback(BoardIDs board) {
     DEBUG_PRINT_ISR("DTC Receieved from board %lu \n", board);
-    fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_CriticalFailure);
-    eventPDU = FATAL_DTC_EV;
+    fsmSendEventUrgentISR(&mainFsmHandle, MN_EV_HV_FatalFailure);
+    sendCoolingEvent(COOLING_EVENT_FATAL_DTC);
 }
 
 void CAN_Msg_TempMotorRight_Callback() {

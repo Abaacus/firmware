@@ -11,6 +11,7 @@
 #include "pdu_can.h"
 #include "watchdog.h"
 #include "pdu_dtc.h"
+#include "motorCooling.h"
 
 volatile bool DC_DC_state = false;
 
@@ -37,9 +38,8 @@ void powerTask(void *pvParameters)
             }
             else
             {
-                if(fsmGetState(&coolingFsmHandle) == COOL_STATE_ON){
-                    fsmSendEvent(&motorFsmHandle, COOL_EV_DISABLE, portMAX_DELAY);
-                }
+                sendCoolingEvent(COOLING_EVENT_DISABLE);
+
                 if(fsmGetState(&motorFsmHandle) == MTR_STATE_EM_Enable){
                     fsmSendEvent(&motorFsmHandle, MTR_EV_EM_DISABLE, portMAX_DELAY);
                 }

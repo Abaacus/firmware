@@ -23,7 +23,7 @@ char PDU_Main_States_String[][25]={
 
 typedef enum MAIN_PDU_Events_t {
     MN_EV_Init = 0,
-    MN_EV_HV_CriticalFailure,
+    MN_EV_HV_FatalFailure,
     MN_EV_FatalDelayElapsed,
     MN_EV_LV_Cuttoff,
     MN_EV_LV_Shutdown,

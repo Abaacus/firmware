@@ -54,7 +54,7 @@ HAL_StatusTypeDef startControl();
 
 Transition_t mainTransitions[] = {
     { MN_STATE_Boards_Off, MN_EV_Init, &runSelftTests },
-    { MN_STATE_Boards_On,  MN_EV_HV_CriticalFailure, &fatalFailureWarning },
+    { MN_STATE_Boards_On,  MN_EV_HV_FatalFailure, &fatalFailureWarning },
     { MN_STATE_Warning_Critical, MN_EV_FatalDelayElapsed, &fatalFailureShutdown },
     { MN_STATE_Boards_On, MN_EV_LV_Cuttoff, &lvCuttoff },
     { MN_STATE_LV_Shutting_Down, MN_EV_LV_Shutdown, &lvShutdown },
@@ -74,26 +74,6 @@ Transition_t motorTransitions[] = {
     { MTR_STATE_EM_Enable, MTR_EV_EM_ENABLE, &motorsOn },
     { MTR_STATE_ANY, MTR_EV_ANY, &MotorDefaultTransition}
 };
-
-Transition_t coolingTransitions[] = {
-    { COOL_STATE_OFF, COOL_EV_ENABLE, &emEnableCooling},        
-    { COOL_STATE_OFF, COOL_EV_OVERTEMP_WARNING, &coolingOn}, 
-    { COOL_STATE_WAIT, COOL_EV_OVERTEMP_WARNING, &coolingOn},   
-    { COOL_STATE_WAIT, COOL_EV_WAIT_ELAPSED, &coolingOn},       
-    { COOL_STATE_WAIT, COOL_EV_DISABLE, &stopCoolingWait},      
-    { COOL_STATE_ON, COOL_EV_DISABLE, &coolingOff},             
-    { COOL_STATE_OFF, COOL_EV_DISABLE, &coolingDoNothing},      
-    { COOL_STATE_ON, COOL_EV_Critical, &coolingFatalFailure }, 
-    { COOL_STATE_ON, COOL_EV_ENABLE, &coolingDoNothing },       
-    { COOL_STATE_OFF, COOL_EV_Critical, &coolingFatalFailure }, 
-    { COOL_STATE_WAIT, COOL_EV_Critical, &coolingFatalFailure }, 
-    { COOL_STATE_ANY, COOL_EV_LV_Cuttoff, &coolingLVCuttoff }, 
-    { COOL_STATE_LV_Cuttoff, COOL_EV_ANY, &coolingDoNothing }, 
-    { COOL_STATE_HV_CRITICAL, COOL_EV_ANY, &coolingDoNothing }, 
-    { COOL_STATE_ON, COOL_EV_OVERTEMP_WARNING, &coolingDoNothing }, 
-    { COOL_STATE_ANY, COOL_EV_ANY, &CoolDefaultTransition}      
-};
-
 
 HAL_StatusTypeDef motorControlInit()
 {
@@ -117,41 +97,6 @@ HAL_StatusTypeDef motorControlInit()
     }
 
     DEBUG_PRINT("Init motor control\n");
-    return HAL_OK;
-}
-
-HAL_StatusTypeDef coolingControlInit()
-{
-    FSM_Init_Struct init;
-
-    coolingDelayTimer = xTimerCreate("COOLING_DELAY",
-                                       pdMS_TO_TICKS(COOLING_DELAY_TIME_MS),
-                                       pdFALSE /* Auto Reload */,
-                                       0,
-                                       coolingDelayCallback);
-    if (coolingDelayTimer == NULL) {
-        ERROR_PRINT("Failed to create software timer\n");
-        return HAL_ERROR;
-    }
-
-    init.maxStateNum = COOL_STATE_ANY;
-    init.maxEventNum = COOL_EV_ANY;
-    init.sizeofEventEnumType = sizeof(CoolingControl_PDU_Events_t);
-    init.ST_ANY = COOL_STATE_ANY;
-    init.EV_ANY = COOL_EV_ANY;
-    init.transitions = coolingTransitions;
-    init.transitionTableLength = TRANS_COUNT(coolingTransitions);
-    init.eventQueueLength = 5;
-    init.watchdogTaskId = 2;
-    if (fsmInit(COOL_STATE_OFF, &init, &coolingFsmHandle) != HAL_OK) {
-        return HAL_ERROR;
-    }
-
-    if (registerTaskToWatch(2, 50, true, &coolingFsmHandle) != HAL_OK) {
-        return HAL_ERROR;
-    }
-
-    DEBUG_PRINT("Init cooling control\n");
     return HAL_OK;
 }
 
@@ -212,10 +157,10 @@ HAL_StatusTypeDef initStateMachines()
         return HAL_ERROR;
     }
 
-    if (coolingControlInit() != HAL_OK) {
-        ERROR_PRINT("Failed to init cooling control fsm\n");
-        return HAL_ERROR;
-    }
+    //if (coolingControlInit() != HAL_OK) {
+    //    ERROR_PRINT("Failed to init cooling control fsm\n");
+    //    return HAL_ERROR;
+    //}
 
     return HAL_OK;
 }
