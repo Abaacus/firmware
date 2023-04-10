@@ -1564,7 +1564,7 @@ void canSendCellTask(void *pvParameters)
     if (sendOneCellVoltAndTemp) {
       // The cell index for sending should be a multiple of 3, as the cells are
       // sent in groups of 3
-      cellIdxToSend = cellToSend - (cellToSend % 3);
+      cellIdxToSend = cellToSend - (cellToSend % CAN_TX_CELL_GROUP_LEN);
     }
 
     sendCAN_BMU_CellVoltage(cellIdxToSend);
@@ -1573,8 +1573,11 @@ void canSendCellTask(void *pvParameters)
 
     // Move on to next cells
     // 3 Cells per CAN message
-    cellIdxToSend += 3;
-    cellIdxToSend = cellIdxToSend % NUM_VOLTAGE_CELLS;
+    cellIdxToSend += CAN_TX_CELL_GROUP_LEN;
+    if(cellIdxToSend >= NUM_VOLTAGE_CELLS)
+	{
+		cellIdxToSend = 0;
+	}
 
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
   }
