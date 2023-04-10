@@ -89,6 +89,7 @@ osThreadId SensorHandle;
 osThreadId watchdogTaskNamHandle;
 osThreadId powerHandle;
 osThreadId canSendTaskHandle;
+osThreadId canPublishHandle;
 osThreadId motorCoolingHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,6 +107,7 @@ extern void sensorTask(void const * argument);
 extern void watchdogTask(void const * argument);
 extern void powerTask(void const * argument);
 extern void canTask(void const * argument);
+extern void canPublishTask(void const * argument);
 extern void motorCoolingTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -235,6 +237,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of canSendTask */
   osThreadDef(canSendTask, canTask, osPriorityRealtime, 0, 1000);
   canSendTaskHandle = osThreadCreate(osThread(canSendTask), NULL);
+
+  /* definition and creation of canPublish */
+  osThreadDef(canPublish, canPublishTask, osPriorityLow, 0, 1000);
+  canPublishHandle = osThreadCreate(osThread(canPublish), NULL);
 
   /* definition and creation of motorCooling */
   osThreadDef(motorCooling, motorCoolingTask, osPriorityIdle, 0, 1000);
