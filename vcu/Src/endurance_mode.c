@@ -130,8 +130,14 @@ void enduranceModeTask(void *pvParameters)
 
 }
 
+#define INITIAL_SOC_VALUE_BASE (0.001f)
+#define NUM_LAPS_BASE (0.001f)
+#define EM_KP_BASE (0.001f)
+#define EM_KI_BASE (0.001f)
+
 HAL_StatusTypeDef set_initial_soc(float initial_soc_value)
 {
+	initial_soc_value *= INITIAL_SOC_VALUE_BASE;
 	if(initial_soc_value < 0 || initial_soc_value > 100)
 	{
 		ERROR_PRINT("Failed to set initial_soc\nValue should be [0, 100]\r\n");
@@ -144,6 +150,7 @@ HAL_StatusTypeDef set_initial_soc(float initial_soc_value)
 
 HAL_StatusTypeDef set_num_laps(float num_laps_value)
 {
+	num_laps_value *= NUM_LAPS_BASE;
 	if(num_laps_value < 0 || num_laps_value > num_laps_to_complete)
 	{
 		ERROR_PRINT("Failed to set num_laps\nValue should be [0, %u]\r\n", num_laps_to_complete);
@@ -170,12 +177,14 @@ void set_in_endurance_mode(bool in_endurance_mode_bool)
 
 void set_em_kP(float em_kP_value)
 {
+	em_kP_value *= EM_KP_BASE;
 	em_kP = em_kP_value;
 	DEBUG_PRINT("Setting em_kP to: %f, the em_kP is now: %f\r\n", em_kP_value, em_kP);
 }
 
 void set_em_kI(float em_kI_value)
 {
+	em_kI_value *= EM_KI_BASE;
 	em_kI = em_kI_value;
 	DEBUG_PRINT("Setting em_kI to: %f, the em_kI is now: %f\r\n", em_kI_value, em_kI);
 }

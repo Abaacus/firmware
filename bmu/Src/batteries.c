@@ -307,6 +307,8 @@ HAL_StatusTypeDef cliSetVBus(float VBus)
    return HAL_OK;
 }
 
+#define IBUS_BASE (0.001f)
+
 /**
  * @brief For nucleo testing, allows setting a dummy value for the IBus
  * reading
@@ -317,9 +319,10 @@ HAL_StatusTypeDef cliSetVBus(float VBus)
  */
 HAL_StatusTypeDef cliSetIBus(float IBus)
 {
-   xQueueOverwrite(IBusQueue, &IBus);
+    IBus *= IBUS_BASE;
+    xQueueOverwrite(IBusQueue, &IBus);
 
-   return HAL_OK;
+    return HAL_OK;
 }
 
 /**
@@ -873,6 +876,8 @@ HAL_StatusTypeDef initPackVoltageQueue()
    return HAL_OK;
 }
 
+#define MAX_CHARGE_CURRENT_BASE (0.001f)
+#define SERTIES_CELL_IR_BASE (0.001f)
 
 /**
  * @brief Sets the maximum current for the charger
@@ -883,16 +888,17 @@ HAL_StatusTypeDef initPackVoltageQueue()
  */
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
 {
-  // Range check, arbitrary max that probable will never need to be changed
-  if (maxCurrent <= 0 || maxCurrent >= 100)
-  {
+    maxCurrent *= MAX_CHARGE_CURRENT_BASE;
+    // Range check, arbitrary max that probable will never need to be changed
+    if (maxCurrent <= 0 || maxCurrent >= 100)
+    {
     ERROR_PRINT("New max current value out of range. Range should be [0, 100]\r\n");
     return HAL_ERROR;
-  }
-  DEBUG_PRINT("Setting maxChargeCurrent to: %f, the maxChargeCurrent is now: %f\r\n", maxCurrent, maxChargeCurrent);
-  maxChargeCurrent = maxCurrent;
+    }
+    maxChargeCurrent = maxCurrent;
+    DEBUG_PRINT("Setting maxChargeCurrent to: %f, the maxChargeCurrent is now: %f\r\n", maxCurrent, maxChargeCurrent);
 
-  return HAL_OK;
+    return HAL_OK;
 }
 
 /**
@@ -904,6 +910,7 @@ HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent)
  */
 HAL_StatusTypeDef setSeriesCellIR(float cellIR_v)
 {
+    cellIR_v *= SERTIES_CELL_IR_BASE;
     // Range check
     if (cellIR_v < 0.0 || cellIR_v > 0.01)
     {

@@ -352,8 +352,14 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
     return HAL_OK;
 }
 
+#define TV_DEADZONE_END_RIGHT_BASE (0.001f)
+#define TV_DEADZONE_END_LEFT_BASE (0.001f)
+#define TORQUE_VECTOR_FACTOR_BASE (0.001f)
+#define MAX_TORQUE_DEMAND_BASE (0.001f)
+
 HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 {
+    tv_deadzone_end_right_value *= TV_DEADZONE_END_RIGHT_BASE;
     if (tv_deadzone_end_right_value < STEERING_POT_LOW && tv_deadzone_end_right_value > STEERING_POT_HIGH)
     {
         ERROR_PRINT("Failed to set tv_deadzone_end_right\nThe range is [%u, %u]\r\n", 
@@ -368,6 +374,7 @@ HAL_StatusTypeDef set_tv_deadzone_end_right(float tv_deadzone_end_right_value)
 
 HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
 {
+    tv_deadzone_end_left_value *= TV_DEADZONE_END_LEFT_BASE;
     if (tv_deadzone_end_left_value < STEERING_POT_LOW && tv_deadzone_end_left_value > STEERING_POT_CENTER)
     {
         ERROR_PRINT("Failed to set tv_deadzone_end_left\nThe range is [%u, %d]\r\n", 
@@ -382,12 +389,14 @@ HAL_StatusTypeDef set_tv_deadzone_end_left(float tv_deadzone_end_left_value)
 
 void set_torque_vector_factor(float torque_vector_factor_value)
 {
+    torque_vector_factor_value *= TORQUE_VECTOR_FACTOR_BASE;
     torque_vector_factor = torque_vector_factor_value;
     DEBUG_PRINT("Setting torque_vector_factor to: %f, the torque_vector_factor is now: %f\r\n", 
                 torque_vector_factor_value, torque_vector_factor);
 }
 
 void set_max_torque_demand(float max_torque_demand_default_value){
+    max_torque_demand_default_value *= MAX_TORQUE_DEMAND_BASE;
     max_torque_demand = max_torque_demand_default_value;
     DEBUG_PRINT("Setting max_torque_demand to: %f, the max_torque_demand is now: %f\r\n", 
                 max_torque_demand_default_value, max_torque_demand);

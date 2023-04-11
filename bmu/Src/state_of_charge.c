@@ -165,6 +165,8 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
 	return ret;
 }
 
+#define CAPACITY_STARTUP_BASE (0.001f)
+
 /**
  * @brief Set startup capacity value
  *
@@ -174,6 +176,7 @@ static HAL_StatusTypeDef getSegmentVoltage(float *segmentVoltage)
  */
 HAL_StatusTypeDef setCapacityStartup(float capacity)
 {
+	capacity *= CAPACITY_STARTUP_BASE;
 	if(capacity < 0 || capacity > TOTAL_CAPACITY)
 	{
 		ERROR_PRINT("New startup capacity value out of range. Should be [0, %f]\r\n", TOTAL_CAPACITY);

@@ -184,8 +184,13 @@ void tractionControlTask(void *pvParameters)
 
 }
 
+#define TC_KP_BASE (0.001f)
+#define TC_ERROR_FLOOR_BASE (0.001f)
+#define ADJUSTMENT_TORQUE_FLOOR_BASE (0.001f)
+
 HAL_StatusTypeDef set_tc_kP(float tc_kP_value)
 {
+	tc_kP_value *= TC_KP_BASE;
 	if(tc_kP_value < 0 || tc_kP_value > 1)
 	{
 		ERROR_PRINT("Failed to set tc_kP value\nThe range is [0, 1]]\r\n");
@@ -198,6 +203,7 @@ HAL_StatusTypeDef set_tc_kP(float tc_kP_value)
 
 HAL_StatusTypeDef set_tc_error_floor(float error_floor_value)
 {
+	error_floor_value *= TC_ERROR_FLOOR_BASE;
 	if(error_floor_value < 0)
 	{
 		ERROR_PRINT("Failed to set error_floor value\nThe range is [0,infinity)\r\n");
@@ -210,6 +216,7 @@ HAL_StatusTypeDef set_tc_error_floor(float error_floor_value)
 
 HAL_StatusTypeDef set_adjustment_torque_floor(float adjustment_torque_floor_value)
 {
+	adjustment_torque_floor_value *= ADJUSTMENT_TORQUE_FLOOR_BASE;
 	if(adjustment_torque_floor_value < 1 || adjustment_torque_floor_value > 30)
 	{
 		ERROR_PRINT("Failed to set adjustment_torque_floor value\n The range is [1, 30]\r\n");
