@@ -66,19 +66,19 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
 BO_ 2215248396 SetVariableVCU: 8 VCU_BeagleBone
- SG_ VariableValueVCU : 16|32@1+ (0.0001,-214748.3648) [-214748.3648|214748.3647] ""  VCU_F7
+ SG_ VariableValueVCU : 16|32@1- (1,0) [-2147483648|2147483647] ""  VCU_F7
  SG_ VariableEnumVCU : 0|8@1+ (1,0) [0|0] ""  VCU_F7
 
 BO_ 2215248652 SetVariablePDU: 8 VCU_BeagleBone
- SG_ VariableValuePDU : 8|32@1+ (0.0001,-214748.3648) [-214748.3648|214748.3647] ""  PDU
+ SG_ VariableValuePDU : 8|32@1- (1,0) [-2147483648|2147483647] ""  PDU
  SG_ VariableEnumPDU : 0|8@1+ (1,0) [0|0] ""  PDU
 
 BO_ 2215248140 SetVariableBMU: 8 VCU_BeagleBone
- SG_ VariableValueBMU : 16|32@1+ (0.0001,-214748.3648) [-214748.3648|214748.3647] ""  BMU
+ SG_ VariableValueBMU : 16|32@1- (1,0) [-2147483648|2147483647] ""  BMU
  SG_ VariableEnumBMU : 0|8@1+ (1,0) [0|0] ""  BMU
 
 BO_ 2215249676 SetVariableDCU: 8 VCU_BeagleBone
- SG_ VariableValueDCU : 16|32@1+ (0.0001,-214748.3648) [-214748.3648|214748.3647] ""  DCU
+ SG_ VariableValueDCU : 16|32@1- (1,0) [-2147483648|2147483647] ""  DCU
  SG_ VariableEnumDCU : 0|8@1+ (1,0) [0|0] ""  DCU
 
 BO_ 2287471618 SpeedMotorKPH: 8 VCU_F7
