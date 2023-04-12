@@ -15,6 +15,7 @@
 
 #include "endurance_mode.h"
 #include "traction_control.h"
+#include "motorController.h"
 
 /*
  * External Board Statuses:

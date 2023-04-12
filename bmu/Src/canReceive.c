@@ -8,6 +8,7 @@
   *****************************************************************************
   */
 
+#include "batteries.h"
 #include "canReceive.h"
 
 #include "userCan.h"
@@ -16,6 +17,7 @@
 #include "boardTypes.h"
 
 #include "controlStateMachine.h"
+#include "state_of_charge.h"
 
 #include "bmu_can.h"
 
