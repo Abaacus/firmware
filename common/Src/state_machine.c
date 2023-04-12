@@ -117,7 +117,7 @@ HAL_StatusTypeDef fsmProcessEvent(FSM_Handle_Struct *handle, uint32_t event)
     if (event > handle->init.maxEventNum) {
         ERROR_PRINT("FSM: Event out of range\n");
         return HAL_ERROR;
-    }
+    } 
 
     for (i = 0; i < handle->init.transitionTableLength; i++) {
         if ((current_state == trans[i].st) || (handle->init.ST_ANY == trans[i].st)) {

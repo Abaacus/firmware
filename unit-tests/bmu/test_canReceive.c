@@ -1,5 +1,8 @@
 #include "unity.h"
 
+#include "batteries.h"
+#include "state_of_charge.h"
+#include "ltc_chip.h"
 
 #include "canReceive.h"
 

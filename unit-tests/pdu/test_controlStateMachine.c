@@ -25,6 +25,8 @@
 #include "Mock_watchdog.h"
 #include "Mock_canHeartbeat.h"
 
+#include "gpio_ports.h"
+
 
 
 void setUp(void)
@@ -41,5 +43,19 @@ void test_simple_fsm(void)
 {
 
 }
+
+void test_motorControlInit(void)
+{
+	// TEST_ASSERT_TRUE(motorControlInit() == HAL_OK);
+	// MotorControlInit_ExpectAndReturn(HAL_OK); 
+    // TEST_ASSERT_TRUE(tfsmGetState(&motorFsmHandle) == MTR_STATE_Motors_Off);
+	fsmInit_ExpectAndReturn(MTR_STATE_Motors_Off, &init, &motorFsmHandle, HAL_OK);
+	registerTaskToWatch_ExpectAndReturn(3, 50, true, &motorFsmHandle, HAL_OK);
+
+    // motorControlInit();
+}
+
+
+
 
 
