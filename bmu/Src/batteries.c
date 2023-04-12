@@ -137,6 +137,11 @@ extern osThreadId stateOfChargeHandle;
  */
 #define IBUS_FILTER_ALPHA 0.24
 
+
+// Filter constant for Filtered Cell Voltages
+// Designed for 75 ms sample period and 1 Hz cutoff
+#define CELL_FILTER_ALPHA 0.32 
+
 /**
  * @brief Low pass filters the HV Bus current measurement
  * @param[in] IBus the measured HV Bus current
@@ -526,12 +531,22 @@ HAL_StatusTypeDef readCellVoltagesAndTemps()
  * */
 void enterAdjustedCellVoltages(void)
 {
+	static bool filter = false;
 	float bus_current_A;
 	getIBus(&bus_current_A);
 	for (int cell = 0; cell < NUM_VOLTAGE_CELLS; cell++)
 	{
-		AdjustedVoltageCell[cell] = VoltageCell[cell] + (bus_current_A * adjustedCellIR);
+		float adjusted_cell_v = VoltageCell[cell] + (bus_current_A * adjustedCellIR);
+		if(filter)
+		{
+			AdjustedVoltageCell[cell] = CELL_FILTER_ALPHA*adjusted_cell_v + (1-CELL_FILTER_ALPHA)*AdjustedVoltageCell[cell];
+		}
+		else
+		{
+			AdjustedVoltageCell[cell] = adjusted_cell_v;
+		}
 	}
+	filter = true;
 }
 /**
  * @brief This functions sets all cell voltages and temps to known values.
@@ -1372,6 +1387,8 @@ void batteryTask(void *pvParameter)
         Error_Handler();
     }
 
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+
     float packVoltage;
     uint32_t dbwTaskNotifications;
     while (1)
@@ -1513,7 +1530,7 @@ void batteryTask(void *pvParameter)
          * this */
 		
         watchdogTaskCheckIn(BATTERY_TASK_ID);
-        vTaskDelay(pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS));
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS));
     }
 }
 
