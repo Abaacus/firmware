@@ -24,7 +24,7 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define RPM_TO_RADS(rpm) ((rpm)*2*PI/60.0f)
 
 // Macros for converting RPM to KPH
-#define GEAR_RATIO 15.0/52.0
+#define GEAR_RATIO ((float)(15.0/52.0))
 #define M_TO_KM 1.0/1000.0f
 #define WHEEL_DIAMETER_M 0.52
 #define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
@@ -32,10 +32,13 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define RPM_TO_KPH(rpm) ((rpm)*HOUR_TO_MIN*WHEEL_CIRCUMFERENCE*M_TO_KM*GEAR_RATIO)
 
 // For every 1rad/s, decrease torque by kP
-#define TC_kP_DEFAULT (0.1f)
+#define TC_kP_DEFAULT (1.25f)
+// 2.0 oscillations
+// 1.0 not strong enough
+// 1.5 slip and oscillations
 
 // With our tire radius, rads/s ~ km/h
-#define ERROR_FLOOR_RADS_DEFAULT (20.0f)
+#define ERROR_FLOOR_RADS_DEFAULT (4.0f)
 #define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (2.0f)
 
 static bool tc_on = false;
@@ -66,14 +69,14 @@ static float get_RR_speed()
 {
 	//Value comes from MC
 	int64_t val = SpeedMotorRight;
-	return RPM_TO_RADS(val - MC_ENCODER_OFFSET);
+	return RPM_TO_RADS(val - MC_ENCODER_OFFSET)*GEAR_RATIO;
 }
 
 static float get_RL_speed()
 {
 	//Value comes from MC
 	int64_t val = SpeedMotorLeft;
-	return RPM_TO_RADS(val - MC_ENCODER_OFFSET);
+	return RPM_TO_RADS(val - MC_ENCODER_OFFSET)*GEAR_RATIO;
 }
 
 float tc_kP = TC_kP_DEFAULT;
