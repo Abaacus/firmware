@@ -46,9 +46,17 @@ typedef struct {
 
 typedef struct {
 	float torque_max;
+	float left_error;
+	float right_error;
+	float torque_adjustment;
 } TCData_S;
 
+
 static bool tc_on = false;
+
+float tc_kP = TC_kP_DEFAULT;
+float error_floor = ERROR_FLOOR_RADS_DEFAULT;
+float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
 
 void disable_TC(void)
 {
@@ -103,14 +111,55 @@ static void publish_can_data(WheelData_S* wheel_data, TCData_S* tc_data)
 	RRSpeedKPH = RADS_TO_KPH(wheel_data->RR);
 	sendCAN_WheelSpeedKPH();
 
-	Torque_Max = tc_data->torque_max;
-	sendCAN_TCTorqueMax();
+	TCTorqueMax = tc_data->torque_max;
+	TCTorqueAdjustment = tc_data->torque_adjustment;
+	TCLeftError = tc_data->left_error;
+	TCRightError = tc_data->right_error;
+	sendCAN_TractionControlData();
+}
+
+static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
+{
+	if(NULL == wheel_data || NULL == tc_data)
+	{
+		ERROR_PRINT("Null pointer passed to tc_compute_limit\n");
+		Error_Handler();
+	}
+
+	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;
+	tc_data->torque_adjustment = 0.0f;
+
+	tc_data->left_error = wheel_data->RL - wheel_data->FL;
+	tc_data->right_error = wheel_data->RR - wheel_data->FR;
+
+	//calculate error. This is a P-controller
+	if(tc_data->left_error > error_floor || tc_data->right_error > error_floor)
+	{
+		if (tc_data->left_error > tc_data->right_error)
+		{
+			tc_data->torque_adjustment = (tc_data->left_error - error_floor) * tc_kP;
+		}
+		else
+		{
+			tc_data->torque_adjustment = (tc_data->right_error - error_floor) * tc_kP;
+		}
+	}
+
+	//clamp values
+	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT - tc_data->torque_adjustment;
+	if(tc_data->torque_max < adjustment_torque_floor)
+	{
+		tc_data->torque_max = adjustment_torque_floor;
+	}
+	else if(tc_data->torque_max > MAX_TORQUE_DEMAND_DEFAULT)
+	{
+		// Whoa error in TC (front wheel is spinning faster than rear)
+		tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;
+	}
+	return tc_data->torque_max;
 }
 
 
-float tc_kP = TC_kP_DEFAULT;
-float error_floor = ERROR_FLOOR_RADS_DEFAULT;
-float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
 
 void tractionControlTask(void *pvParameters)
 {
@@ -123,10 +172,10 @@ void tractionControlTask(void *pvParameters)
 	WheelData_S wheel_data = {0};
 	TCData_S tc_data = {0};
 
-	float torque_max = MAX_TORQUE_DEMAND_DEFAULT;
-	float torque_adjustment = adjustment_torque_floor;
-	float error_left = 0.0f; //error between left rear and front
-	float error_right = 0.0f; //error between right rear and front
+	tc_data.torque_max = MAX_TORQUE_DEMAND_DEFAULT;
+	tc_data.torque_adjustment = adjustment_torque_floor;
+	tc_data.left_error = 0.0f; 
+	tc_data.right_error = 0.0f; 
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 
 	//initialized variables so that speed is 0 on startup 
@@ -135,50 +184,18 @@ void tractionControlTask(void *pvParameters)
 
 	while(1)
 	{
-		torque_max = MAX_TORQUE_DEMAND_DEFAULT;
 		// rads/s
 		wheel_data.FL = get_FL_speed(); 
 		wheel_data.FR = get_FR_speed(); 
 		wheel_data.RL = get_RL_speed(); 
 		wheel_data.RR = get_RR_speed(); 
+	
 
+		float tc_torque = tc_compute_limit(&wheel_data, &tc_data);
+		float output_torque = tc_on ? tc_torque : MAX_TORQUE_DEMAND_DEFAULT;
 
-		if(tc_on)
-		{
-			torque_adjustment = 0.0f;
+		setTorqueLimit(output_torque);
 
-			error_left = wheel_data.RL - wheel_data.FL;
-			error_right = wheel_data.RR - wheel_data.FR;
-
-			//calculate error. This is a P-controller
-			if(error_left > error_floor || error_right > error_floor)
-			{
-				if (error_left > error_right)
-				{
-					torque_adjustment = (error_left - error_floor) * tc_kP;
-				}
-				else
-				{
-					torque_adjustment = (error_right - error_floor) * tc_kP;
-				}
-			}
-
-			//clamp values
-			torque_max = MAX_TORQUE_DEMAND_DEFAULT - torque_adjustment;
-			if(torque_max < adjustment_torque_floor)
-			{
-				torque_max = adjustment_torque_floor;
-			}
-			else if(torque_max > MAX_TORQUE_DEMAND_DEFAULT)
-			{
-				// Whoa error in TC (front wheel is spinning faster than rear)
-				torque_max = MAX_TORQUE_DEMAND_DEFAULT;
-			}
-		}
-
-		setTorqueLimit(torque_max);
-
-		tc_data.torque_max = torque_max;
 		publish_can_data(&wheel_data, &tc_data);
 		// Always poll at almost exactly PERIOD
         watchdogTaskCheckIn(TRACTION_CONTROL_TASK_ID);
