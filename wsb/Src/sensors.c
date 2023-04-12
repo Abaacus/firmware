@@ -13,7 +13,7 @@
 
 // Task Information
 #define POLL_SENSORS_TASK_ID 2
-#define POLL_SENSORS_PERIOD_MS 100
+#define POLL_SENSORS_PERIOD_MS 10
 
 
 // Encoder Information

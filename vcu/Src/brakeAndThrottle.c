@@ -252,21 +252,21 @@ HAL_StatusTypeDef brakeAndThrottleStart()
 
 void canPublishTask(void *pvParameters)
 {
-  while (1) {
-    // Delay to allow first ADC readings to come in
-    vTaskDelay(500);
+	// Delay to allow first ADC readings to come in
+	vTaskDelay(500);
+	while (1) {
 
-    // Update value to be sent over can
-    ThrottlePercent = throttlePercentReading;
-    brakePressure = getBrakePressure();
-    SteeringAngle = getSteeringAngle();
-    BrakePercent = getBrakePositionPercent();
+		// Update value to be sent over can
+		ThrottlePercent = throttlePercentReading;
+		brakePressure = getBrakePressure();
+		SteeringAngle = getSteeringAngle();
+		BrakePercent = getBrakePositionPercent();
 
-    if (sendCAN_VCU_Data() != HAL_OK) {
-      ERROR_PRINT("Failed to send vcu can data\n");
-    }
-    vTaskDelay(pdMS_TO_TICKS(VCU_DATA_PUBLISH_TIME_MS));
-  }
+		if (sendCAN_VCU_Data() != HAL_OK) {
+			ERROR_PRINT("Failed to send vcu can data\n");
+		}
+		vTaskDelay(pdMS_TO_TICKS(VCU_DATA_PUBLISH_TIME_MS));
+	}
 }
 
 

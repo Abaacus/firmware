@@ -20,7 +20,7 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define MC_ENCODER_OFFSET 32768
 
 #define TRACTION_CONTROL_TASK_ID 3
-#define TRACTION_CONTROL_TASK_PERIOD_MS 200
+#define TRACTION_CONTROL_TASK_PERIOD_MS 20
 #define RPM_TO_RADS(rpm) ((rpm)*2*PI/60.0f)
 
 // Macros for converting RPM to KPH
@@ -32,14 +32,14 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define RPM_TO_KPH(rpm) ((rpm)*HOUR_TO_MIN*WHEEL_CIRCUMFERENCE*M_TO_KM*GEAR_RATIO)
 
 // For every 1rad/s, decrease torque by kP
-#define TC_kP_DEFAULT (1.25f)
+#define TC_kP_DEFAULT (8.0f)
 // 2.0 oscillations
 // 1.0 not strong enough
 // 1.5 slip and oscillations
 
 // With our tire radius, rads/s ~ km/h
-#define ERROR_FLOOR_RADS_DEFAULT (4.0f)
-#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (2.0f)
+#define ERROR_FLOOR_RADS_DEFAULT (2.0f)
+#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (0.0f)
 
 static bool tc_on = false;
 
