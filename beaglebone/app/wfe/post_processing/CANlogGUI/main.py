@@ -56,13 +56,21 @@ def showGraph():
                     checked_data_dict[i] = data_dict[i]
      # print(checked_data_dict)
 
-     #obtain all other constraints and save in args_dict
+     # obtain all other constraints and save in args_dict
      args_dict = {}
      args_dict["MaxXInput"] = ui.MaxXInput.text()
      args_dict["MinXInput"] = ui.MinXInput.text()
      args_dict["MaxYInput"] = ui.MaxYInput.text()
      args_dict["MinYInput"] = ui.MinYInput.text()
-     # print(args_dict)
+
+     # BUGFIX for dense x/y axis label when pass in the csv file
+     # the following code convert checked_data_dict value from tuple arrays to 2D arrays
+     if(ui.FileLocation.toPlainText()[-4:] == ".csv"):
+          for signal in checked_data_dict.keys():
+               signal_value_array = checked_data_dict[signal]
+               for i in range(0, len(signal_value_array)):
+                    value_pair = signal_value_array[i]
+                    signal_value_array[i] = [float(value_pair[0]), float(value_pair[1])]
 
      graph(checked_data_dict, args_dict)
 
