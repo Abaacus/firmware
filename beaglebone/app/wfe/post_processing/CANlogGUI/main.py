@@ -63,7 +63,7 @@ def showGraph():
      args_dict["MaxYInput"] = ui.MaxYInput.text()
      args_dict["MinYInput"] = ui.MinYInput.text()
 
-     # BUGFIX for dense x/y axis label when pass in the csv file
+     # BUGFIX:fix the over-dense axis label when a csv file is passed in
      # the following code convert checked_data_dict value from tuple arrays to 2D arrays
      if(ui.FileLocation.toPlainText()[-4:] == ".csv"):
           for signal in checked_data_dict.keys():
