@@ -31,11 +31,11 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define SECS_PER_HOUR (3600.0f)
 #define RADS_TO_KPH(rads) (rads * (WHEEL_DIAMETER_M/2.0) * SECS_PER_HOUR * M_TO_KM)
 // For every 1rad/s, decrease torque by kP
-#define TC_kP_DEFAULT (10.0f)
+#define TC_kP_DEFAULT (1.0f)
 
 // With our tire radius, rads/s ~ km/h
-#define ERROR_FLOOR_RADS_DEFAULT (1.0f)
-#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (2.0f)
+#define ERROR_FLOOR_RADS_DEFAULT (2.5f)
+#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (4.0f)
 
 typedef struct {
 	float FL;
@@ -140,11 +140,11 @@ static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
 	{
 		if (tc_data->left_error > tc_data->right_error)
 		{
-			error = tc_data->left_error;
+			error = tc_data->left_error - error_floor;
 		}
 		else
 		{
-			error = tc_data->right_error; 
+			error = tc_data->right_error - error_floor; 
 		}
 		tc_data->cum_error += error;
 	}
