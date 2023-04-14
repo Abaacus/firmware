@@ -35,7 +35,7 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 
 // With our tire radius, rads/s ~ km/h
 #define ERROR_FLOOR_RADS_DEFAULT (2.5f)
-#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (4.0f)
+#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (1.5f)
 
 typedef struct {
 	float FL;
