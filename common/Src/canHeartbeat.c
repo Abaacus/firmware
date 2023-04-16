@@ -21,27 +21,27 @@ void heartbeatReceived(BoardIDs board)
     switch (board) {
         case ID_DCU:
             {
-                lastDCU_Heartbeat_ticks = xTaskGetTickCount();
+                lastDCU_Heartbeat_ticks = xTaskGetTickCountFromISR();
                 break;
             }
         case ID_PDU:
             {
-                lastPDU_Heartbeat_ticks = xTaskGetTickCount();
+                lastPDU_Heartbeat_ticks = xTaskGetTickCountFromISR();
                 break;
             }
         case ID_BMU:
             {
-                lastBMU_Heartbeat_ticks = xTaskGetTickCount();
+                lastBMU_Heartbeat_ticks = xTaskGetTickCountFromISR();
                 break;
             }
         case ID_VCU_F7:
             {
-                lastVCU_F7_Heartbeat_ticks = xTaskGetTickCount();
+                lastVCU_F7_Heartbeat_ticks = xTaskGetTickCountFromISR();
                 break;
             }
         case ID_ChargeCart:
             {
-                lastChargeCart_Heartbeat_ticks = xTaskGetTickCount();
+                lastChargeCart_Heartbeat_ticks = xTaskGetTickCountFromISR();
                 break;
             }
         default:
@@ -56,7 +56,7 @@ void heartbeatReceived(BoardIDs board)
     }
 }
 
-bool heartbeatEnabled = true;
+bool heartbeatEnabled = false;
 bool DCU_heartbeatEnabled = true;
 bool PDU_heartbeatEnabled = true;
 bool BMU_heartbeatEnabled = true;

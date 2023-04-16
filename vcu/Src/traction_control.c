@@ -101,7 +101,7 @@ static void publish_can_data(WheelData_S* wheel_data, TCData_S* tc_data)
 	if(NULL == wheel_data || NULL == tc_data)
 	{
 		ERROR_PRINT("Null pointer passed to publish_can_data\n");
-		Error_Handler();
+		handleError();
 	}
 	VCU_wheelSpeed_RL = wheel_data->RL;
 	VCU_wheelSpeed_RR = wheel_data->RR;
@@ -125,7 +125,7 @@ static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
 	if(NULL == wheel_data || NULL == tc_data)
 	{
 		ERROR_PRINT("Null pointer passed to tc_compute_limit\n");
-		Error_Handler();
+		handleError();
 	}
 
 	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;

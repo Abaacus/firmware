@@ -8,7 +8,7 @@
 #include "drive_by_wire_mock.h"
 #include "motorController.h"
 #include "beaglebone.h"
-
+#include "generalErrorHandler.h"
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                     signed char *pcTaskName )

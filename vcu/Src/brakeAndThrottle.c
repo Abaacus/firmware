@@ -64,8 +64,11 @@ int map_range(int in, int low, int high, int low_out, int high_out) {
 
 float getBrakePositionPercent()
 {
-    return map_range(brakeThrottleSteeringADCVals[BRAKE_POS_INDEX],
+	
+    float per = map_range(brakeThrottleSteeringADCVals[BRAKE_POS_INDEX],
                            BRAKE_POS_LOW, BRAKE_POS_HIGH, 0, 100);
+//    DEBUG_PRINT("Percent: %f\n",per);
+    return per;
 }
 
 bool is_throttle1_in_range(uint32_t throttle) {

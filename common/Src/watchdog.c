@@ -137,7 +137,7 @@ void watchdogSignalError(uint32_t id)
         uint8_t data = id | (BOARD_ID << 4);
         sendDTC_FATAL_WatchdogTaskMissedCheckIn(data);
 #if BOARD_TYPE != NUCLEO_F7
-        Error_Handler();
+        handleError();
 #endif
         signaledError = true;
     }
@@ -206,7 +206,7 @@ void watchdogTask(void *pvParameters)
             if (checkAllHeartbeats() != HAL_OK) {
                 // checkAllHeartbeats sends DTC, so don't need to do it here
                 ERROR_PRINT("Heartbeat missed!\n");
-                Error_Handler();
+                handleError();
                 signaledError = true;
             }
         }
@@ -242,7 +242,7 @@ void printWDResetState()
         // Need to start CAN here since it won't be started already
         if (canStart(&CAN_HANDLE) != HAL_OK)
         {
-            Error_Handler();
+            handleError();
         }
 
         sendDTC_FATAL_WatchdogReset();
