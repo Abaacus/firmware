@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "adc.h"
-#include "generalErrorHandler.h"
 
 /* USER CODE BEGIN 0 */
 

@@ -387,7 +387,7 @@ void vPortEndScheduler( void )
 	configASSERT( uxCriticalNesting == 1000UL );
 }
 /*-----------------------------------------------------------*/
-#include "debug.h"
+
 void vPortEnterCritical( void )
 {
 	portDISABLE_INTERRUPTS();

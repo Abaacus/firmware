@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
-#include "generalErrorHandler.h"
 
 /* USER CODE BEGIN 0 */
 
