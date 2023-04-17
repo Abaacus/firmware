@@ -228,6 +228,11 @@ void SystemClock_Config(void)
 
 /* USER CODE END 4 */
 
+void Error_Handler(void)
+{
+	handleError();
+}
+
 /**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
