@@ -81,7 +81,6 @@ HAL_StatusTypeDef checkAllHeartbeats()
     if (heartbeatEnabled)
     {
         uint32_t curTick = xTaskGetTickCount();
-
 #if BOARD_ID != ID_DCU
         if (DCU_heartbeatEnabled) {
             if (curTick - lastDCU_Heartbeat_ticks >= HEARTBEAT_TIMEOUT_TICKS)

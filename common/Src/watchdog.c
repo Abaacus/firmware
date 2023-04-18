@@ -169,7 +169,11 @@ void watchdogTask(void *pvParameters)
     while (1) {
         node = tasksToWatchList;
         uint32_t curTick = xTaskGetTickCount();
-
+		static uint32_t last_tick = 0;
+		if(curTick-last_tick > 50)
+		{
+			DEBUG_PRINT("dT %ld\n", curTick-last_tick);
+		}
         while (node != NULL) {
             if (node->isFsmTask) {
                 if (node->fsmCheckInRequestTimeTicks == 0) {
@@ -220,7 +224,7 @@ void watchdogTask(void *pvParameters)
             lastHeartbeatTick = curTick;
         }
 #endif
-
+		last_tick = curTick;
         vTaskDelay(WATCHDOGTASK_PERIOD_TICKS);
     }
 }

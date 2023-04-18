@@ -12,7 +12,7 @@
 
 // This is subject to change and is expected to be 50ms
 // I moved it to 75ms to be safe
-#define BATTERY_TASK_PERIOD_MS 75
+#define BATTERY_TASK_PERIOD_MS 100
 #define BATTERY_CHARGE_TASK_PERIOD_MS 2000
 #define BATTERY_TASK_ID 2
 
@@ -145,7 +145,8 @@ HAL_StatusTypeDef getVBus(float *VBus);
 HAL_StatusTypeDef initBusVoltagesAndCurrentQueues();
 HAL_StatusTypeDef balance_cell(int cell, bool set);
 HAL_StatusTypeDef getPackVoltage(float *packVoltage);
-HAL_StatusTypeDef initPackVoltageQueue();
+HAL_StatusTypeDef getAdjustedPackVoltage(float *packVoltage);
+HAL_StatusTypeDef initPackVoltageQueues();
 float map_range_float(float in, float low, float high, float low_out, float high_out);
 HAL_StatusTypeDef setMaxChargeCurrent(float maxCurrent);
 void setSendOnlyOneCell(int cellIdx);

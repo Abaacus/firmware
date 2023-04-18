@@ -114,6 +114,8 @@ QueueHandle_t VBusQueue;
 QueueHandle_t VBattQueue;
 /// Queue holding most recent battery  voltage (calculated from sum of cell voltages) measurement
 QueueHandle_t PackVoltageQueue;
+/// Queue holding most recent adjusted pack voltage (calculated from sum of filtered and adjusted cell voltages) measurement
+QueueHandle_t AdjustedPackVoltageQueue;
 
 
 /*
@@ -126,6 +128,7 @@ QueueHandle_t PackVoltageQueue;
 float cellVoltagesFiltered[NUM_VOLTAGE_CELLS];
 
 extern osThreadId stateOfChargeHandle;
+
 /*
  * HV Measure
  */
@@ -397,9 +400,9 @@ void HVMeasureTask(void *pvParamaters)
         {
             CurrentBusHV = IBus;
             VoltageBusHV = VBus;
-            sendCAN_BMU_stateBusHV();
+            //sendCAN_BMU_stateBusHV();
             AMS_PackVoltage = VBatt;
-            sendCAN_BMU_AmsVBatt();
+            //sendCAN_BMU_AmsVBatt();
             lastStateBusHVSend = xTaskGetTickCount();
         }
 		integrate_bus_current(IBus, (float)HV_MEASURE_TASK_PERIOD_MS);
@@ -618,7 +621,7 @@ static uint32_t errorCounter = 0;
 bool boundedContinue()
 {
     if ((++errorCounter) > MAX_ERROR_COUNT) {
-        BatteryTaskError();
+//        BatteryTaskError();
         return false;
     } else {
         DEBUG_PRINT("Error counter %d\n", (int)errorCounter);
@@ -698,7 +701,7 @@ void filterCellVoltages(float *cellVoltages, float *cellVoltagesFiltered)
  *
  * @return HAL_StatusTypeDef
  */
-HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage, float *maxTemp, float *minTemp, float *packVoltage)
+HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage, float *maxTemp, float *minTemp, float *packVoltage, float* adjustedPackVoltage)
 {
    HAL_StatusTypeDef rc = HAL_OK;
    float measure;
@@ -715,6 +718,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
    *maxTemp = -100; // Cells shouldn't get this cold right??
    *minTemp = CELL_OVERTEMP;
    *packVoltage = 0;
+   *adjustedPackVoltage = 0;
 
    // Unfortunately the thermistors may run slower than the cell voltage measurements
    static uint8_t thermistor_lag_counter = 0;
@@ -749,6 +753,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
       if (measure_high < (*minVoltage)) {(*minVoltage) = measure_high;}
 
       // Sum up cell voltages to get overall pack voltage
+      (*adjustedPackVoltage) += measure_high; /*This is our adjusted cell voltage*/
       (*packVoltage) += measure_low;
    }
 
@@ -857,6 +862,14 @@ HAL_StatusTypeDef publishPackVoltage(float packVoltage)
    return HAL_OK;
 }
 
+HAL_StatusTypeDef publishAdjustedPackVoltage(float adjustedPackVoltage)
+{
+   xQueueOverwrite(AdjustedPackVoltageQueue, &adjustedPackVoltage);
+
+   return HAL_OK;
+}
+
+
 /**
  * @brief Gets the current pack voltage. This returns the pack voltage as
  * calculated by summing all the cell voltages.
@@ -875,17 +888,34 @@ HAL_StatusTypeDef getPackVoltage(float *packVoltage)
     return HAL_OK;
 }
 
+HAL_StatusTypeDef getAdjustedPackVoltage(float *adjustedPackVoltage)
+{
+    if (xQueuePeek(AdjustedPackVoltageQueue, adjustedPackVoltage, 0) != pdTRUE) {
+        ERROR_PRINT("Failed to receive Adjusted Pack Voltage from queue\n");
+        return HAL_ERROR;
+    }
+
+    return HAL_OK;
+}
+
 /**
- * @brief Creates the pack voltage queue. Needs to be called before RTOS starts
+ * @brief Creates the pack voltage queues. Needs to be called before RTOS starts
  *
  * @return HAL_StatusTypeDef
  */
-HAL_StatusTypeDef initPackVoltageQueue()
+HAL_StatusTypeDef initPackVoltageQueues()
 {
    PackVoltageQueue = xQueueCreate(1, sizeof(float));
 
    if (PackVoltageQueue == NULL) {
       ERROR_PRINT("Failed to create pack voltage queue!\n");
+      return HAL_ERROR;
+   }
+   
+   AdjustedPackVoltageQueue = xQueueCreate(1, sizeof(float));
+
+   if (AdjustedPackVoltageQueue == NULL) {
+      ERROR_PRINT("Failed to create adjusted pack voltage queue!\n");
       return HAL_ERROR;
    }
 
@@ -1142,6 +1172,7 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
     bool waitingForBalanceDone = false; // Set to true when receive stop but still balancing
     uint32_t dbwTaskNotifications;
     float packVoltage;
+    float adjustedPackVoltage;
 
     while (1) {
        /*
@@ -1201,7 +1232,7 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
         if (checkCellVoltagesAndTemps(
                 ((float *)&VoltageCellMax), ((float *)&VoltageCellMin),
                 ((float *)&TempCellMax), ((float *)&TempCellMin),
-                &packVoltage) != HAL_OK)
+                &packVoltage, &adjustedPackVoltage) != HAL_OK)
         {
             BatteryTaskError();
         }
@@ -1334,11 +1365,12 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
          * - StateBMS
          */
         if (sendCAN_BMU_batteryStatusHV() != HAL_OK) {
-            ERROR_PRINT("Failed to send batter status HV\n");
+//            ERROR_PRINT("Failed to send batter status HV\n");
             if (boundedContinue()) { continue; }
         }
 
         publishPackVoltage(packVoltage);
+        publishAdjustedPackVoltage(adjustedPackVoltage);
 
         // Succesfully reach end of loop, update error counter to reflect that
         ERROR_COUNTER_SUCCESS();
@@ -1390,6 +1422,7 @@ void batteryTask(void *pvParameter)
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 
     float packVoltage;
+    float adjustedPackVoltage;
     uint32_t dbwTaskNotifications;
     while (1)
     {
@@ -1483,7 +1516,7 @@ void batteryTask(void *pvParameter)
         if (checkCellVoltagesAndTemps(
               ((float *)&VoltageCellMax), ((float *)&VoltageCellMin),
               ((float *)&TempCellMax), ((float *)&TempCellMin),
-              &packVoltage) != HAL_OK)
+              &packVoltage, &adjustedPackVoltage) != HAL_OK)
         {
             BatteryTaskFailure = CHECK_CELL_VOLTAGE_TEMPS_FAIL_BIT;
             sendCAN_BMU_BatteryChecks();
@@ -1497,6 +1530,8 @@ void batteryTask(void *pvParameter)
             ERROR_PRINT("Failed to publish pack voltage\n");
             if (boundedContinue()) { continue; }
         }
+        // Adjusted Pack Voltage not critical
+		publishAdjustedPackVoltage(adjustedPackVoltage);
 
         StateBatteryPowerHV = calculateStateOfPower();
         StateBMS = fsmGetState(&fsmHandle);
@@ -1512,7 +1547,7 @@ void batteryTask(void *pvParameter)
          * - StateBMS
          */
         if (sendCAN_BMU_batteryStatusHV() != HAL_OK) {
-            ERROR_PRINT("Failed to send batter status HV\n");
+            //ERROR_PRINT("Failed to send batter status HV\n");
             if (boundedContinue()) { continue; }
         }
 
@@ -1522,13 +1557,10 @@ void batteryTask(void *pvParameter)
 			xTaskNotifyGive(stateOfChargeHandle);
 			released_soc = true;
 		}
-
-
         // Succesfully reach end of loop, update error counter to reflect that
         ERROR_COUNTER_SUCCESS();
         /*!!! Change the check in in bounded continue as well if you change
          * this */
-		
         watchdogTaskCheckIn(BATTERY_TASK_ID);
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BATTERY_TASK_PERIOD_MS));
     }
@@ -1539,7 +1571,8 @@ void batteryTask(void *pvParameter)
  */
 
 /// The period to send cell voltage and temperature CAN messages
-#define CAN_CELL_SEND_PERIOD_MS 40
+#define CAN_CELL_SEND_PERIOD_MS 50
+#define CAN_CELL_SEND_TASK_ID 8
 
 bool sendOneCellVoltAndTemp = false;
 int cellToSend;
@@ -1574,28 +1607,33 @@ void clearSendOnlyOneCell()
  */
 void canSendCellTask(void *pvParameters)
 {
-  uint32_t cellIdxToSend = 0;
-  TickType_t xLastWakeTime = xTaskGetTickCount();
 
-  while (1) {
-    if (sendOneCellVoltAndTemp) {
-      // The cell index for sending should be a multiple of 3, as the cells are
-      // sent in groups of 3
-      cellIdxToSend = cellToSend - (cellToSend % CAN_TX_CELL_GROUP_LEN);
-    }
+	uint32_t cellIdxToSend = 0;
+	TickType_t xLastWakeTime = xTaskGetTickCount();
 
-    sendCAN_BMU_CellVoltage(cellIdxToSend);
-    sendCAN_BMU_CellVoltage_Adjusted(cellIdxToSend);
-    sendCAN_BMU_ChannelTemp(cellIdxToSend);
-
-    // Move on to next cells
-    // 3 Cells per CAN message
-    cellIdxToSend += CAN_TX_CELL_GROUP_LEN;
-    if(cellIdxToSend >= NUM_VOLTAGE_CELLS)
+	if (registerTaskToWatch(CAN_CELL_SEND_TASK_ID, 5*pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS), false, NULL) != HAL_OK)
 	{
-		cellIdxToSend = 0;
+		ERROR_PRINT("ERROR: Failed to register canSendCellTask with watchdog\n");
 	}
+	while (1) {
+		if (sendOneCellVoltAndTemp) {
+			// The cell index for sending should be a multiple of 3, as the cells are
+			// sent in groups of 3
+			cellIdxToSend = cellToSend - (cellToSend % CAN_TX_CELL_GROUP_LEN);
+		}
 
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
-  }
+		sendCAN_BMU_CellVoltage(cellIdxToSend);
+		sendCAN_BMU_CellVoltage_Adjusted(cellIdxToSend);
+		sendCAN_BMU_ChannelTemp(cellIdxToSend);
+
+		// Move on to next cells
+		// 3 Cells per CAN message
+		cellIdxToSend += CAN_TX_CELL_GROUP_LEN;
+		if(cellIdxToSend >= NUM_VOLTAGE_CELLS)
+		{
+			cellIdxToSend = 0;
+		}
+		watchdogTaskCheckIn(CAN_CELL_SEND_TASK_ID);
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
+	}
 }

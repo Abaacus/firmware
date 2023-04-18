@@ -34,7 +34,7 @@
 #define CAN_P0_QUEUE_LEN 10
 #define CAN_P1_QUEUE_LEN 15
 #define CAN_P2_QUEUE_LEN 10
-#define CAN_P3_QUEUE_LEN 5
+#define CAN_P3_QUEUE_LEN 15
 #elif IS_BOARD_F0_FAMILY
 #define CAN_P0_QUEUE_LEN 2
 #define CAN_P1_QUEUE_LEN 2
@@ -234,7 +234,7 @@ HAL_StatusTypeDef sendCanMessage(uint32_t id, uint32_t length, uint8_t *data)
     if (xQueueSend(sendQueueHandle, &msg, pdMS_TO_TICKS(CAN_SEND_TIMEOUT_MS))
         != pdTRUE)
     {
-        ERROR_PRINT("Failed to send can msg to queue\n");
+//        ERROR_PRINT("Failed to send can msg to queue\n");
         return HAL_ERROR;
     }
 

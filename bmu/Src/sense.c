@@ -66,7 +66,7 @@ void sensorTask(void *pvParameters)
    {
       BrakePressureBMU = brakeAndHVILVals[BRAKE_ADC_CHANNEL] / BRAKE_ADC_DIVIDER;
       if (sendCAN_BMU_BrakePressure() != HAL_OK) {
-         ERROR_PRINT("Failed to send brake value over CAN\n");
+//         ERROR_PRINT("Failed to send brake value over CAN\n");
       }
 
       watchdogTaskCheckIn(3);
