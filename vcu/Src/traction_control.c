@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "motorController.h"
 #include "vcu_F7_can.h"
+#include "math.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "bsp.h"
@@ -30,12 +31,13 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
 #define SECS_PER_HOUR (3600.0f)
 #define RADS_TO_KPH(rads) (rads * (WHEEL_DIAMETER_M/2.0) * SECS_PER_HOUR * M_TO_KM)
-// For every 1rad/s, decrease torque by kP
-#define TC_kP_DEFAULT (1.0f)
+#define TC_kP_DEFAULT (5.0f/(0.05f))
 
 // With our tire radius, rads/s ~ km/h
-#define ERROR_FLOOR_RADS_DEFAULT (2.5f)
-#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (1.5f)
+#define ERROR_FLOOR_RADS_DEFAULT (0.05f)
+#define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (0.0f)
+#define ZERO_SPEED_LOWER_BOUND (0.001f)
+#define HIGH_ERROR_SLIP_RATE (1.0f/ZERO_SPEED_LOWER_BOUND)
 
 typedef struct {
 	float FL;
@@ -130,9 +132,22 @@ static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
 
 	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;
 	tc_data->torque_adjustment = 0.0f;
-
-	tc_data->left_error = wheel_data->RL - wheel_data->FL;
-	tc_data->right_error = wheel_data->RR - wheel_data->FR;
+	if(fabs(wheel_data->FL) > ZERO_SPEED_LOWER_BOUND)
+	{
+		tc_data->left_error = (wheel_data->RL - wheel_data->FL)/(wheel_data->FL);
+	}
+	else
+	{
+		tc_data->left_error = HIGH_ERROR_SLIP_RATE;
+	}
+	if(fabs(wheel_data->FR) > ZERO_SPEED_LOWER_BOUND)
+	{
+		tc_data->right_error = (wheel_data->RR - wheel_data->FR)/(wheel_data->FR);
+	}
+	else
+	{
+		tc_data->right_error = HIGH_ERROR_SLIP_RATE;
+	}
 
 	//calculate error. This is a P-controller
 	float error = 0.0f;
