@@ -400,9 +400,9 @@ void HVMeasureTask(void *pvParamaters)
         {
             CurrentBusHV = IBus;
             VoltageBusHV = VBus;
-            //sendCAN_BMU_stateBusHV();
+            sendCAN_BMU_stateBusHV();
             AMS_PackVoltage = VBatt;
-            //sendCAN_BMU_AmsVBatt();
+            sendCAN_BMU_AmsVBatt();
             lastStateBusHVSend = xTaskGetTickCount();
         }
 		integrate_bus_current(IBus, (float)HV_MEASURE_TASK_PERIOD_MS);
@@ -621,7 +621,7 @@ static uint32_t errorCounter = 0;
 bool boundedContinue()
 {
     if ((++errorCounter) > MAX_ERROR_COUNT) {
-//        BatteryTaskError();
+        BatteryTaskError();
         return false;
     } else {
         DEBUG_PRINT("Error counter %d\n", (int)errorCounter);
@@ -1365,7 +1365,7 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
          * - StateBMS
          */
         if (sendCAN_BMU_batteryStatusHV() != HAL_OK) {
-//            ERROR_PRINT("Failed to send batter status HV\n");
+            ERROR_PRINT("Failed to send batter status HV\n");
             if (boundedContinue()) { continue; }
         }
 
@@ -1547,7 +1547,7 @@ void batteryTask(void *pvParameter)
          * - StateBMS
          */
         if (sendCAN_BMU_batteryStatusHV() != HAL_OK) {
-            //ERROR_PRINT("Failed to send batter status HV\n");
+            ERROR_PRINT("Failed to send battery status HV\n");
             if (boundedContinue()) { continue; }
         }
 
