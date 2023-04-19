@@ -130,8 +130,8 @@ BO_ 2214985474 UartOverCanConfig: 1 VCU_BeagleBone
 
 BO_ 2281901058 TractionControlData: 8 VCU_F7
  SG_ TCTorqueAdjustment : 48|16@1- (0.01,0) [-327.68|327.67] "" Vector__XXX
- SG_ TCRightError : 32|16@1- (0.003,0) [-98.304|98.301] "rads/s" Vector__XXX
- SG_ TCLeftError : 16|16@1- (0.003,0) [-98.304|98.301] "percent" Vector__XXX
+ SG_ TCRightSlip : 32|16@1- (0.003,0) [-98.304|98.301] "percent" Vector__XXX
+ SG_ TCLeftSlip : 16|16@1- (0.003,0) [-98.304|98.301] "percent" Vector__XXX
  SG_ TCTorqueMax : 0|16@1+ (0.001,0) [0|65.535] "Nm"  VCU_BeagleBone
 
 BO_ 2215641611 WSBRR_Sensors: 8 WSBRR

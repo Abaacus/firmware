@@ -34,10 +34,10 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define TC_kP_DEFAULT (5.0f/(0.05f))
 
 // With our tire radius, rads/s ~ km/h
-#define ERROR_FLOOR_RADS_DEFAULT (0.05f)
+#define SLIP_PERCENT_DEFAULT (0.05f)
 #define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (0.0f)
-#define ZERO_SPEED_LOWER_BOUND (0.001f)
-#define HIGH_ERROR_SLIP_RATE (1.0f/ZERO_SPEED_LOWER_BOUND)
+#define ZERO_SPEED_LOWER_BOUND (1.0f)
+#define MAX_SLIP (80.0f)
 
 typedef struct {
 	float FL;
@@ -48,8 +48,8 @@ typedef struct {
 
 typedef struct {
 	float torque_max;
-	float left_error;
-	float right_error;
+	float left_slip;
+	float right_slip;
 	float torque_adjustment;
 	float cum_error;
 } TCData_S;
@@ -59,7 +59,8 @@ static bool tc_on = false;
 
 float tc_kP = TC_kP_DEFAULT;
 float tc_kI = 0.0f;
-float error_floor = ERROR_FLOOR_RADS_DEFAULT;
+float tc_kD = 0.0f;
+float desired_slip = SLIP_PERCENT_DEFAULT;
 float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
 
 void disable_TC(void)
@@ -117,9 +118,53 @@ static void publish_can_data(WheelData_S* wheel_data, TCData_S* tc_data)
 
 	TCTorqueMax = tc_data->torque_max;
 	TCTorqueAdjustment = tc_data->torque_adjustment;
-	TCLeftError = tc_data->left_error;
-	TCRightError = tc_data->right_error;
+	TCLeftSlip = tc_data->left_slip;
+	TCRightSlip = tc_data->right_slip;
 	sendCAN_TractionControlData();
+}
+
+static float abs_clamp(float input, float high, float low)
+{
+	if(input > high)
+	{
+		return high;
+	}
+	else if(input < low)
+	{
+		return low;
+	}
+	else
+	{
+		return input;
+	}
+}
+
+static float compute_side_slip(float front, float rear)
+{
+	float slip = MAX_SLIP;
+	// Check that front speed is > 0 (very low)
+	// If front speed 0, then clamp error high
+	if(fabs(front) > ZERO_SPEED_LOWER_BOUND)
+	{
+		slip = (rear - front) / front;
+	}
+
+	// Clamp error to +/-MAX_SLIP
+	slip = abs_clamp(slip, MAX_SLIP, -MAX_SLIP);
+	return slip;
+}
+
+static float compute_gains(TCData_S* tc_data)
+{
+	//calculate error. This is a P-controller
+	float slip = fmax(tc_data->left_slip, tc_data->right_slip);
+	float error = slip - desired_slip;
+	tc_data->cum_error += error;
+	if(error > 0.0)
+	{	
+		return tc_kP * error + tc_kI * tc_data->cum_error;
+	}
+	return 0.0f;
 }
 
 static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
@@ -132,50 +177,14 @@ static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
 
 	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;
 	tc_data->torque_adjustment = 0.0f;
-	if(fabs(wheel_data->FL) > ZERO_SPEED_LOWER_BOUND)
-	{
-		tc_data->left_error = (wheel_data->RL - wheel_data->FL)/(wheel_data->FL);
-	}
-	else
-	{
-		tc_data->left_error = HIGH_ERROR_SLIP_RATE;
-	}
-	if(fabs(wheel_data->FR) > ZERO_SPEED_LOWER_BOUND)
-	{
-		tc_data->right_error = (wheel_data->RR - wheel_data->FR)/(wheel_data->FR);
-	}
-	else
-	{
-		tc_data->right_error = HIGH_ERROR_SLIP_RATE;
-	}
 
-	//calculate error. This is a P-controller
-	float error = 0.0f;
-	if(tc_data->left_error > error_floor || tc_data->right_error > error_floor)
-	{
-		if (tc_data->left_error > tc_data->right_error)
-		{
-			error = tc_data->left_error - error_floor;
-		}
-		else
-		{
-			error = tc_data->right_error - error_floor; 
-		}
-		tc_data->cum_error += error;
-	}
-	
-	tc_data->torque_adjustment = tc_kP * error + tc_kI * tc_data->cum_error;
-	//clamp values
-	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT - tc_data->torque_adjustment;
-	if(tc_data->torque_max < adjustment_torque_floor)
-	{
-		tc_data->torque_max = adjustment_torque_floor;
-	}
-	else if(tc_data->torque_max > MAX_TORQUE_DEMAND_DEFAULT)
-	{
-		// Whoa error in TC (front wheel is spinning faster than rear)
-		tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;
-	}
+	tc_data->left_slip = compute_side_slip(wheel_data->FL, wheel_data->RL);
+	tc_data->right_slip = compute_side_slip(wheel_data->FR, wheel_data->RR);
+
+	tc_data->torque_adjustment = compute_gains(tc_data);
+
+	float desired_torque = MAX_TORQUE_DEMAND_DEFAULT - tc_data->torque_adjustment;
+	tc_data->torque_max = abs_clamp(desired_torque, MAX_TORQUE_DEMAND_DEFAULT, adjustment_torque_floor);
 	return tc_data->torque_max;
 }
 
@@ -194,8 +203,8 @@ void tractionControlTask(void *pvParameters)
 
 	tc_data.torque_max = MAX_TORQUE_DEMAND_DEFAULT;
 	tc_data.torque_adjustment = adjustment_torque_floor;
-	tc_data.left_error = 0.0f; 
-	tc_data.right_error = 0.0f; 
+	tc_data.left_slip = 0.0f; 
+	tc_data.right_slip = 0.0f; 
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 
 	//initialized variables so that speed is 0 on startup 
@@ -210,9 +219,13 @@ void tractionControlTask(void *pvParameters)
 		wheel_data.RL = get_RL_speed(); 
 		wheel_data.RR = get_RR_speed(); 
 	
-
+		
 		float tc_torque = tc_compute_limit(&wheel_data, &tc_data);
-		float output_torque = tc_on ? tc_torque : MAX_TORQUE_DEMAND_DEFAULT;
+		float output_torque = MAX_TORQUE_DEMAND_DEFAULT;
+		if(tc_on && fmax(wheel_data.RL, wheel_data.RR) > ZERO_SPEED_LOWER_BOUND)
+		{
+			output_torque = tc_torque;
+		}
 
 		setTorqueLimit(output_torque);
 
