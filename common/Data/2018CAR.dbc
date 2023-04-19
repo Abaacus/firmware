@@ -66,10 +66,10 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ VoltageBatteryLV : 0|14@1+ (1,0) [0|16383] "mV" Vector__XXX
 
 BO_ 2281898688 TractionControlConfig: 8 VCU_BeagleBone
- SG_ TC_desiredSlipPercent : 48|16@1- (0.0001,0) [-3.2768|3.2767] "percent" Vector__XXX
- SG_ TC_kD : 32|16@1+ (0.01,0) [0|655.35] "" Vector__XXX
- SG_ TC_kI : 16|16@1+ (0.01,0) [0|655.35] "" Vector__XXX
- SG_ TC_kP : 0|16@1+ (0.01,0) [0|655.35] "" Vector__XXX
+ SG_ TC_desiredSlipPercent : 48|16@1- (0.0001,0) [-3.2768|3.2767] "percent"  VCU_F7
+ SG_ TC_kD : 32|16@1+ (0.01,0) [0|655.35] ""  VCU_F7
+ SG_ TC_kI : 16|16@1+ (0.01,0) [0|655.35] ""  VCU_F7
+ SG_ TC_kP : 0|16@1+ (0.01,0) [0|655.35] ""  VCU_F7
 
 BO_ 2291796994 RearWheelSpeedRADS: 8 VCU_F7
  SG_ VCU_wheelSpeed_RR : 32|32@1+ (1E-005,0) [0|42949.67295] "rads/s" Vector__XXX
