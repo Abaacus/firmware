@@ -272,7 +272,6 @@ void canPublishTask(void *pvParameters)
 	}
 }
 
-
 void pollThrottle(TickType_t* xLastWakeTime)
 {
     while(1)
