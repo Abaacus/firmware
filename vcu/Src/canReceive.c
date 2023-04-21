@@ -139,4 +139,5 @@ void CAN_Msg_TractionControlConfig_Callback()
 	tc_kI = TC_kI;
 	tc_kD = TC_kD;
 	desired_slip = TC_desiredSlipPercent;
+	DEBUG_PRINT_ISR("tc_kP is %f\n", tc_kP);
 }

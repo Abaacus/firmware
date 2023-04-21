@@ -31,12 +31,12 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
 #define SECS_PER_HOUR (3600.0f)
 #define RADS_TO_KPH(rads) (rads * (WHEEL_DIAMETER_M/2.0) * SECS_PER_HOUR * M_TO_KM)
-#define TC_kP_DEFAULT (5.0f/(0.05f))
+#define TC_kP_DEFAULT (50.0f)
 
 // With our tire radius, rads/s ~ km/h
-#define SLIP_PERCENT_DEFAULT (0.05f)
+#define SLIP_PERCENT_DEFAULT (0.15f)
 #define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (0.0f)
-#define ZERO_SPEED_LOWER_BOUND (1.0f)
+#define ZERO_SPEED_LOWER_BOUND (7.5f)
 #define MAX_SLIP (80.0f)
 
 typedef struct {
@@ -52,6 +52,7 @@ typedef struct {
 	float right_slip;
 	float torque_adjustment;
 	float cum_error;
+	float last_error;
 } TCData_S;
 
 
@@ -144,7 +145,7 @@ static float compute_side_slip(float front, float rear)
 	float slip = MAX_SLIP;
 	// Check that front speed is > 0 (very low)
 	// If front speed 0, then clamp error high
-	if(fabs(front) > ZERO_SPEED_LOWER_BOUND)
+	if(fabs(front) > 0.1)
 	{
 		slip = (rear - front) / front;
 	}
@@ -160,10 +161,13 @@ static float compute_gains(TCData_S* tc_data)
 	float slip = fmax(tc_data->left_slip, tc_data->right_slip);
 	float error = slip - desired_slip;
 	tc_data->cum_error += error;
+	float de_dt = (error - tc_data->last_error)/(TRACTION_CONTROL_TASK_PERIOD_MS/1000.0f);
+	tc_data->last_error = error;
 	if(error > 0.0)
 	{	
-		return tc_kP * error + tc_kI * tc_data->cum_error;
+		return tc_kP * error + tc_kI * tc_data->cum_error * TRACTION_CONTROL_TASK_PERIOD_MS/(1000.0f) + tc_kD * de_dt;
 	}
+
 	return 0.0f;
 }
 
@@ -178,9 +182,13 @@ static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
 	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;
 	tc_data->torque_adjustment = 0.0f;
 
-	tc_data->left_slip = compute_side_slip(wheel_data->FL, wheel_data->RL);
+	tc_data->left_slip = compute_side_slip(wheel_data->FR, wheel_data->RL); /*Bug fix change back to FL*/
 	tc_data->right_slip = compute_side_slip(wheel_data->FR, wheel_data->RR);
 
+	if(fabs(wheel_data->RL) < 3.0f && fabs(wheel_data->RR) < 3.0f)
+	{
+		tc_data->cum_error = 0.0f;
+	}
 	tc_data->torque_adjustment = compute_gains(tc_data);
 
 	float desired_torque = MAX_TORQUE_DEMAND_DEFAULT - tc_data->torque_adjustment;
