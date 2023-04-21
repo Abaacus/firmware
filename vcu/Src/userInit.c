@@ -1,5 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
+#include "CRC_CALC.h"
 
 #include "bsp.h"
 #include "debug.h"
@@ -26,6 +27,7 @@ void userInit()
     if (debugInit() != HAL_OK) {
         Error_Handler();
     }
+	generate_CRC_lookup_table();
 
     if (driveByWireInit() != HAL_OK)
     {
