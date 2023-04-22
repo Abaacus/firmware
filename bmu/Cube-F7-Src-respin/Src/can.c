@@ -71,11 +71,11 @@ void MX_CAN3_Init(void)
 
   /* USER CODE END CAN3_Init 1 */
   hcan3.Instance = CAN3;
-  hcan3.Init.Prescaler = 10;
+  hcan3.Init.Prescaler = 5;
   hcan3.Init.Mode = CAN_MODE_NORMAL;
   hcan3.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan3.Init.TimeSeg1 = CAN_BS1_8TQ;
-  hcan3.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan3.Init.TimeSeg1 = CAN_BS1_13TQ;
+  hcan3.Init.TimeSeg2 = CAN_BS2_6TQ;
   hcan3.Init.TimeTriggeredMode = DISABLE;
   hcan3.Init.AutoBusOff = ENABLE;
   hcan3.Init.AutoWakeUp = ENABLE;
