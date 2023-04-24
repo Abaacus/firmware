@@ -59,7 +59,7 @@ HAL_StatusTypeDef setFan()
   if (overrideFanControl)
   {
     // PWM Output is inverted from what we generate from PROC
-    FanPeriod = FAN_PERIOD_COUNT-overridePercent*FAN_PERIOD_COUNT; 
+    FanPeriod = FAN_PERIOD_COUNT-fanOverridePercent*FAN_PERIOD_COUNT; 
   }
   else
   {

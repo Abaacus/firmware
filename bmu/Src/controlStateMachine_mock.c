@@ -55,7 +55,7 @@ BaseType_t setFanFull(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     overrideFanControl = true;
-    overridePercent = FAN_MAX_DUTY_PERCENT;
+    fanOverridePercent = FAN_MAX_DUTY_PERCENT;
     COMMAND_OUTPUT("Fan full speed\n");
     return pdFALSE;
 }
@@ -72,7 +72,7 @@ BaseType_t setFanOff(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     overrideFanControl = true;
-    overridePercent = 0.0;
+    fanOverridePercent = 0.0;
     COMMAND_OUTPUT("Fan off\n");
     return pdFALSE;
 }

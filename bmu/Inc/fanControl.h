@@ -12,6 +12,6 @@
 #define FAN_TASK_PERIOD_MS 1000
 
 bool overrideFanControl = false;
-float overridePercent = 0.;
+float fanOverridePercent = 0.;
 
 #endif /* end of include guard: FANCONTROL_H */
