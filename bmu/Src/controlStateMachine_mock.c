@@ -55,7 +55,7 @@ BaseType_t overrideFansToMaxSpeed(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
     isOverrideFansToMaxEnabled = true;
-    COMMAND_OUTPUT("Overridden   the BMU fans to full speed\n");
+    COMMAND_OUTPUT("Overridden the BMU fans to full speed\n");
     return pdFALSE;
 }
 
