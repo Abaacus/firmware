@@ -54,8 +54,7 @@ static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
 BaseType_t setFanFull(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    overrideFanControl = true;
-    fanOverridePercent = FAN_MAX_DUTY_PERCENT;
+    overrideFan2FullSpeed();
     COMMAND_OUTPUT("Fan full speed\n");
     return pdFALSE;
 }
@@ -71,8 +70,7 @@ static const CLI_Command_Definition_t setFanFullCommandDefinition =
 BaseType_t setFanOff(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    overrideFanControl = true;
-    fanOverridePercent = 0.0;
+    overrideFan2Off();
     COMMAND_OUTPUT("Fan off\n");
     return pdFALSE;
 }
