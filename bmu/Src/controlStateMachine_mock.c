@@ -51,35 +51,35 @@ static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
     0 /* Number of parameters */
 };
 
-BaseType_t setFanFull(char *writeBuffer, size_t writeBufferLength,
+BaseType_t overrideFansToMaxSpeed(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    overrideFan2FullSpeed();
+    overrideFansToMax = true;
     COMMAND_OUTPUT("Fan full speed\n");
     return pdFALSE;
 }
 
 static const CLI_Command_Definition_t setFanFullCommandDefinition =
 {
-    "setFanFull",
-    "setFanFull:\r\n Set the BMU fan to full speed\r\n",
-    setFanFull,
+    "overrideFansToMaxSpeed",
+    "overrideFansToMaxSpeed:\r\n Set the BMU fan to full speed\r\n",
+    overrideFansToMaxSpeed,
     0 /* Number of parameters */
 };
 
-BaseType_t setFanOff(char *writeBuffer, size_t writeBufferLength,
+BaseType_t disableFansOverride(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    overrideFan2Off();
+    overrideFansToMax = false;
     COMMAND_OUTPUT("Fan off\n");
     return pdFALSE;
 }
 
 static const CLI_Command_Definition_t setFanOffCommandDefinition =
 {
-    "setFanOff",
-    "setFanOff:\r\n Turn off the BMU fan\r\n",
-    setFanOff,
+    "disableFansOverride",
+    "disableFansOverride:\r\n Turn off the BMU fan\r\n",
+    disableFansOverride,
     0 /* Number of parameters */
 };
 

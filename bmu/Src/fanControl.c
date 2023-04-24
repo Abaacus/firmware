@@ -26,9 +26,6 @@
 #define FAN_PERIOD_COUNT 400
 #define FAN_TASK_PERIOD_MS 1000
 
-bool overrideFanControl = false;
-float fanOverridePercent = 0.;
-
 uint32_t calculateFanPeriod()
 {
   // PWM Output is inverted from what we generate from PROC
@@ -63,8 +60,13 @@ HAL_StatusTypeDef fanInit()
 
 HAL_StatusTypeDef setFan()
 {
-  uint32_t duty = calculateFanPeriod();
-
+  uint32_t duty;
+  if (overrideFansToMax) {
+    duty = FAN_PERIOD_COUNT - (FAN_MAX_DUTY_PERCENT * FAN_PERIOD_COUNT);
+  }
+  else {
+    duty = calculateFanPeriod();
+  }
   __HAL_TIM_SET_COMPARE(&FAN_HANDLE, TIM_CHANNEL_1, duty);
 
   FanPeriod = duty;
@@ -72,17 +74,6 @@ HAL_StatusTypeDef setFan()
   return HAL_OK;
 }
 
-void overrideFan2FullSpeed()
-{
-  overrideFanControl = true;
-  fanOverridePercent = FAN_MAX_DUTY_PERCENT;
-}
-
-void overrideFan2Off()
-{
-  overrideFanControl = true;
-  fanOverridePercent = 0.;
-}
 /**
  * Task to control the battery box fans.
  */
@@ -95,13 +86,7 @@ void fanTask()
 
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while (1) {
-    if (overrideFanControl) {
-      // PWM Output is inverted from what we generate from PROC
-      FanPeriod = FAN_PERIOD_COUNT-fanOverridePercent*FAN_PERIOD_COUNT; 
-    }
-    else{
-     setFan();
-    }
+    setFan();
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(FAN_TASK_PERIOD_MS));
   }
 }

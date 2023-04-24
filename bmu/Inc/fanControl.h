@@ -1,7 +1,6 @@
 #ifndef FANCONTROL_H
 #define FANCONTROL_H
-
-void overrideFan2FullSpeed();
-void overrideFan2Off();
+#include <stdbool.h>
+bool overrideFansToMax = false;
 
 #endif /* end of include guard: FANCONTROL_H */
