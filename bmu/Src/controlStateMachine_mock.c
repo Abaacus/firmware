@@ -54,15 +54,15 @@ static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
 BaseType_t overrideFansToMaxSpeed(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    overrideFansToMax = true;
-    COMMAND_OUTPUT("Fan full speed\n");
+    isOverrideFansToMaxEnabled = true;
+    COMMAND_OUTPUT("Overridden   the BMU fans to full speed\n");
     return pdFALSE;
 }
 
-static const CLI_Command_Definition_t setFanFullCommandDefinition =
+static const CLI_Command_Definition_t overrideFansToMaxSpeedCommandDefinition =
 {
     "overrideFansToMaxSpeed",
-    "overrideFansToMaxSpeed:\r\n Set the BMU fan to full speed\r\n",
+    "overrideFansToMaxSpeed:\r\n Override the BMU fans to full speed\r\n",
     overrideFansToMaxSpeed,
     0 /* Number of parameters */
 };
@@ -70,15 +70,15 @@ static const CLI_Command_Definition_t setFanFullCommandDefinition =
 BaseType_t disableFansOverride(char *writeBuffer, size_t writeBufferLength,
                        const char *commandString)
 {
-    overrideFansToMax = false;
-    COMMAND_OUTPUT("Fan off\n");
+    isOverrideFansToMaxEnabled = false;
+    COMMAND_OUTPUT("Disabled fans override. They will operate normally now\n");
     return pdFALSE;
 }
 
-static const CLI_Command_Definition_t setFanOffCommandDefinition =
+static const CLI_Command_Definition_t disableFansOverrideCommandDefinition =
 {
     "disableFansOverride",
-    "disableFansOverride:\r\n Turn off the BMU fan\r\n",
+    "disableFansOverride:\r\n Disable override of fans\r\n",
     disableFansOverride,
     0 /* Number of parameters */
 };
@@ -1092,10 +1092,10 @@ HAL_StatusTypeDef stateMachineMockInit()
     if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-    if (FreeRTOS_CLIRegisterCommand(&setFanFullCommandDefinition) != pdPASS) {
+    if (FreeRTOS_CLIRegisterCommand(&overrideFansToMaxSpeedCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
-    if (FreeRTOS_CLIRegisterCommand(&setFanOffCommandDefinition) != pdPASS) {
+    if (FreeRTOS_CLIRegisterCommand(&disableFansOverrideCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&printHVMeasurementsCommandDefinition) != pdPASS) {

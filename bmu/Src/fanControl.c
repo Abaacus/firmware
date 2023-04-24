@@ -30,6 +30,10 @@ uint32_t calculateFanPeriod()
 {
   // PWM Output is inverted from what we generate from PROC
 
+  // check if we are in override mode
+  if (isOverrideFansToMaxEnabled) {
+    return FAN_PERIOD_COUNT - FAN_PERIOD_COUNT*FAN_MAX_DUTY_PERCENT;
+  }
   // Full fan while charging
   if (fsmGetState(&fsmHandle) == STATE_Charging || fsmGetState(&fsmHandle) == STATE_Balancing) {
     /*DEBUG_PRINT("Charging fans\n");*/
@@ -60,13 +64,7 @@ HAL_StatusTypeDef fanInit()
 
 HAL_StatusTypeDef setFan()
 {
-  uint32_t duty;
-  if (overrideFansToMax) {
-    duty = FAN_PERIOD_COUNT - (FAN_MAX_DUTY_PERCENT * FAN_PERIOD_COUNT);
-  }
-  else {
-    duty = calculateFanPeriod();
-  }
+  uint32_t duty = calculateFanPeriod();
   __HAL_TIM_SET_COMPARE(&FAN_HANDLE, TIM_CHANNEL_1, duty);
 
   FanPeriod = duty;
