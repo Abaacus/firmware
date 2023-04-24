@@ -25,6 +25,7 @@
 #include "batteries.h"
 #include "faultMonitor.h"
 #include "ltc_chip.h"
+#include "fanControl.h"
 
 #if IS_BOARD_F7
 #include "imdDriver.h"
@@ -47,6 +48,40 @@ static const CLI_Command_Definition_t debugUartOverCanCommandDefinition =
     "isUartOverCanEnabled",
     "isUartOverCanEnabled help string",
     debugUartOverCan,
+    0 /* Number of parameters */
+};
+
+BaseType_t setFanFull(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    overrideFanControl = true;
+    overridePercent = FAN_MAX_DUTY_PERCENT;
+    COMMAND_OUTPUT("Fan full speed\n");
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setFanFullCommandDefinition =
+{
+    "setFanFull",
+    "setFanFull:\r\n Set the BMU fan to full speed\r\n",
+    setFanFull,
+    0 /* Number of parameters */
+};
+
+BaseType_t setFanOff(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+    overrideFanControl = true;
+    overridePercent = 0.0;
+    COMMAND_OUTPUT("Fan off\n");
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setFanOffCommandDefinition =
+{
+    "setFanOff",
+    "setFanOff:\r\n Turn off the BMU fan\r\n",
+    setFanOff,
     0 /* Number of parameters */
 };
 
@@ -1057,6 +1092,12 @@ HAL_StatusTypeDef stateMachineMockInit()
     cliSetIBus(0);
 
     if (FreeRTOS_CLIRegisterCommand(&debugUartOverCanCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&setFanFullCommandDefinition) != pdPASS) {
+        return HAL_ERROR;
+    }
+    if (FreeRTOS_CLIRegisterCommand(&setFanOffCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
     if (FreeRTOS_CLIRegisterCommand(&printHVMeasurementsCommandDefinition) != pdPASS) {
