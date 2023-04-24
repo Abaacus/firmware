@@ -28,7 +28,16 @@ void selfTestLEDs(void);
 void flashLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void flashDualLED(GPIO_TypeDef* GPIOx1, uint16_t GPIO_Pin1,
                   GPIO_TypeDef* GPIOx2, uint16_t GPIO_Pin2);
-
+void HAL_EM_LED_Toggle(void){
+    if (HAL_GPIO_ReadPin(EM_LED_GPIO_Port, EM_LED_Pin) == GPIO_PIN_SET)
+    {
+        EM_LED_OFF
+    }
+    else
+    {
+       EM_LED_ON
+    }
+}
 /**
  * @brief Task function for led task
  * @details LedTask function, which is the entry to the task controlling the
@@ -63,7 +72,8 @@ void ledTask(void *pvParameters)
                 break;
             case STATE_EM_Toggle:
                 HV_LED_ON;
-                HAL_GPIO_TogglePin(EM_LED_GPIO_Port, EM_LED_Pin);
+                HAL_EM_LED_Toggle();
+                // HAL_GPIO_TogglePin(EM_LED_GPIO_Port, EM_LED_Pin);
                 break;
             case STATE_EM_Enable:
                 HV_LED_ON;
@@ -79,7 +89,7 @@ void ledTask(void *pvParameters)
                 }
 
                 HAL_GPIO_TogglePin(EM_LED_GPIO_Port, HV_LED_Pin);
-                HAL_GPIO_TogglePin(EM_LED_GPIO_Port, EM_LED_Pin);
+                HAL_EM_LED_Toggle();
                 break;
             default:
                 break;
@@ -116,6 +126,7 @@ void selfTestLEDs(void)
 
 void flashLED(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
+    if (GPIOx == EV_LED_EN_GPIO_Port)
     HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET);
     vTaskDelay(pdMS_TO_TICKS(FLASH_DURATION_MS));
     HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
