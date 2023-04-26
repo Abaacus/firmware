@@ -49,7 +49,7 @@ HAL_StatusTypeDef sensorTaskInit()
  */
 void sensorTask(void *pvParameters)
 {
-    
+	vTaskDelay(portMAX_DELAY); 
     if (registerTaskToWatch(3, 2*pdMS_TO_TICKS(SENSOR_TASK_PERIOD), false, NULL) != HAL_OK)
     {
         ERROR_PRINT("Failed to register battery task with watchdog!\n");
