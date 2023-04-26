@@ -1366,7 +1366,7 @@ ChargeReturn balanceCharge(Balance_Type_t using_charger)
          */
         if (sendCAN_BMU_batteryStatusHV() != HAL_OK) {
             ERROR_PRINT("Failed to send batter status HV\n");
-            if (boundedContinue()) { continue; }
+//            if (boundedContinue()) { continue; }
         }
 
         publishPackVoltage(packVoltage);
@@ -1548,7 +1548,7 @@ void batteryTask(void *pvParameter)
          */
         if (sendCAN_BMU_batteryStatusHV() != HAL_OK) {
             ERROR_PRINT("Failed to send battery status HV\n");
-            if (boundedContinue()) { continue; }
+//            if (boundedContinue()) { continue; }
         }
 
 		static bool released_soc = false;
