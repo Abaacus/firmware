@@ -6,11 +6,11 @@ from pathlib import Path
 import os
 
 
-def add_to_dict(dict, signal, value):
-    if signal in dict:
-        dict[signal].append(value)
+def add_to_dict(dictionary, signal, value):
+    if signal in dictionary:
+        dictionary[signal].append(value)
     else:
-        dict[signal] = [value]
+        dictionary[signal] = [value]
 
 
 def parse_args():
