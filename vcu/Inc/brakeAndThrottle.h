@@ -13,14 +13,14 @@
 #define TPS_MAX_WHILE_BRAKE_PRESSED_PERCENT 35
 #define TPS_WHILE_BRAKE_PRESSED_RESET_PERCENT 10
 
-#define THROTT_A_LOW (2547)
+#define THROTT_A_LOW (2570)
 #define THROTT_B_LOW (1137)
 
-#define THROTT_A_HIGH (2899)
-#define THROTT_B_HIGH (1483)
+#define THROTT_A_HIGH (2889)
+#define THROTT_B_HIGH (1449)
 
-#define BRAKE_POS_LOW (1040)
-#define BRAKE_POS_HIGH (1140)
+#define BRAKE_POS_LOW (1030)
+#define BRAKE_POS_HIGH (1150)
 
 #define STEERING_POT_LOW (1) //Pot value when the wheel is all the way to the left
 #define STEERING_POT_HIGH (4095) //Pot value when the wheel is all the way to the right
@@ -41,7 +41,7 @@
 
 #define THROTTLE_POLLING_TASK_ID 4
 #define THROTTLE_POLLING_FLAG_BIT (0)
-#define VCU_DATA_PUBLISH_TIME_MS 25
+#define VCU_DATA_PUBLISH_TIME_MS 50
 #define THROTTLE_POLLING_PERIOD_MS 50
 #define THROTTLE_POLLING_TASK_PERIOD_MS 200
 

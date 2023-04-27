@@ -123,16 +123,17 @@ bool getThrottlePositionPercent(float *throttleOut)
     (*throttleOut) = 0;
 
 
+	ThrottleAReading = brakeThrottleSteeringADCVals[THROTTLE_A_INDEX];
+	ThrottleBReading = brakeThrottleSteeringADCVals[THROTTLE_B_INDEX];
+	BrakeReading = brakeThrottleSteeringADCVals[BRAKE_POS_INDEX];
+	sendCAN_VCU_ADCReadings();
+
     // Read both TPS sensors
     if (is_throttle1_in_range(brakeThrottleSteeringADCVals[THROTTLE_A_INDEX])
         && is_throttle2_in_range(brakeThrottleSteeringADCVals[THROTTLE_B_INDEX]))
     {
         throttle1_percent = calculate_throttle_percent1(brakeThrottleSteeringADCVals[THROTTLE_A_INDEX]);
         throttle2_percent = calculate_throttle_percent2(brakeThrottleSteeringADCVals[THROTTLE_B_INDEX]);
-		ThrottleAReading = brakeThrottleSteeringADCVals[THROTTLE_A_INDEX];
-		ThrottleBReading = brakeThrottleSteeringADCVals[THROTTLE_B_INDEX];
-		BrakeReading = brakeThrottleSteeringADCVals[BRAKE_POS_INDEX];
-		sendCAN_VCU_ADCReadings();
     } else {
       ERROR_PRINT("Throttle pot out of range: (A: %lu, B: %lu)\n", brakeThrottleSteeringADCVals[THROTTLE_A_INDEX], brakeThrottleSteeringADCVals[THROTTLE_B_INDEX]);
       return false;
