@@ -132,6 +132,7 @@ bool getThrottlePositionPercent(float *throttleOut)
 		ThrottleAReading = brakeThrottleSteeringADCVals[THROTTLE_A_INDEX];
 		ThrottleBReading = brakeThrottleSteeringADCVals[THROTTLE_B_INDEX];
 		BrakeReading = brakeThrottleSteeringADCVals[BRAKE_POS_INDEX];
+		sendCAN_VCU_ADCReadings();
     } else {
       ERROR_PRINT("Throttle pot out of range: (A: %lu, B: %lu)\n", brakeThrottleSteeringADCVals[THROTTLE_A_INDEX], brakeThrottleSteeringADCVals[THROTTLE_B_INDEX]);
       return false;

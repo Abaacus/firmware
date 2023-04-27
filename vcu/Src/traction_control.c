@@ -21,7 +21,7 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define MC_ENCODER_OFFSET 32768
 
 #define TRACTION_CONTROL_TASK_ID 3
-#define TRACTION_CONTROL_TASK_PERIOD_MS 20
+#define TRACTION_CONTROL_TASK_PERIOD_MS 50
 #define RPM_TO_RADS(rpm) ((rpm)*2*PI/60.0f)
 
 // Macros for converting RPM to KPH
@@ -31,12 +31,14 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
 #define SECS_PER_HOUR (3600.0f)
 #define RADS_TO_KPH(rads) (rads * (WHEEL_DIAMETER_M/2.0) * SECS_PER_HOUR * M_TO_KM)
-#define TC_kP_DEFAULT (50.0f)
+#define TC_kP_DEFAULT (20.0f)
+#define TC_kI_DEFAULT (0.0f)
+#define TC_kD_DEFAULT (0.0f)
 
 // With our tire radius, rads/s ~ km/h
-#define SLIP_PERCENT_DEFAULT (0.15f)
+#define SLIP_PERCENT_DEFAULT (0.1f)
 #define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (0.0f)
-#define ZERO_SPEED_LOWER_BOUND (7.5f)
+#define ZERO_SPEED_LOWER_BOUND (10.0f)
 #define MAX_SLIP (80.0f)
 
 typedef struct {
@@ -59,8 +61,8 @@ typedef struct {
 static bool tc_on = false;
 
 float tc_kP = TC_kP_DEFAULT;
-float tc_kI = 0.0f;
-float tc_kD = 0.0f;
+float tc_kI = TC_kI_DEFAULT;
+float tc_kD = TC_kD_DEFAULT;
 float desired_slip = SLIP_PERCENT_DEFAULT;
 float adjustment_torque_floor = ADJUSTMENT_TORQUE_FLOOR_DEFAULT;
 

@@ -92,7 +92,7 @@ uint32_t updateFromCAN(uint32_t event)
             }
 			else
 			{
-				if (current_State == STATE_HV_Enable)
+				if (getHVState() == HV_Power_State_On)
 				{
 					updated_state = STATE_HV_Enable;
 				}
