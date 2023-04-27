@@ -177,11 +177,15 @@ uint32_t EM_Fault(uint32_t event)
 {
     int newState = STATE_Failure_Fatal;
     int currentState = fsmGetState(&fsmHandle);
+    
+    EMFaultEvent = event;
+    sendCAN_VCU_EM_Fault();
 
     if (fsmGetState(&fsmHandle) == STATE_Failure_Fatal) {
         DEBUG_PRINT("EM Fault, already in fatal failure state\n");
         return STATE_Failure_Fatal;
     }
+
 
     switch (event) {
         case EV_Bps_Fail:

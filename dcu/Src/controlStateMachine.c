@@ -90,6 +90,18 @@ uint32_t updateFromCAN(uint32_t event)
 
                 DEBUG_PRINT("Recieved an EM on state but already in EM_Enable\n");
             }
+			else
+			{
+				if (current_State == STATE_HV_Enable)
+				{
+					updated_state = STATE_HV_Enable;
+				}
+				else
+				{
+					updated_state = STATE_HV_Disable;	
+				}
+				DEBUG_PRINT("Recieved an EM off state\n");
+			}
 
             break;
 
