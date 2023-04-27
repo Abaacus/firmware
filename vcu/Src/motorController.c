@@ -257,8 +257,8 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
 
     float maxTorqueDemand = min(mcRightSettings.DriveTorqueLimit, mcLeftSettings.DriveTorqueLimit);
 
-	float throttleRight = throttle + (throttle * steeringAngle * TORQUE_VECTOR_FACTOR);
-	float throttleLeft = throttle - (throttle * steeringAngle * TORQUE_VECTOR_FACTOR);
+	float throttleRight = throttle - (throttle * steeringAngle * TORQUE_VECTOR_FACTOR);
+	float throttleLeft = throttle + (throttle * steeringAngle * TORQUE_VECTOR_FACTOR);
 
     float torqueDemandR = map_range_float(throttleRight, 0, 100, 0, maxTorqueDemand);
     float torqueDemandL = map_range_float(throttleLeft, 0, 100, 0, maxTorqueDemand);

@@ -21,7 +21,7 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define MC_ENCODER_OFFSET 32768
 
 #define TRACTION_CONTROL_TASK_ID 3
-#define TRACTION_CONTROL_TASK_PERIOD_MS 50
+#define TRACTION_CONTROL_TASK_PERIOD_MS 35
 #define RPM_TO_RADS(rpm) ((rpm)*2*PI/60.0f)
 
 // Macros for converting RPM to KPH
@@ -40,6 +40,7 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define ADJUSTMENT_TORQUE_FLOOR_DEFAULT (0.0f)
 #define ZERO_SPEED_LOWER_BOUND (10.0f)
 #define MAX_SLIP (80.0f)
+#define INTEGRAL_RESET_SPEED (5.0f)
 
 typedef struct {
 	float FL;
@@ -145,12 +146,11 @@ static float abs_clamp(float input, float high, float low)
 static float compute_side_slip(float front, float rear)
 {
 	float slip = MAX_SLIP;
-	// Check that front speed is > 0 (very low)
-	// If front speed 0, then clamp error high
-	if(fabs(front) > 0.1)
+	if(fabs(front) < 0.1)
 	{
-		slip = (rear - front) / front;
+		front = 0.1;
 	}
+	slip = (rear - front) / front;
 
 	// Clamp error to +/-MAX_SLIP
 	slip = abs_clamp(slip, MAX_SLIP, -MAX_SLIP);
@@ -184,10 +184,10 @@ static float tc_compute_limit(WheelData_S* wheel_data, TCData_S* tc_data)
 	tc_data->torque_max = MAX_TORQUE_DEMAND_DEFAULT;
 	tc_data->torque_adjustment = 0.0f;
 
-	tc_data->left_slip = compute_side_slip(wheel_data->FR, wheel_data->RL); /*Bug fix change back to FL*/
+	tc_data->left_slip = compute_side_slip(wheel_data->FL, wheel_data->RL); 
 	tc_data->right_slip = compute_side_slip(wheel_data->FR, wheel_data->RR);
 
-	if(fabs(wheel_data->RL) < 3.0f && fabs(wheel_data->RR) < 3.0f)
+	if(fabs(wheel_data->RL) < INTEGRAL_RESET_SPEED && fabs(wheel_data->RR) < INTEGRAL_RESET_SPEED)
 	{
 		tc_data->cum_error = 0.0f;
 	}
