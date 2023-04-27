@@ -42,8 +42,6 @@ VAL_TABLE_ BMS_State 7 "Failure_Fatal" 6 "Charging" 5 "Discharge" 4 "Precharge" 
 
 
 BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
- SG_ ThrottleBPercent : 0|8@1+ (0.5,0) [0|127.5] "" Vector__XXX
- SG_ ThrottleAPercent : 0|8@1+ (0.5,0) [0|127.5] "" Vector__XXX
  SG_ Hartbeat_BMU : 0|8@1+ (1,0) [0|0] "" Vector__XXX
  SG_ Hartbeat_VCU_F7 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
  SG_ Hartbeat_DCU : 0|8@1+ (1,0) [0|0] "" Vector__XXX
@@ -70,7 +68,9 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
 BO_ 2287209474 VCU_EM_Fault: 8 VCU_F7
  SG_ EMFaultEvent : 0|8@1+ (1,0) [0|255] ""  VCU_BeagleBone
 
-BO_ 2284981250 VCU_ADCReadings: 6 VCU_F7
+BO_ 2284981250 VCU_ADCReadings: 8 VCU_F7
+ SG_ ThrottleBPercent : 56|8@1+ (0.5,0) [0|127.5] "" Vector__XXX
+ SG_ ThrottleAPercent : 48|8@1+ (0.5,0) [0|127.5] "" Vector__XXX
  SG_ BrakeReading : 32|12@1+ (1,0) [0|4095] ""  VCU_BeagleBone
  SG_ ThrottleBReading : 16|12@1+ (1,0) [0|4095] ""  VCU_BeagleBone
  SG_ ThrottleAReading : 0|12@1+ (1,0) [0|4095] ""  VCU_BeagleBone
