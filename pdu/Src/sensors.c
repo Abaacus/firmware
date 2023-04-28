@@ -13,6 +13,7 @@
 #include "watchdog.h"
 #include "bsp.h"
 
+#define LV_BATTERY_VOLTAGE_LOW_DTC_PERIOD_MS 5000
 #define READY_FOR_PUBLISH(TICKCOUNT, LAST_TIME, INTERVAL) ((TICKCOUNT) - (LAST_TIME) >= pdMS_TO_TICKS(INTERVAL))
 
 volatile uint32_t ADC_Buffer[NUM_PDU_CHANNELS];
@@ -214,7 +215,7 @@ void sensorTask(void *pvParameters)
     // Delay to allow adc readings to start
     vTaskDelay(100);
 
-    uint8_t lowBattery = pdFALSE;
+    TickType_t lastLowBattery = xTaskGetTickCount();
 
     while (1)
     {
@@ -237,8 +238,9 @@ void sensorTask(void *pvParameters)
             ERROR_PRINT("Failed to send bus measurements on can!\n");
         }
 
-        if (lowBattery == pdFALSE && readBusVoltage() <= LOW_VOLTAGE_LIMIT_VOLTS) {
-            lowBattery = pdTRUE; 
+        if ((readBusVoltage() <= LOW_VOLTAGE_LIMIT_VOLTS) && 
+            (xTaskGetTickCount() - lastLowBattery > LV_BATTERY_VOLTAGE_LOW_DTC_PERIOD_MS)) {
+            lastLowBattery = xTaskGetTickCount();
             sendDTC_WARNING_LV_Battery_Low();
         }
 
