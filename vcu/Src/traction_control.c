@@ -31,7 +31,7 @@ We want to do (((int32_t)rpm) - 32768)  where the driver will do  (int32_t)((uin
 #define WHEEL_CIRCUMFERENCE WHEEL_DIAMETER_M*PI
 #define SECS_PER_HOUR (3600.0f)
 #define RADS_TO_KPH(rads) (rads * (WHEEL_DIAMETER_M/2.0) * SECS_PER_HOUR * M_TO_KM)
-#define TC_kP_DEFAULT (20.0f)
+#define TC_kP_DEFAULT (10.0f)
 #define TC_kI_DEFAULT (0.0f)
 #define TC_kD_DEFAULT (0.0f)
 
