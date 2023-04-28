@@ -35,7 +35,7 @@ def main():
 
     csv_in = Path(f'{args.src}')
 
-    dbc = Path('../../../../common/Data/2018CAR.dbc')
+    dbc = Path('2018CAR.dbc')
     db = cantools.db.load_file(dbc)
 
     csv_out = [['Timestamp', 'Signal', 'Value']]
@@ -48,24 +48,28 @@ def main():
         csv_data = next(csv_reader)  # skip header
 
         for csv_data in csv_reader:
-            ms = int(csv_data[0])
-            can_id = int(csv_data[1]) - 0x80000000  # account for extended ids
-            data = bytes.fromhex(''.join(csv_data[2].strip().split(' ')))
+            try:
+                ms = int(csv_data[0])
+                can_id = int(csv_data[1]) - 0x80000000 # account for extended ids
+                
+                data = bytes.fromhex(''.join(csv_data[2].strip().split(' ')))
 
-            name = db.get_message_by_frame_id(can_id).name
-            decoded_data = db.decode_message(can_id, data)
+                name = db.get_message_by_frame_id(can_id).name
+                decoded_data = db.decode_message(can_id, data)
 
-            if args.json:
-                if name not in json_out:
-                    json_out[name] = {}
-                add_to_dict(json_out[name], 'timestamp', ms)
-
-            for signal in decoded_data:
                 if args.json:
-                    add_to_dict(json_out[name],
-                                signal, decoded_data[signal])
-                if args.csv:
-                    csv_out.append([ms, signal, decoded_data[signal]])
+                    if name not in json_out:
+                        json_out[name] = {}
+                    add_to_dict(json_out[name], 'timestamp', ms)
+
+                for signal in decoded_data:
+                    if args.json:
+                        add_to_dict(json_out[name],
+                                    signal, decoded_data[signal])
+                    if args.csv:
+                        csv_out.append([ms, signal, decoded_data[signal]])
+            except Exception:
+                pass
 
     if args.csv:
         if not os.path.exists(args.dest):
