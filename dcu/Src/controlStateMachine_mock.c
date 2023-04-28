@@ -61,10 +61,72 @@ static const CLI_Command_Definition_t setTractionControlCommandDefinition =
 	1 /*Number of parameters*/
 };
 
+BaseType_t toggleAMSFaultLED(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+	BaseType_t paramLen;
+	const char * ledOnStr = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+	char ledOn = 0;
+	sscanf(ledOnStr, "%c", &ledOn);
+
+    if(ledOn == '1')
+	{
+		AMS_FAIL_LED_ON
+	}
+	else if (ledOn == '0')
+	{
+		AMS_FAIL_LED_OFF
+	}
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setAmsLedCommandDefinition =
+{
+	"amsLED",
+	"amsLED <0,1>:\r\n Set AMS Fault LED on or off\r\n",
+	toggleAMSFaultLED,
+	1 /*Number of parameters*/
+};
+
+BaseType_t toggleIMDFaultLED(char *writeBuffer, size_t writeBufferLength,
+                       const char *commandString)
+{
+	BaseType_t paramLen;
+	const char * ledOnStr = FreeRTOS_CLIGetParameter(commandString, 1, &paramLen);
+	char ledOn = 0;
+	sscanf(ledOnStr, "%c", &ledOn);
+
+    if(ledOn == '1')
+	{
+		IMD_FAIL_LED_ON
+	}
+	else if (ledOn == '0')
+	{
+		IMD_FAIL_LED_OFF
+	}
+
+    return pdFALSE;
+}
+
+static const CLI_Command_Definition_t setImdLedCommandDefinition =
+{
+	"imdLED",
+	"imdLED <0,1>:\r\n Set IMD Fault LED on or off\r\n",
+	toggleIMDFaultLED,
+	1 /*Number of parameters*/
+};
+
 HAL_StatusTypeDef stateMachineMockInit()
 {
     if (FreeRTOS_CLIRegisterCommand(&setTractionControlCommandDefinition) != pdPASS) {
         return HAL_ERROR;
     }
+    if (FreeRTOS_CLIRegisterCommand(&setAmsLedCommandDefinition) != pdPASS) {
+		return HAL_ERROR;
+	}
+    if (FreeRTOS_CLIRegisterCommand(&setImdLedCommandDefinition) != pdPASS) {
+		return HAL_ERROR;
+	}
     return HAL_OK;
 }

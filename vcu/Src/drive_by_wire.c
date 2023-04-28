@@ -34,6 +34,7 @@ HAL_StatusTypeDef MotorStop();
 
 extern osThreadId throttlePollingHandle;
 
+
 Transition_t transitions[] = {
     { STATE_Self_Check, EV_Init, &runSelftTests },
     { STATE_EM_Disable, EV_EM_Toggle, &EM_Enable },
@@ -350,7 +351,6 @@ HAL_StatusTypeDef MotorStart()
                               pdMS_TO_TICKS(DRIVE_BY_WIRE_WATCHDOG_TIMEOUT_MS));
 
     DEBUG_PRINT("MCs started up\n");
-
     return HAL_OK;
 }
 

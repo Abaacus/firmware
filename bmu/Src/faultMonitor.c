@@ -246,7 +246,8 @@ void faultMonitorTask(void *pvParameters)
 
 		bool il_ok = getIL_Status();
 		bool cbrb_ok = getCBRB_IL_Status();
-		if(!cbrb_ok && !cbrb_pressed)
+		bool hvd_ok = getHVD_Status();
+		if((!cbrb_ok && hvd_ok) && !cbrb_pressed)
 		{	
 			ERROR_PRINT("Fault Monitor: Cockpit BRB pressed\n");
 			BMU_checkFailed = CBRB_FAILED_BIT;
@@ -260,7 +261,8 @@ void faultMonitorTask(void *pvParameters)
 			fsmSendEvent(&fsmHandle, EV_Cockpit_BRB_Unpressed, portMAX_DELAY);
 			cbrb_pressed = false;
 		}
-		else if (!il_ok && cbrb_ok)
+		
+		if ((!hvd_ok) || (!il_ok && cbrb_ok))
 		{
 			ERROR_PRINT("Fault Monitor: IL broken!\n");
 			BMU_checkFailed = IL_FAILED_BIT;

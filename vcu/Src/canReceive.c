@@ -131,3 +131,13 @@ void CAN_Msg_PDU_DTC_Callback(int DTC_CODE, int DTC_Severity, int DTC_Data) {
             break;
     }
 }
+
+void CAN_Msg_TractionControlConfig_Callback()
+{
+	// This is pretty terrible and should be wrapped in function calls or like have changed names
+	tc_kP = TC_kP;
+	tc_kI = TC_kI;
+	tc_kD = TC_kD;
+	desired_slip = TC_desiredSlipPercent;
+	DEBUG_PRINT_ISR("tc_kP is %f\n", tc_kP);
+}

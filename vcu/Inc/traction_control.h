@@ -3,4 +3,5 @@
 
 void toggle_TC(void);
 void disable_TC(void);
+extern float tc_kP, tc_kI, tc_kD, desired_slip;
 #endif
