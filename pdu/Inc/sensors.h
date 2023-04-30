@@ -44,7 +44,19 @@ const char *channelNames[NUM_PDU_CHANNELS];
 #define LV_MAX_CURRENT_AMPS 50.0f
 //
 // TODO: Find this value
-#define FUSE_BLOWN_MIN_CURRENT_AMPS 5.0
+#define FUSE_BLOWN_MIN_CURRENT_AMPS 0.1
+
+#define FUSE_RATING_THRESHOLD 0.975
+
+#define FAN_FUSE_RATING 10.0
+#define PUMP_FUSE_RATING 10.0
+#define MC_FUSE_RATING 3.0
+#define DCU_FUSE_RATING 3.0
+#define VCU_FUSE_RATING 2.0
+#define BMU_FUSE_RATING 5.0
+#define WSB_FUSE_RATING 2.0
+#define AUX_FUSE_RATING 2.0
+#define BRAKE_LIGHT_FUSE_RATING 2.0
 
 // https://www.icloud.com/numbers/0S6koOG2vne6wmcGm2YSY_cUw#PDU_Calculations
 #define ADC_TO_AMPS_DIVIDER 225.168595041322
