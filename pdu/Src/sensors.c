@@ -194,9 +194,62 @@ float readBusCurrent()
     return rawValue / ADC_TO_AMPS_DIVIDER;
 }
 
-bool checkBlownFuse(float channelCurrent)
+bool checkBlownFuse(PDU_Channels_t channel, float channelCurrent)
 {
-    return channelCurrent <= FUSE_BLOWN_MIN_CURRENT_AMPS;
+    bool fuseDanger = false;
+    if (channel < NUM_PDU_CHANNELS) {
+        switch (channel) {
+            case Fan_Right_Channel:
+                fuseDanger = (channelCurrent >= FAN_FUSE_RATING);
+                break;
+            case DCU_Channel:
+                fuseDanger = (channelCurrent >= DCU_FUSE_RATING);
+                break;
+            case MC_Left_Channel:
+                fuseDanger = (channelCurrent >= MC_FUSE_RATING);
+                break;
+            case Pump_Left_Channel:
+                fuseDanger = (channelCurrent >= PUMP_FUSE_RATING);
+                break;
+            case Fan_Left_Channel:
+                fuseDanger = (channelCurrent >= FAN_FUSE_RATING);
+                break;
+            case VCU_Channel:
+                fuseDanger = (channelCurrent >= VCU_FUSE_RATING);
+                break;
+            case Brake_Light_Channel:
+                fuseDanger = (channelCurrent >= BRAKE_LIGHT_FUSE_RATING);
+                break;
+            case AUX_Channel:
+                fuseDanger = (channelCurrent >= AUX_FUSE_RATING);
+                break;
+            case MC_Right_Channel:
+                fuseDanger = (channelCurrent >= MC_FUSE_RATING);
+                break;
+            case Pump_Right_Channel:
+                fuseDanger = (channelCurrent >= PUMP_FUSE_RATING);
+                break;
+            case BMU_Channel:
+                fuseDanger = (channelCurrent >= BMU_FUSE_RATING);
+                break;
+            case WSB_Channel:
+                fuseDanger = (channelCurrent >= WSB_FUSE_RATING);
+                break;
+            case LV_Current:
+                break;
+            case LV_Voltage:
+                break;
+            default:
+                DEBUG_PRINT("Channel not handled by code\n");
+                break;
+        }
+    }
+
+    if (fuseDanger) {
+        sendDTC_WARNING_PDU_Fuse_Current_High(channel);
+    }
+
+    return fuseDanger;
 }
 
 void sensorTask(void *pvParameters)
@@ -286,8 +339,7 @@ void canPublishCurrent() {
 
 void canPublishFuseStatus() {
     for (PDU_Channels_t channel = 0; channel < NUM_PDU_CHANNELS; channel++) {
-        float channelCurrent = readCurrent(channel);
-        uint8_t fuseStatus = checkBlownFuse(channelCurrent);
+        uint8_t fuseStatus = checkBlownFuse(channel, readCurrent(channel));
         setFuseStatusSignal(channel, fuseStatus);
     }
     if (sendCAN_PDU_Fuse_Status() != HAL_OK) {
