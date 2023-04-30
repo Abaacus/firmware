@@ -1547,7 +1547,7 @@ void batteryTask(void *pvParameter)
          * - StateBMS
          */
         if (sendCAN_BMU_batteryStatusHV() != HAL_OK) {
-            ERROR_PRINT("Failed to send battery status HV\n");
+//            ERROR_PRINT("Failed to send battery status HV\n");
 //            if (boundedContinue()) { continue; }
         }
 
