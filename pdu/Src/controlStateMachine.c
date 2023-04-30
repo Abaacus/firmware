@@ -343,15 +343,36 @@ uint32_t MotorDefaultTransition(uint32_t event)
     return motorsOff(event);
 }
 
+void boardOnChannelStatusPublish() {
+    StatusPowerVCU = StatusPowerVCU_CHANNEL_ON;
+    StatusPowerDCU = StatusPowerDCU_CHANNEL_ON;
+    StatusPowerBMU = StatusPowerBMU_CHANNEL_ON;
+    StatusPowerAUX = StatusPowerAUX_CHANNEL_ON;
+
+    if (sendCAN_PDU_ChannelStatus() != HAL_OK) {
+        ERROR_PRINT("Failed to send pdu channel status CAN message\n");
+    }
+}
+
+void boardOffChannelStatusPublish() {
+    StatusPowerVCU = StatusPowerVCU_CHANNEL_OFF;
+    StatusPowerDCU = StatusPowerDCU_CHANNEL_OFF;
+    StatusPowerBMU = StatusPowerBMU_CHANNEL_OFF;
+
+    if (sendCAN_PDU_ChannelStatus() != HAL_OK) {
+        ERROR_PRINT("Failed to send pdu channel status CAN message\n");
+    }
+}
+
 HAL_StatusTypeDef turnBoardsOn()
 {
     DEBUG_PRINT("Turning boards on\n");
-
     VCU_ENABLE;
     DCU_ENABLE;
     WSB_ENABLE;
     BMU_ENABLE;
     AUX_ENABLE;
+    boardOnChannelStatusPublish();
     return HAL_OK;
 }
 
@@ -362,6 +383,7 @@ HAL_StatusTypeDef turnBoardsOff()
     DCU_DISABLE;
     WSB_DISABLE;
     BMU_DISABLE;
+    boardOffChannelStatusPublish();
     return HAL_OK;
 }
 
@@ -467,6 +489,7 @@ uint32_t coolingLVCuttoff(uint32_t event) {
     coolingOff(event);
     return COOL_STATE_LV_Cuttoff;
 }
+
 uint32_t coolingCriticalFailure(uint32_t event) {
 	coolingOff(event);
     if (fsmGetState(&coolingFsmHandle) != COOL_STATE_HV_CRITICAL) {
@@ -479,12 +502,30 @@ uint32_t coolingCriticalFailure(uint32_t event) {
     return COOL_STATE_HV_CRITICAL;
 }
 
+void coolingChannelStatusPublish(bool cooling_on) {
+    if (cooling_on) {
+        StatusPowerCoolingFanLeft = StatusPowerCoolingFanLeft_CHANNEL_ON;
+        StatusPowerCoolingFanRight = StatusPowerCoolingFanRight_CHANNEL_ON;
+        StatusPowerCoolingPumpLeft = StatusPowerCoolingPumpLeft_CHANNEL_ON;
+        StatusPowerCoolingPumpRight = StatusPowerCoolingPumpRight_CHANNEL_ON;
+    } else {
+        StatusPowerCoolingFanLeft = StatusPowerCoolingFanLeft_CHANNEL_OFF;
+        StatusPowerCoolingFanRight = StatusPowerCoolingFanRight_CHANNEL_OFF;
+        StatusPowerCoolingPumpLeft = StatusPowerCoolingPumpLeft_CHANNEL_OFF;
+        StatusPowerCoolingPumpRight = StatusPowerCoolingPumpRight_CHANNEL_OFF;
+    }
+    if (sendCAN_PDU_ChannelStatus() != HAL_OK) {
+        ERROR_PRINT("Failed to send pdu cooling channel status CAN message\n");
+    }
+}
+
 uint32_t coolingOff(uint32_t event) {
     DEBUG_PRINT("Turning cooling off\n");
     PUMP_LEFT_DISABLE;
     PUMP_RIGHT_DISABLE;
     FAN_LEFT_DISABLE;
     FAN_RIGHT_DISABLE;
+    coolingChannelStatusPublish(false);
     return COOL_STATE_OFF;
 }
 
@@ -494,6 +535,7 @@ uint32_t coolingOn(uint32_t event) {
     PUMP_RIGHT_ENABLE;
     FAN_LEFT_ENABLE;
     FAN_RIGHT_ENABLE;
+    coolingChannelStatusPublish(true);
     return COOL_STATE_ON;
 }
 
