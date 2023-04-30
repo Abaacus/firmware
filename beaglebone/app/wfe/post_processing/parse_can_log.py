@@ -16,8 +16,6 @@ def add_to_dict(dictionary, signal, value):
 
 
 def decode_can_id(can_id):
-    # if can_id < 0x80000000:
-    #     return can_id + 0x8000000  # account for standard ids
     return can_id - 0x80000000  # account for extended ids
 
 
