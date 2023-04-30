@@ -5,10 +5,15 @@ import json
 import argparse
 from pathlib import Path
 import os
+import bitstruct
 import traceback
 
 
 def add_to_dict(dictionary, signal, value):
+    if type(signal) != str:
+        print(type(signal))
+    if isinstance(value, cantools.db.can.signal.NamedSignalValue):
+        value = value.value
     if signal in dictionary:
         dictionary[signal].append(value)
     else:
@@ -33,6 +38,54 @@ def parse_args():
     return args
 
 
+def write_json(csv_in, json_out, dest):
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    json_filename = Path(f'{dest}/parsed_{csv_in.stem}.json')
+    with open(json_filename, 'w') as json_file:
+        json_file.write(json.dumps(json_out, indent=4))
+
+
+def write_csv(csv_in, csv_out, dest):
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    csv_out_filename = Path(f'{dest}/parsed_{csv_in.stem}.csv')
+    with open(csv_out_filename, 'w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerows(csv_out)
+
+
+def parse_line(csv_data, db, args, json_out, csv_out, failed_ids):
+    ts = int(csv_data[0])
+    can_id = decode_can_id(int(csv_data[1]))
+    data = bytes.fromhex(''.join(csv_data[2].strip().split(' ')))
+
+    try:
+        name = db.get_message_by_frame_id(can_id).name
+        decoded_data = db.decode_message(can_id, data)
+
+        if args.json:
+            if name not in json_out:
+                json_out[name] = {}
+            add_to_dict(json_out[name], 'timestamp', ts)
+
+        for signal in decoded_data:
+            if args.json:
+                add_to_dict(json_out[name],
+                            signal, decoded_data[signal])
+            if args.csv:
+                csv_out.append([ts, signal, decoded_data[signal]])
+
+    except KeyError:
+        a = [hex(int(csv_data[1])), hex(can_id),
+             int(csv_data[1]), int(can_id)]
+        if a not in failed_ids:
+            failed_ids.append(a)
+    except bitstruct.Error:
+        print(f'Invalid data length. Line {ts} ignored')
+        pass
+
+
 def main():
     args = parse_args()
     if not args.json and not args.csv:
@@ -50,50 +103,17 @@ def main():
     with open(csv_in, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
         next(csv_reader)  # skip header
-
         for csv_data in csv_reader:
-            # csv_data = csv_data[:-1]  # remove empty last element
-            ms = int(csv_data[0])
-            can_id = decode_can_id(int(csv_data[1]))
-            data = bytes.fromhex(''.join(csv_data[2].strip().split(' ')))
-            try:
-                name = db.get_message_by_frame_id(can_id).name
-                decoded_data = db.decode_message(can_id, data)
-
-                if args.json:
-                    if name not in json_out:
-                        json_out[name] = {}
-                    add_to_dict(json_out[name], 'timestamp', ms)
-
-                for signal in decoded_data:
-                    if args.json:
-                        add_to_dict(json_out[name],
-                                    signal, decoded_data[signal])
-                    if args.csv:
-                        csv_out.append([ms, signal, decoded_data[signal]])
-            except KeyError:
-                a = [hex(int(csv_data[1])), hex(can_id), int(csv_data[1]), int(can_id)]
-                if a not in failed_ids:
-                    failed_ids.append(a)
+            parse_line(csv_data, db, args, json_out, csv_out, failed_ids)
 
     if len(failed_ids) > 1:
         print("Failed to parse the following ids:")
         pprint.pprint(failed_ids)
 
     if args.csv:
-        if not os.path.exists(args.dest):
-            os.makedirs(args.dest)
-        csv_out_filename = Path(f'{args.dest}/parsed_{csv_in.stem}.csv')
-        with open(csv_out_filename, 'w') as csv_file:
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerows(csv_out)
-
+        write_csv(csv_in, csv_out, args.dest)
     if args.json:
-        if not os.path.exists(args.dest):
-            os.makedirs(args.dest)
-        json_filename = Path(f'{args.dest}/parsed_{csv_in.stem}.json')
-        with open(json_filename, 'w') as out:
-            out.write(json.dumps(json_out, indent=4))
+        write_json(csv_in, json_out, args.dest)
 
 
 if __name__ == '__main__':
