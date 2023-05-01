@@ -343,25 +343,30 @@ uint32_t MotorDefaultTransition(uint32_t event)
     return motorsOff(event);
 }
 
-void boardOnChannelStatusPublish() {
+static HAL_StatusTypeDef boardOnChannelStatusPublish() {
     StatusPowerVCU = StatusPowerVCU_CHANNEL_ON;
     StatusPowerDCU = StatusPowerDCU_CHANNEL_ON;
     StatusPowerBMU = StatusPowerBMU_CHANNEL_ON;
     StatusPowerAUX = StatusPowerAUX_CHANNEL_ON;
 
-    if (sendCAN_PDU_ChannelStatus() != HAL_OK) {
+
+    HAL_StatusTypeDef status = sendCAN_PDU_ChannelStatus();
+    if (status != HAL_OK) {
         ERROR_PRINT("Failed to send pdu channel status CAN message\n");
     }
+    return status;
 }
 
-void boardOffChannelStatusPublish() {
+static HAL_StatusTypeDef boardOffChannelStatusPublish() {
     StatusPowerVCU = StatusPowerVCU_CHANNEL_OFF;
     StatusPowerDCU = StatusPowerDCU_CHANNEL_OFF;
     StatusPowerBMU = StatusPowerBMU_CHANNEL_OFF;
 
-    if (sendCAN_PDU_ChannelStatus() != HAL_OK) {
+    HAL_StatusTypeDef status = sendCAN_PDU_ChannelStatus();
+    if (status != HAL_OK) {
         ERROR_PRINT("Failed to send pdu channel status CAN message\n");
     }
+    return status;
 }
 
 HAL_StatusTypeDef turnBoardsOn()
@@ -372,8 +377,7 @@ HAL_StatusTypeDef turnBoardsOn()
     WSB_ENABLE;
     BMU_ENABLE;
     AUX_ENABLE;
-    boardOnChannelStatusPublish();
-    return HAL_OK;
+    return boardOnChannelStatusPublish();
 }
 
 HAL_StatusTypeDef turnBoardsOff()
@@ -383,8 +387,7 @@ HAL_StatusTypeDef turnBoardsOff()
     DCU_DISABLE;
     WSB_DISABLE;
     BMU_DISABLE;
-    boardOffChannelStatusPublish();
-    return HAL_OK;
+    return boardOffChannelStatusPublish();
 }
 
 uint32_t motorsOn(uint32_t event)
@@ -502,7 +505,7 @@ uint32_t coolingCriticalFailure(uint32_t event) {
     return COOL_STATE_HV_CRITICAL;
 }
 
-void coolingChannelStatusPublish(bool cooling_on) {
+static void coolingChannelStatusPublish(bool cooling_on) {
     if (cooling_on) {
         StatusPowerCoolingFanLeft = StatusPowerCoolingFanLeft_CHANNEL_ON;
         StatusPowerCoolingFanRight = StatusPowerCoolingFanRight_CHANNEL_ON;

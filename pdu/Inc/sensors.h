@@ -44,9 +44,7 @@ const char *channelNames[NUM_PDU_CHANNELS];
 #define LV_MAX_CURRENT_AMPS 50.0f
 //
 // TODO: Find this value
-#define FUSE_BLOWN_MIN_CURRENT_AMPS 0.1
-
-#define FUSE_RATING_THRESHOLD 0.975
+// #define FUSE_BLOWN_MIN_CURRENT_AMPS 0.1
 
 #define FAN_FUSE_RATING 10.0
 #define PUMP_FUSE_RATING 10.0
