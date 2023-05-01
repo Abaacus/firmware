@@ -53,47 +53,47 @@ bool checkBlownFuse(PDU_Channels_t channel, float channelCurrent)
     return channelCurrent >= fuseRatings[channel];
 }
 
-void setFuseStatusSignal(PDU_Channels_t channel, bool status) {
+void setFuseStatusSignal(PDU_Channels_t channel, float channelCurrent) {
     if (channel < NUM_PDU_CHANNELS) {
         switch (channel) {
             case Fan_Right_Channel:
-                FuseBlownFanRight = status;
+                FuseBlownFanRight = checkBlownFuse(channel, current);
                 break;
             case DCU_Channel:
-                FuseBlownDCUChannel = status;
+                FuseBlownDCUChannel = checkBlownFuse(channel, current);
                 break;
             case MC_Left_Channel:
-                FuseBlownMCLeft = status;
+                FuseBlownMCLeft = checkBlownFuse(channel, current);
                 break;
             case Pump_Left_Channel:
-                FuseBlownPumpLeft = status;
+                FuseBlownPumpLeft = checkBlownFuse(channel, current);
                 break;
             case Fan_Left_Channel:
-                FuseBlownFanLeft = status;
+                FuseBlownFanLeft = checkBlownFuse(channel, current);
                 break;
             case VCU_Channel:
-                FuseBlownVCUChannel = status;
+                FuseBlownVCUChannel = checkBlownFuse(channel, current);
                 break;
             case Brake_Light_Channel:
-                FuseBlownBrakeLight = status;
+                FuseBlownBrakeLight = checkBlownFuse(channel, current);
                 break;
             case AUX_Channel:
-                FuseBlownAUX = status;
+                FuseBlownAUX = checkBlownFuse(channel, current);
                 break;
             case MC_Right_Channel:
-                FuseBlownMCRight = status;
+                FuseBlownMCRight = checkBlownFuse(channel, current);
                 break;
             case Pump_Right_Channel:
-                FuseBlownPumpRight = status;
+                FuseBlownPumpRight = checkBlownFuse(channel, current);
                 break;
             case BMU_Channel:
-                FuseBlownBMUChannel = status;
+                FuseBlownBMUChannel = checkBlownFuse(channel, current);
                 break;
             case WSB_Channel:
-                FuseBlownWSBChannel = status;
+                FuseBlownWSBChannel = checkBlownFuse(channel, current);
                 break;
             case LV_Current:
-                FuseBlownLVCurrent = status;
+                FuseBlownLVCurrent = checkBlownFuse(channel, current);
                 break;
             case LV_Voltage:
                 break;
@@ -302,8 +302,7 @@ void canPublishCurrent() {
 
 void canPublishFuseStatus() {
     for (PDU_Channels_t channel = 0; channel < NUM_PDU_CHANNELS; channel++) {
-        const bool fuseStatus = checkBlownFuse(channel, readCurrent(channel));
-        setFuseStatusSignal(channel, fuseStatus);
+        setFuseStatusSignal(channel, readCurrent(channel));
     }
     if (sendCAN_PDU_Fuse_Status() != HAL_OK) {
         ERROR_PRINT("Publish PDU fuse statuses failed!\n");
