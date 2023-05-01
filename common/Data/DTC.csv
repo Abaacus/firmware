@@ -57,5 +57,5 @@ DTC CODE,NAME,ORIGIN,SEVERITY,SUBSCRIBERS,DATA,MESSAGE
 56,MOTOR_CONTROLLERS_FAULT_OFF,VCU_F7,4,"DCU,VCU_F7,VCU_BEAGLEBONE,BMU",MotorLeft,"Motor controllers in fault off state"
 57,VCU_F7_EM_ENABLED_ERROR,VCU_F7,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU",NA,"VCU: Unknown EM Fault"
 58,VCU_F7_EV_FATAL,VCU_F7,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU",NA,"VCU: Got Fatal DTC"
-59, VCU_F7_NoTransition,VCU_F7,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU",NA,"VCU: No state machine transition found"
+59, VCU_F7_NoTransition,VCU_F7,1,"PDU, DCU,VCU_F7,VCU_BEAGLEBONE,BMU",NA,VCU: No state machine transition found
 60,PDU_Fuse_Current_High,PDU,4,"DCU,VCU_F7,VCU_BEAGLEBONE,BMU",channel,"Channel current for #data (check enum) is over the fuse rating"
