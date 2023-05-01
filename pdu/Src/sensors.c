@@ -53,7 +53,7 @@ bool checkBlownFuse(PDU_Channels_t channel, float channelCurrent)
     return channelCurrent >= fuseRatings[channel];
 }
 
-void setFuseStatusSignal(PDU_Channels_t channel, float channelCurrent) {
+void setFuseStatusSignal(PDU_Channels_t channel, float current) {
     if (channel < NUM_PDU_CHANNELS) {
         switch (channel) {
             case Fan_Right_Channel:
