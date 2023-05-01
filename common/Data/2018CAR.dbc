@@ -104,6 +104,7 @@ BO_ 2284129283 PDU_Fan_and_Pump_Current: 8 PDU
  SG_ ChannelCurrentFanLeft : 0|16@1+ (0.01,0) [0|0] "Amps"  VCU_BeagleBone
 
 BO_ 2293566467 PDU_Fuse_Status: 2 PDU
+ SG_ FuseBlownLVCurrent : 6|1@1+ (1,0) [0|0] ""  VCU_BeagleBone
  SG_ FuseBlownWSBChannel : 12|1@1+ (1,0) [0|0] ""  VCU_BeagleBone
  SG_ FuseBlownVCUChannel : 11|1@1+ (1,0) [0|0] ""  VCU_BeagleBone
  SG_ FuseBlownPumpRight : 10|1@1+ (1,0) [0|0] ""  VCU_BeagleBone

@@ -55,6 +55,7 @@ const char *channelNames[NUM_PDU_CHANNELS];
 #define WSB_FUSE_RATING 2.0
 #define AUX_FUSE_RATING 2.0
 #define BRAKE_LIGHT_FUSE_RATING 2.0
+#define LV_FUSE_RATING 20.0
 
 // https://www.icloud.com/numbers/0S6koOG2vne6wmcGm2YSY_cUw#PDU_Calculations
 #define ADC_TO_AMPS_DIVIDER 225.168595041322

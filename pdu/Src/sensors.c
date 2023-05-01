@@ -32,8 +32,28 @@ const char *channelNames[] = {  "Fan Right",
                             "Pump Right",
                             "BMU",
                             "WSB"};
+const float fuseRatings[] = { FAN_FUSE_RATING,
+                            DCU_FUSE_RATING,
+                            MC_FUSE_RATING,
+                            PUMP_FUSE_RATING,
+                            FAN_FUSE_RATING,
+                            VCU_FUSE_RATING,
+                            BRAKE_LIGHT_FUSE_RATING,
+                            AUX_FUSE_RATING,
+                            LV_FUSE_RATING,
+                            LV_FUSE_RATING,
+                            MC_FUSE_RATING,
+                            PUMP_FUSE_RATING,
+                            BMU_FUSE_RATING,
+                            WSB_FUSE_RATING
+};
 
-void setFuseStatusSignal(PDU_Channels_t channel, uint8_t status) {
+bool checkBlownFuse(PDU_Channels_t channel, float channelCurrent)
+{
+    return channelCurrent >= fuseRatings[channel];
+}
+
+void setFuseStatusSignal(PDU_Channels_t channel, bool status) {
     if (channel < NUM_PDU_CHANNELS) {
         switch (channel) {
             case Fan_Right_Channel:
@@ -73,6 +93,7 @@ void setFuseStatusSignal(PDU_Channels_t channel, uint8_t status) {
                 FuseBlownWSBChannel = status;
                 break;
             case LV_Current:
+                FuseBlownLVCurrent = status;
                 break;
             case LV_Voltage:
                 break;
@@ -194,64 +215,6 @@ float readBusCurrent()
     return rawValue / ADC_TO_AMPS_DIVIDER;
 }
 
-bool checkBlownFuse(PDU_Channels_t channel, float channelCurrent)
-{
-    bool fuseDanger = false;
-    if (channel < NUM_PDU_CHANNELS) {
-        switch (channel) {
-            case Fan_Right_Channel:
-                fuseDanger = (channelCurrent >= FAN_FUSE_RATING);
-                break;
-            case DCU_Channel:
-                fuseDanger = (channelCurrent >= DCU_FUSE_RATING);
-                break;
-            case MC_Left_Channel:
-                fuseDanger = (channelCurrent >= MC_FUSE_RATING);
-                break;
-            case Pump_Left_Channel:
-                fuseDanger = (channelCurrent >= PUMP_FUSE_RATING);
-                break;
-            case Fan_Left_Channel:
-                fuseDanger = (channelCurrent >= FAN_FUSE_RATING);
-                break;
-            case VCU_Channel:
-                fuseDanger = (channelCurrent >= VCU_FUSE_RATING);
-                break;
-            case Brake_Light_Channel:
-                fuseDanger = (channelCurrent >= BRAKE_LIGHT_FUSE_RATING);
-                break;
-            case AUX_Channel:
-                fuseDanger = (channelCurrent >= AUX_FUSE_RATING);
-                break;
-            case MC_Right_Channel:
-                fuseDanger = (channelCurrent >= MC_FUSE_RATING);
-                break;
-            case Pump_Right_Channel:
-                fuseDanger = (channelCurrent >= PUMP_FUSE_RATING);
-                break;
-            case BMU_Channel:
-                fuseDanger = (channelCurrent >= BMU_FUSE_RATING);
-                break;
-            case WSB_Channel:
-                fuseDanger = (channelCurrent >= WSB_FUSE_RATING);
-                break;
-            case LV_Current:
-                break;
-            case LV_Voltage:
-                break;
-            default:
-                DEBUG_PRINT("Channel not handled by code\n");
-                break;
-        }
-    }
-
-    if (fuseDanger) {
-        sendDTC_WARNING_PDU_Fuse_Current_High(channel);
-    }
-
-    return fuseDanger;
-}
-
 void sensorTask(void *pvParameters)
 {
     if (registerTaskToWatch(4, 2*pdMS_TO_TICKS(SENSOR_READ_PERIOD_MS), false, NULL) != HAL_OK)
@@ -339,7 +302,7 @@ void canPublishCurrent() {
 
 void canPublishFuseStatus() {
     for (PDU_Channels_t channel = 0; channel < NUM_PDU_CHANNELS; channel++) {
-        uint8_t fuseStatus = checkBlownFuse(channel, readCurrent(channel));
+        const bool fuseStatus = checkBlownFuse(channel, readCurrent(channel));
         setFuseStatusSignal(channel, fuseStatus);
     }
     if (sendCAN_PDU_Fuse_Status() != HAL_OK) {

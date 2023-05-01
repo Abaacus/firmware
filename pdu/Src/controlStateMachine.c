@@ -349,7 +349,6 @@ static HAL_StatusTypeDef boardOnChannelStatusPublish() {
     StatusPowerBMU = StatusPowerBMU_CHANNEL_ON;
     StatusPowerAUX = StatusPowerAUX_CHANNEL_ON;
 
-
     HAL_StatusTypeDef status = sendCAN_PDU_ChannelStatus();
     if (status != HAL_OK) {
         ERROR_PRINT("Failed to send pdu channel status CAN message\n");
