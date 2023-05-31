@@ -27,16 +27,13 @@
 
 /* The following is specified in Volts (floating point) */
 /// Maximum voltage of a cell, will send a critical DTC is exceeded.
-
 #define DEFAULT_LIMIT_OVERVOLTAGE 4.2F
-volatile float LIMIT_OVERVOLTAGE = DEFAULT_LIMIT_OVERVOLTAGE;
 /// Used in SOC function. TODO: confirm this value
 #define LIMIT_HIGHVOLTAGE 4.2F
 /// Used in SOC function. TODO: confirm this value
 #define LIMIT_LOWVOLTAGE 3.0F
 /// Minimum voltage of a cell, will send a critical DTC if it goes below
 #define DEFAULT_LIMIT_UNDERVOLTAGE 2.5F
-volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 /// Warning voltage of a cell, will send a warning DTC if it goes below
 #define LIMIT_LOWVOLTAGE_WARNING 2.8F
 /// Rate at which the low voltage threshold dynamically lowers vs current
@@ -108,6 +105,12 @@ volatile float LIMIT_UNDERVOLTAGE = DEFAULT_LIMIT_UNDERVOLTAGE;
 #define READ_CELL_VOLTAGE_TEMPS_FAIL_BIT            (1U << 2)
 #define CHECK_CELL_VOLTAGE_TEMPS_FAIL_BIT           (1U << 3)
 #define PACK_VOLTAGE_FAIL_BIT                       (1U << 4)
+
+/* 
+ * canSendTask sends in multiples of 3 as 8 bits must be used for the muxIndex leaving 56 data bits for cell readings of 16 bits each
+ * Therefore cell readings are send in groups of 3.
+ */
+#define CAN_SEND_CELL_NUM_CELLS_PER_MUX_GROUP 3
 
 /**
  * Return of balance charge function

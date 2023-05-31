@@ -45,6 +45,7 @@
 #include "imdDriver.h"
 #endif
 
+
 /*
  * Defines to enable/disable different functionality for testing purposes
  */
@@ -67,6 +68,11 @@ float adjustedCellIR = ADJUSTED_CELL_IR_DEFAULT;
  * Charging voltage limit to be sent to charger. Charging is actually stopped based on min cell SoC as specified by @ref CHARGE_STOP_SOC
  */
 float maxChargeVoltage = DEFAULT_LIMIT_OVERVOLTAGE * NUM_VOLTAGE_CELLS;
+
+// Limits for Under/Over Voltage - Can be overwritten from the CLI
+volatile float limit_overvoltage = DEFAULT_LIMIT_OVERVOLTAGE;
+volatile float limit_undervoltage = DEFAULT_LIMIT_UNDERVOLTAGE;
+
 
 /**
  * Set to true if we've already sent a high temperature warning for this cell to
@@ -539,7 +545,7 @@ HAL_StatusTypeDef initVoltageAndTempArrays()
    float initVoltage = 3.5;
    float initTemp = 0;
 #elif IS_BOARD_NUCLEO_F7 || !defined(ENABLE_AMS)
-   float initVoltage = LIMIT_OVERVOLTAGE - 0.1;
+   float initVoltage = limit_overvoltage - 0.1;
    float initTemp = CELL_OVERTEMP - 20;
 #else
 #error Unsupported board type
@@ -690,7 +696,7 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
        return HAL_ERROR;
    } 
    *maxVoltage = 0;
-   *minVoltage = LIMIT_OVERVOLTAGE;
+   *minVoltage = limit_overvoltage;
    *maxTemp = -100; // Cells shouldn't get this cold right??
    *minTemp = CELL_OVERTEMP;
    *packVoltage = 0;
@@ -709,11 +715,11 @@ HAL_StatusTypeDef checkCellVoltagesAndTemps(float *maxVoltage, float *minVoltage
       measure_low = VoltageCell[i];
 
       // Check it is within bounds
-      if (measure_high < LIMIT_UNDERVOLTAGE) {
+      if (measure_high < limit_undervoltage) {
          ERROR_PRINT("Cell %d is undervoltage at %f Volts\n", i, measure_high);
          sendDTC_CRITICAL_CELL_VOLTAGE_LOW(i);
          rc = HAL_ERROR;
-      } else if (measure_low > LIMIT_OVERVOLTAGE) {
+      } else if (measure_low > limit_overvoltage) {
 		 ERROR_PRINT("Cell %d is overvoltage at %f Volts\n", i, measure_low);
          sendDTC_CRITICAL_CELL_VOLTAGE_HIGH(i);
          rc = HAL_ERROR;
@@ -1084,8 +1090,8 @@ float map_range_float(float in, float low, float high, float low_out, float high
 float getSOCFromVoltage(float cellVoltage)
 {
     // mV per step 11.88
-    float VoltsPerLookup = (LIMIT_OVERVOLTAGE - LIMIT_UNDERVOLTAGE) / (NUM_SOC_LOOKUP_VALS-1);
-    float lookupIndex = (cellVoltage - LIMIT_UNDERVOLTAGE) / VoltsPerLookup;
+    float VoltsPerLookup = (limit_overvoltage - limit_undervoltage) / (NUM_SOC_LOOKUP_VALS-1);
+    float lookupIndex = (cellVoltage - limit_undervoltage) / VoltsPerLookup;
     if (lookupIndex < 0) { lookupIndex = 0;}
     if (lookupIndex > (NUM_SOC_LOOKUP_VALS-1)) { lookupIndex = (NUM_SOC_LOOKUP_VALS-1);}
     int lookupIndexInt = (int)lookupIndex;
@@ -1545,6 +1551,15 @@ void clearSendOnlyOneCell()
   sendOneCellVoltAndTemp = false;
 }
 
+// Round up input to the nearest multiple. 
+// ex. roundUpNearestMultiple(7, 100) = 100
+//     roundUpNearestMultiple(117, 100) = 200
+//     roundUpNearestMultiple(70, 3) = 72 (our use case for cell indexing)
+static inline uint8_t roundUpNearestMultiple(uint8_t input, uint8_t multiple)
+{
+    return (multiple <= 1 || input % multiple == 0) ? input : input + (multiple - (input % multiple));
+}
+
 /**
  * @brief Sends the cell voltages and temperatures over CAN
  *
@@ -1556,9 +1571,9 @@ void canSendCellTask(void *pvParameters)
 
   while (1) {
     if (sendOneCellVoltAndTemp) {
-      // The cell index for sending should be a multiple of 3, as the cells are
-      // sent in groups of 3
-      cellIdxToSend = cellToSend - (cellToSend % 3);
+      // The cell index for sending should be a multiple of CAN_SEND_CELL_NUM_CELLS_PER_MUX_GROUP, as the cells are
+      // sent in groups of CAN_SEND_CELL_NUM_CELLS_PER_MUX_GROUP
+      cellIdxToSend = cellToSend - (cellToSend % CAN_SEND_CELL_NUM_CELLS_PER_MUX_GROUP);
     }
 
     sendCAN_BMU_CellVoltage(cellIdxToSend);
@@ -1566,9 +1581,12 @@ void canSendCellTask(void *pvParameters)
     sendCAN_BMU_ChannelTemp(cellIdxToSend);
 
     // Move on to next cells
-    // 3 Cells per CAN message
-    cellIdxToSend += 3;
-    cellIdxToSend = cellIdxToSend % NUM_VOLTAGE_CELLS;
+    // CAN_SEND_CELL_NUM_CELLS_PER_MUX_GROUP Cells per CAN message
+    cellIdxToSend += CAN_SEND_CELL_NUM_CELLS_PER_MUX_GROUP;
+    if (cellIdxToSend >= roundUpNearestMultiple(NUM_VOLTAGE_CELLS, CAN_SEND_CELL_NUM_CELLS_PER_MUX_GROUP))
+    {
+        cellIdxToSend = 0;
+    }
 
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CAN_CELL_SEND_PERIOD_MS));
   }
