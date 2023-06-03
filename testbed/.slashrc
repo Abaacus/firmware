@@ -1,5 +1,6 @@
 import slash
 from testbeds.hil_testbed import *
+import can.interfaces.slcan as slcan
 
 @slash.plugins.active
 class ParamsPlugin(slash.plugins.PluginInterface):
@@ -15,5 +16,10 @@ class ParamsPlugin(slash.plugins.PluginInterface):
 			self.testbed_name = "VehicleHIL"
 
 	def session_start(self):
-		slash.g.can_listeners = dict()
+		slash.g.vehicle_bus = None
+		slash.g.hil_bus = None
+		
+		slash.g.vehicle_listeners = {}
+		slash.g.hil_listeners = {}
+
 		slash.g.testbed = globals()[self.testbed_name]()

@@ -1,23 +1,22 @@
 import slash
-from testbeds.common_testbed import Testbed
-
+from drivers.sim_boards.vcu_sim import VCUSim
+from testbeds.common_testbed import Testbed, HWManifestItem
+from drivers.boards.vcu import VCU
 
 class HILTestbed(Testbed):
     pass
 
-class VehicleHIL(HILTestbed):
-    def hw_manifest(self):
-        return {
-            "vcu": {
-                "driver": "VCU",
-                "can_interface": "can1"
-            },
-            "vcu_sim": {
-                "driver": "VCUSim",
-                "can_interface": "can2"
-            }
-        }
 
-@slash.fixture()
+class VehicleHIL(HILTestbed):
+    vehicle_manifest = [
+        HWManifestItem("vcu", VCU, {}),
+    ]
+    hil_manifest = [
+        HWManifestItem("vcu_hil", VCUSim, {}),
+    ]
+    
+
+
+@slash.fixture
 def hil_testbed():
-    return slash.g.testbed 
+    return slash.g.testbed
