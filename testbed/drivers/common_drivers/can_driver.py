@@ -62,5 +62,5 @@ class HilCANDriver(CANDriver):
 
         self.listener.register_can_listener(self.can_id, self.can_msg_rx)
 
-    def __can_msg_tx(self, msg):
+    def __can_msg_tx(self, msg: can.Message):
         self._bus.send(msg)
