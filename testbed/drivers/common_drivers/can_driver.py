@@ -32,14 +32,16 @@ class CANDriver(TestbedDriver):
             msg.data,
             allow_truncated=True
         )
-        for signal_name, signal_value in decoded_data.items():
+        for signal_name, signal_value in decoded_data.items(): # type: ignore
             self.store[signal_name] = signal_value
 
     def get_signal(self, signal_name):
-        if signal_name not in self.store:
+        # Should be faster to fail fast than to check if signal_name is in self.store
+        try:
+            return self.store[signal_name]
+        except KeyError:
             logger.warning(f"Signal {signal_name} not found in {self.name}")
             return None
-        return self.store[signal_name]
 
 class VehicleCANDriver(CANDriver):
     def __init__(self, name, bus, db, can_id):
@@ -62,5 +64,10 @@ class HilCANDriver(CANDriver):
 
         self.listener.register_can_listener(self.can_id, self.can_msg_rx)
 
-    def __can_msg_tx(self, msg: can.Message):
+    def set_signal(self, message_name, signal_name, signal_value):
+        try:
+            msg = self.db.encode_message(message_name, {signal_name: signal_value})
+        except KeyError:
+            logger.warning(f"Message {message_name} not found in {self.name}")
+            return
         self._bus.send(msg)
