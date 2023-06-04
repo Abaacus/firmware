@@ -18,5 +18,5 @@ class VehicleHIL(HILTestbed):
 
 
 @slash.fixture
-def hil_testbed():
+def teststand():
     return slash.g.testbed

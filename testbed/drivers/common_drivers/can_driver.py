@@ -1,9 +1,9 @@
+import cantools
 from drivers.common_drivers.driver import TestbedDriver
 import can
 from slash import logger
 import slash
-import can.interfaces.slcan as slcan
-import time
+
 class CANListener(can.Listener):
     def __init__(self, interface_name):
         super().__init__()
@@ -17,44 +17,50 @@ class CANListener(can.Listener):
             self.callbacks[board_id](msg)
 
 class CANDriver(TestbedDriver):
-    def __init__(self, name, bus, can_id):
+    def __init__(self, name, bus, db: cantools.db.Database, can_id):
         super().__init__(name)
         self.can_id = can_id
         self.name = name
         self._bus = bus
-        self.listener = None
-        
-            # slash.g.can_listeners[self.can_interface] = CANListener(self.can_interface)
-            # notifier = can.Notifier(slash.g.vehicle_bus, slash.g.can_listeners[self.can_interface])
-            # can.Notifier(slash.g.hil_bus, slash.g.can_listeners[self.can_interface])
-        # slash.g.can_listeners[self.can_interface].register_can_listener(self.can_id, self.can_msg_rx)
+        self.db = db
 
+        self.store = {}
 
     def can_msg_rx(self, msg):
-        logger.debug(f"RXed id: {msg.arbitration_id} {msg.data}")
-        # TODO: Store the CAN data within the CANDriver object
+        decoded_data = self.db.decode_message(
+            msg.arbitration_id,
+            msg.data,
+            allow_truncated=True
+        )
+        for signal_name, signal_value in decoded_data.items():
+            self.store[signal_name] = signal_value
 
-    def get_can_signal(self, signal_name):
-        # TODO: Add DBC connection for signal name parsing
-        # TODO: Add signal formatting and parsing through DBC
-        pass
+    def get_signal(self, signal_name):
+        if signal_name not in self.store:
+            logger.warning(f"Signal {signal_name} not found in {self.name}")
+            return None
+        return self.store[signal_name]
 
 class VehicleCANDriver(CANDriver):
-    def __init__(self, name, bus, can_id):
-        super().__init__(name, bus, can_id)
+    def __init__(self, name, bus, db, can_id):
+        super().__init__(name, bus, db, can_id)
         assert self.name not in slash.g.vehicle_listeners
+
         self.listener = CANListener(self.name)
         slash.g.vehicle_listeners[self.name] = self.listener
 
+        self.listener.register_can_listener(self.can_id, self.can_msg_rx)
+        
+
 class HilCANDriver(CANDriver):
-    def __init__(self, name, bus, can_id):
-        super().__init__(name, bus, can_id)
-        assert self.name not in slash.g.hil_listeners
+    def __init__(self, name, bus, db, can_id):
+        super().__init__(name, bus, db, can_id)
+        assert self.name not in slash.g.fil_listeners
+
         self.listener = CANListener(self.name)
         slash.g.hil_listeners[self.name] = self.listener
 
-    def send_can_msg(self, msg):
+        self.listener.register_can_listener(self.can_id, self.can_msg_rx)
+
+    def __can_msg_tx(self, msg):
         self._bus.send(msg)
-
-
-print('__bus' in vars(CANDriver))

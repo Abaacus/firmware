@@ -1,5 +1,5 @@
-from drivers.common_drivers.can_driver import CANDriver
-class VCU(CANDriver):
+from drivers.common_drivers.can_driver import VehicleCANDriver
+class VCU(VehicleCANDriver):
     CAN_ID = 2
-    def __init__(self, name, can_interface):
-        super().__init__(name, can_interface, self.CAN_ID,)
+    def __init__(self, name, bus, db):
+        super().__init__(name, bus, db, self.CAN_ID)
