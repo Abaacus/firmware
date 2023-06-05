@@ -1,17 +1,9 @@
-import time
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from dataclasses import dataclass
-
+from typing import List
 import cantools
-from drivers.common_drivers.can_driver import CANDriver
-from drivers.boards.vcu import VCU
-from drivers.sim_boards.vcu_sim import VCUSim
-from slash import logger
 import slash
-from copy import copy
-import atexit
 import can.interfaces.slcan as slcan
 import can
+from drivers.common_drivers.can_driver import CANDriver
 
 
 class HWManifestItem:

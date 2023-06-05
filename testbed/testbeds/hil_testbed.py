@@ -1,5 +1,5 @@
 import slash
-from drivers.sim_boards.vcu_sim import VCUSim
+from drivers.hil_boards.vcu_hil import VCUHil
 from testbeds.common_testbed import Testbed, HWManifestItem
 from drivers.boards.vcu import VCU
 
@@ -12,7 +12,7 @@ class VehicleHIL(HILTestbed):
         HWManifestItem("vcu", VCU, {}),
     ]
     hil_manifest = [
-        HWManifestItem("vcu_hil", VCUSim, {}),
+        HWManifestItem("vcu_hil", VCUHil, {}),
     ]
     
 
