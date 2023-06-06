@@ -8,5 +8,8 @@ from testbeds.hil_testbed import teststand
 
 def test_can(teststand):
     print(teststand.vehicle_boards)
+    a = time.time()
     while 1:
-        print(teststand.vehicle_boards["vcu"].get_signal('FR_Speed_RAD_S'))
+        # if time.time() - a > 1:
+        print(teststand.vehicle_boards["vcu"].store)
+            # a = time.time()

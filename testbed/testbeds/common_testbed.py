@@ -25,7 +25,7 @@ class Testbed:
     vehicle_manifest: List[HWManifestItem] = []
     hil_manifest: List[HWManifestItem] = []
     def __init__(self):
-        vehicle_port = "COM4"
+        vehicle_port = "/dev/ttyACM1"
         hil_port = "COM12"
         # TODO: Maybe move this to .slashrc as an arg
         self.vehicle_db = cantools.db.load_file("../common/Data/2018CAR.dbc")
@@ -33,7 +33,7 @@ class Testbed:
         # self.hil_db = cantools.db.load_file("testbeds/dbc/hil.dbc")
 
 
-        vehicle_bus = slcan.slcanBus(channel=vehicle_port, ttyBaudrate=230400, bitrate=500000)
+        vehicle_bus = slcan.slcanBus(channel=vehicle_port, ttyBaudrate=1000000, bitrate=500000)
         # self.hil_bus = slcan.slcanBus(channel=hil_port, ttyBaudrate=230400, bitrate=500000)
 
         
