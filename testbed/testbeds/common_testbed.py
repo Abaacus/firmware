@@ -5,58 +5,60 @@ import slash
 import can.interfaces.slcan as slcan
 from can.interfaces.socketcan.socketcan import SocketcanBus
 import can
-from drivers.common_drivers.can_driver import CANDriver
+from drivers.common_drivers.can_driver import CANDriver, CANListener
 
 
 class HWManifestItem:
-        '''
-        Class to store information about a hardware board in the testbed manifest
-        @name: Name of the board, must NOT have spaces
-        @classObj: Class object of the board driver, ex: VCU
-        @params: Dictionary of parameters to pass to the board driver
-        '''
-        def __init__(self, name: str, classObj, params) -> None:
-            self.name = name
-            self.classObj: CANDriver = classObj
-            self.params = params
+    '''
+    Class to store information about a hardware board in the testbed manifest
+    @name: Name of the board, must NOT have spaces
+    @classObj: Class object of the board driver, ex: VCU
+    '''
 
-        def __repr__(self) -> str:
-            return f"HWManifestItem(name={self.name}, classObj={self.classObj}, params={self.params})"
+    def __init__(self, name: str, classObj: CANDriver):
+        self.name = name
+        self.classObj = classObj
+
+    def __repr__(self) -> str:
+        return f"HWManifestItem(name={self.name}, classObj={self.classObj})"
+
 
 class Testbed:
     vehicle_manifest: List[HWManifestItem] = []
     hil_manifest: List[HWManifestItem] = []
+
     def __init__(self):
-        vehicle_port = "/dev/ttyACM7"
-        hil_port = "COM12"
-        # TODO: Maybe move this to .slashrc as an arg
-        self.vehicle_db = cantools.db.load_file("../common/Data/2018CAR.dbc")
+        # Choose which to enable, useful for debugging individual buses
+        setup_vehicle = False
+        setup_hil = True
 
-        self.hil_db = cantools.db.load_file("HIL_Firmware/HIL.dbc")
+        # Vehicle Bus
+        if setup_vehicle:
+            # TODO: Maybe move this to .slashrc as an arg
+            vehicle_db = cantools.db.load_file("../common/Data/2018CAR.dbc")
 
+            vehicle_bus = SocketcanBus(channel='slcan1', bitrate=500000)
+            assert vehicle_bus is not None, "Vehicle bus not initialized"
 
-        # vehicle_bus = SocketcanBus(channel='slcan0', bitrate=500000)
-        # time.sleep(2) # wait for bus to init
-        hil_bus = SocketcanBus(channel='slcan0', bitrate=500000)
+            vehicle_listener = CANListener()
+            can.Notifier(hil_bus, [vehicle_listener])
 
-        
-        self.vehicle_boards = {}
-        self.hil_boards = {}
+            self.vehicle_boards = {}
+            for board in self.vehicle_manifest:
+                self.vehicle_boards[board.name] = board.classObj(
+                    board.name, vehicle_bus, vehicle_db, vehicle_listener)
 
-        # for board in self.vehicle_manifest:
-        #     self.vehicle_boards[board.name] = board.classObj(board.name, vehicle_bus, self.vehicle_db, **board.params) # type: ignore
-        
-        for board in self.hil_manifest:
-            self.hil_boards[board.name] = board.classObj(board.name, hil_bus, self.hil_db, **board.params) # type: ignore
+        # HIL Bus
+        if setup_hil:
+            hil_db = cantools.db.load_file("HIL_Firmware/HIL.dbc")
 
-        
-        # assert vehicle_bus is not None, "Vehicle bus not initialized"
-        assert hil_bus is not None, "HIL bus not initialized"
+            hil_bus = SocketcanBus(channel='slcan0', bitrate=500000)
+            assert hil_bus is not None, "HIL bus not initialized"
 
-        # can.Notifier(vehicle_bus, [listener for name, listener in slash.g.vehicle_listeners.items()])
-        can.Notifier(hil_bus, [listener for name, listener in slash.g.hil_listeners.items()])
-        # can.Notifier(self.hil_bus, slash.g.hil_listeners)
-    
-    def close_buses(self):
-        self.vehicle_bus.shutdown()
-        self.hil_bus.shutdown()
+            hil_listener = CANListener()
+            can.Notifier(hil_bus, [hil_listener])
+
+            self.hil_boards = {}
+            for board in self.hil_manifest:
+                self.hil_boards[board.name] = board.classObj(
+                    board.name, hil_bus, hil_db, hil_listener)

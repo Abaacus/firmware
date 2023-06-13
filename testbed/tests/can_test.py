@@ -17,14 +17,13 @@ def test_can(teststand):
     while 1:
         v = (v + 200) % 3300
         vcu_hil.set_signal(message_name="Throttle_position_A", signal_name="Throttle_position_A", signal_value=v)
-        time.sleep(1)
         vcu_hil.set_signal(message_name="Throttle_position_B", signal_name="Throttle_position_B", signal_value=v)
         time.sleep(1)
         try:
             store = vcu_hil.store
             print(store, f'{errors=}')
         except ValueError:
-            erros += 1
+            errors += 1
         except KeyError:
             pass
             # input()
