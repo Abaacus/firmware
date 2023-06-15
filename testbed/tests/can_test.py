@@ -12,22 +12,15 @@ from drivers.hil_boards.vcu_hil import VCUHil
 def test_can(teststand):
     print(teststand.hil_boards)
     vcu_hil: VCUHil = teststand.hil_boards["vcu_hil"]
-    errors = 0
-    v = 0
+    mV = 0
     while 1:
-        v = (v + 200) % 3300
-        vcu_hil.set_signal(message_name="Throttle_position_A", signal_name="Throttle_position_A", signal_value=v)
-        vcu_hil.set_signal(message_name="Throttle_position_B", signal_name="Throttle_position_B", signal_value=v)
-        time.sleep(1)
-        try:
-            store = vcu_hil.store
-            print(store, f'{errors=}')
-        except ValueError:
-            errors += 1
-        except KeyError:
-            pass
-            # input()
-        # if time.time() - a > 1:
-       
-
-        # a = time.time()
+        mV = (mV + 200) % 3300
+        vcu_hil.set_signal(message_name="Throttle_position_A", signal_name="Throttle_position_A", signal_value=mV)
+        time.sleep(0.2)
+        assert vcu_hil.get_signal("Throttle_A_status") == 1
+        print(f"Sent {mV} to Throttle A")
+        
+        vcu_hil.set_signal(message_name="Throttle_position_B", signal_name="Throttle_position_B", signal_value=mV)
+        time.sleep(0.2)
+        assert vcu_hil.get_signal("Throttle_B_status") == 1
+        print(f"Sent {mV} to Throttle B")
