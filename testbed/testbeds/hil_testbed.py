@@ -9,10 +9,10 @@ class HILTestbed(Testbed):
 
 class VehicleHIL(HILTestbed):
     vehicle_manifest = [
-        HWManifestItem("vcu", VCU),
+        HWManifestItem("vcu", 2),
     ]
     hil_manifest = [
-        HWManifestItem("vcu_hil", VCUHil),
+        HWManifestItem("vcu_hil", 7),
     ]
     
 

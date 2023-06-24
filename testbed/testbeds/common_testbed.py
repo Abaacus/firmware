@@ -1,11 +1,11 @@
 import time
-from typing import List
+from typing import List, Callable
 import cantools
 import slash
 import can.interfaces.slcan as slcan
 from can.interfaces.socketcan.socketcan import SocketcanBus
 import can
-from drivers.common_drivers.can_driver import CANDriver, CANListener
+from drivers.common_drivers.can_driver import VehicleBoard, HILBoard, CANListener
 
 
 class HWManifestItem:
@@ -15,12 +15,12 @@ class HWManifestItem:
     @classObj: Class object of the board driver, ex: VCU
     '''
 
-    def __init__(self, name: str, classObj: CANDriver):
+    def __init__(self, name: str, can_id: int):
         self.name = name
-        self.classObj = classObj
+        self.can_id = can_id
 
     def __repr__(self) -> str:
-        return f"HWManifestItem(name={self.name}, classObj={self.classObj})"
+        return f"HWManifestItem(name={self.name}, can_id={self.can_id})"
 
 
 class Testbed:
@@ -33,32 +33,25 @@ class Testbed:
         setup_hil = True
 
         # Vehicle Bus
-        if setup_vehicle:
-            # TODO: Maybe move this to .slashrc as an arg
-            vehicle_db = cantools.db.load_file("../common/Data/2018CAR.dbc")
+        if setup_vehicle:                     
+            slash.g.vehicle_bus = SocketcanBus(channel='slcan1', bitrate=500000)
+            assert slash.g.vehicle_bus is not None, "Vehicle bus not initialized"
 
-            vehicle_bus = SocketcanBus(channel='slcan1', bitrate=500000)
-            assert vehicle_bus is not None, "Vehicle bus not initialized"
-
-            vehicle_listener = CANListener()
-            can.Notifier(hil_bus, [vehicle_listener])
+            slash.g.vehicle_listener = CANListener()
+            can.Notifier(slash.g.vehicle_bus, [slash.g.vehicle_listener])
 
             self.vehicle_boards = {}
             for board in self.vehicle_manifest:
-                self.vehicle_boards[board.name] = board.classObj(
-                    board.name, vehicle_bus, vehicle_db, vehicle_listener)
+                self.vehicle_boards[board.name] = VehicleBoard(board.name, board.can_id)
 
         # HIL Bus
         if setup_hil:
-            hil_db = cantools.db.load_file("HIL_Firmware/HIL.dbc")
+            slash.g.hil_bus = SocketcanBus(channel='slcan0', bitrate=500000)
+            assert slash.g.hil_bus is not None, "HIL bus not initialized"
 
-            hil_bus = SocketcanBus(channel='slcan0', bitrate=500000)
-            assert hil_bus is not None, "HIL bus not initialized"
-
-            hil_listener = CANListener()
-            can.Notifier(hil_bus, [hil_listener])
+            slash.g.hil_listener = CANListener()
+            can.Notifier(slash.g.hil_bus, [slash.g.hil_listener])
 
             self.hil_boards = {}
             for board in self.hil_manifest:
-                self.hil_boards[board.name] = board.classObj(
-                    board.name, hil_bus, hil_db, hil_listener)
+                self.hil_boards[board.name] = HILBoard(board.name, board.can_id)

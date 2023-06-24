@@ -22,14 +22,13 @@ class CANListener(can.Listener):
 
 
 class CANDriver(TestbedDriver):
-    def __init__(self, name, bus: SocketcanBus, db: cantools.db.Database, listener: CANListener, can_id):
+    def __init__(self, name, can_id):
         super().__init__(name)
-        self.can_id = can_id
-        self.name = name
-        self._bus = bus
-        self.db = db
 
-        listener.register_callback(self.can_id, self.can_msg_rx)
+        self.name = name
+        self.can_id = can_id
+        self._bus: SocketcanBus = NotImplemented
+        self.db: cantools.db.Database = NotImplemented
 
         self.store = {}
 
@@ -41,32 +40,43 @@ class CANDriver(TestbedDriver):
             decode_choices=False,
             decode_containers=False
         )
-        for signal_name, signal_value in decoded_data.items():
+
+        for signal_name, signal_value in decoded_data.items():  # type: ignore
             self.store[signal_name] = signal_value
 
     def get_signal(self, signal_name):
-        # Should be faster to fail fast than to check if signal_name is in self.store
         try:
             return self.store[signal_name]
         except KeyError:
             logger.warning(f"Signal {signal_name} not found in {self.name}")
             return None
+        
+    def __repr__(self) -> str:
+        return f"{self.name}({self.can_id})"
 
 
 class VehicleBoard(CANDriver):
-    def __init__(self, name, bus, db, listener, can_id):
-        super().__init__(name, bus, db, listener, can_id)
+    def __init__(self, name, can_id):
+        super().__init__(name, can_id)
+
+        self._bus = slash.g.vehicle_bus
+        self.db = slash.g.vehicle_db
+        slash.g.vehicle_listener.register_callback(
+            self.can_id, self.can_msg_rx)
 
 
 class HILBoard(CANDriver):
-    def __init__(self, name, bus, db, listener, can_id):
-        super().__init__(name, bus, db, listener, can_id)
+    def __init__(self, name, can_id):
+        super().__init__(name, can_id)
 
-    def set_signal(self, message_name, signal_name, signal_value):
-        self._bus.flush_tx_buffer()
+        self._bus = slash.g.hil_bus
+        self.db = slash.g.hil_db
+        slash.g.hil_listener.register_callback(self.can_id, self.can_msg_rx)
+
+    def set_signal(self, message_name: str, signal_value_pair: dict):
         try:
             data = self.db.encode_message(
-                message_name, {signal_name: signal_value})
+                message_name, signal_value_pair)
         except KeyError:
             logger.warning(f"Message {message_name} not found in {self.db}")
             return
@@ -74,3 +84,7 @@ class HILBoard(CANDriver):
 
         msg = can.Message(arbitration_id=msg.frame_id, data=data)
         self._bus.send(msg)
+
+    def flush_tx(self):
+        '''Flushing will delete older messages but some may be backed up in queue'''
+        self._bus.flush_tx_buffer()

@@ -1,6 +1,11 @@
 import slash
 from testbeds.hil_testbed import *
 
+import cantools
+from can.interfaces.socketcan.socketcan import SocketcanBus
+
+from drivers.common_drivers.can_driver import CANListener
+
 
 @slash.plugins.active
 class ParamsPlugin(slash.plugins.PluginInterface):
@@ -16,4 +21,14 @@ class ParamsPlugin(slash.plugins.PluginInterface):
             self.testbed_name = "VehicleHIL"
 
     def session_start(self):
+        # TODO: Maybe move this to .slashrc as an arg
+        slash.g.vehicle_db = cantools.db.load_file("../common/Data/2018CAR.dbc")
+        slash.g.hil_db = cantools.db.load_file("HIL_Firmware/HIL.dbc")
+
+        slash.g.vehicle_bus: SocketcanBus = NotImplemented
+        slash.g.hil_bus: SocketcanBus = NotImplemented
+
+        slash.g.vehicle_listener = CANListener()
+        slash.g.hil_listener = CANListener()
+
         slash.g.testbed = globals()[self.testbed_name]()
