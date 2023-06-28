@@ -73,17 +73,18 @@ class HILBoard(CANDriver):
         self.db = slash.g.hil_db
         slash.g.hil_listener.register_callback(self.can_id, self.can_msg_rx)
 
-    def set_signal(self, message_name: str, signal_value_pair: dict):
+    def set_signal(self, message_name: str, signal_value_pair: dict) -> bool:
         try:
             data = self.db.encode_message(
                 message_name, signal_value_pair)
         except KeyError:
             logger.warning(f"Message {message_name} not found in {self.db}")
-            return
+            return False
         msg = self.db.get_message_by_name(message_name)
 
         msg = can.Message(arbitration_id=msg.frame_id, data=data)
         self._bus.send(msg)
+        return True
 
     def flush_tx(self):
         '''Flushing will delete older messages but some may be backed up in queue'''
