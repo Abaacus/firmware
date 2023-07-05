@@ -4,6 +4,7 @@ import cantools
 import slash
 import can.interfaces.slcan as slcan
 from can.interfaces.socketcan.socketcan import SocketcanBus
+from can.interfaces.vector import VectorBus
 import can
 from drivers.common_drivers.can_driver import VehicleBoard, HILBoard, CANListener
 
@@ -32,9 +33,14 @@ class Testbed:
         setup_vehicle = False
         setup_hil = True
 
+        is_vehicle_vector = True
+
         # Vehicle Bus
-        if setup_vehicle:                     
-            slash.g.vehicle_bus = SocketcanBus(channel='slcan1', bitrate=500000)
+        if setup_vehicle:   
+            if is_vehicle_vector:
+                slash.g.vehicle_bus = VectorBus(channel=0)
+            else:
+                slash.g.vehicle_bus = SocketcanBus(channel='slcan1', bitrate=500000)
             assert slash.g.vehicle_bus is not None, "Vehicle bus not initialized"
 
             slash.g.vehicle_listener = CANListener()
