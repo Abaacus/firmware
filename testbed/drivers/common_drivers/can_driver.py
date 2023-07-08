@@ -16,9 +16,17 @@ class CANListener(can.Listener):
         self.callbacks[board_id] = func_callback
 
     def on_message_received(self, msg):
-        board_id = (msg.arbitration_id >> 8) & 0x07
-        assert board_id in self.callbacks, f"{board_id} not in {self.callbacks}"
-        self.callbacks[board_id](msg)
+        # TODO: FIX THIS SO THAT HIL USES sender id for ack
+        #       should just be board_id = msg.arbitration_id & 0x07
+        if 7 in self.callbacks:
+            board_id = (msg.arbitration_id>>8) & 0x07
+        else:
+            board_id = msg.arbitration_id & 0x07
+
+
+        if board_id in self.callbacks:
+        # assert board_id in self.callbacks, f"{board_id} not in {self.callbacks}, can_id: {hex(msg.arbitration_id)}"
+            self.callbacks[board_id](msg)
 
 
 class CANDriver(TestbedDriver):
@@ -61,8 +69,7 @@ class VehicleBoard(CANDriver):
 
         self._bus = slash.g.vehicle_bus
         self.db = slash.g.vehicle_db
-        slash.g.vehicle_listener.register_callback(
-            self.can_id, self.can_msg_rx)
+        slash.g.vehicle_listener.register_callback(self.can_id, self.can_msg_rx)
 
 
 class HILBoard(CANDriver):

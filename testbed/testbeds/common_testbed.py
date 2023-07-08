@@ -2,7 +2,6 @@ import time
 from typing import List, Callable
 import cantools
 import slash
-import can.interfaces.slcan as slcan
 from can.interfaces.socketcan.socketcan import SocketcanBus
 from can.interfaces.vector import VectorBus
 import can
@@ -30,17 +29,13 @@ class Testbed:
 
     def __init__(self):
         # Choose which to enable, useful for debugging individual buses
-        setup_vehicle = False
+        setup_vehicle = True
         setup_hil = True
 
-        is_vehicle_vector = True
 
         # Vehicle Bus
         if setup_vehicle:   
-            if is_vehicle_vector:
-                slash.g.vehicle_bus = VectorBus(channel=0)
-            else:
-                slash.g.vehicle_bus = SocketcanBus(channel='slcan1', bitrate=500000)
+            slash.g.vehicle_bus = VectorBus(channel=1)
             assert slash.g.vehicle_bus is not None, "Vehicle bus not initialized"
 
             slash.g.vehicle_listener = CANListener()
@@ -52,7 +47,7 @@ class Testbed:
 
         # HIL Bus
         if setup_hil:
-            slash.g.hil_bus = SocketcanBus(channel='slcan0', bitrate=500000)
+            slash.g.hil_bus = VectorBus(channel=0)
             assert slash.g.hil_bus is not None, "HIL bus not initialized"
 
             slash.g.hil_listener = CANListener()
