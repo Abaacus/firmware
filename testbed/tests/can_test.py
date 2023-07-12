@@ -25,5 +25,9 @@ def test_steeringAngle(teststand):
 # --> returns an array of DTC data where the length is the number of times the dtc was received
 #     (also marks the dtc as read, so the second time you call it you'll get an empty array
 #       unless you received another dtc of the same code)
+# vcu.dtc_logger.get_dtc_structs(10)
+# --> same as before but returns the actual DTC class objects instead of just the data
 # vcu.dtc_logger.list_dtcs() 
 # --> returns a list of all the dtc codes that have been received
+# vcu.dtc_logger.reset_logger()
+# --> resetst the logger to {}
