@@ -1,5 +1,5 @@
 import time
-from typing import List, Callable
+from typing import List, Callable, Dict
 import cantools
 import slash
 from can.interfaces.socketcan.socketcan import SocketcanBus
@@ -16,8 +16,8 @@ class HWManifestItem:
     '''
 
     def __init__(self, name: str, can_id: int):
-        self.name = name
-        self.can_id = can_id
+        self.name: str = name
+        self.can_id: int = can_id
 
     def __repr__(self) -> str:
         return f"HWManifestItem(name={self.name}, can_id={self.can_id})"
@@ -41,7 +41,7 @@ class Testbed:
             slash.g.vehicle_listener = CANListener()
             can.Notifier(slash.g.vehicle_bus, [slash.g.vehicle_listener])
 
-            self.vehicle_boards = {}
+            self.vehicle_boards: Dict[str, VehicleBoard] = {}
             for board in self.vehicle_manifest:
                 self.vehicle_boards[board.name] = VehicleBoard(board.name, board.can_id)
 

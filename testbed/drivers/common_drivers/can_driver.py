@@ -1,16 +1,19 @@
 import cantools
+from cantools import DecodeResultType
 from drivers.common_drivers.driver import TestbedDriver
 import can
+from can import Message
 from slash import logger
 import slash
+from typing import Dict, Callable
 from can.interfaces.socketcan.socketcan import SocketcanBus
 
 
 class CANListener(can.Listener):
-    def __init__(self):
+    def __init__(self, dtc_logger=None):
         super().__init__()
-        self.callbacks = {}
-
+        self.callbacks: Dict[int, Callable] = {}
+    
     def register_callback(self, board_id, func_callback):
         assert board_id not in self.callbacks
         self.callbacks[board_id] = func_callback
@@ -40,18 +43,6 @@ class CANDriver(TestbedDriver):
 
         self.store = {}
 
-    def can_msg_rx(self, msg):
-        decoded_data = self.db.decode_message(
-            msg.arbitration_id,
-            msg.data,
-            allow_truncated=True,
-            decode_choices=False,
-            decode_containers=False
-        )
-
-        for signal_name, signal_value in decoded_data.items():  # type: ignore
-            self.store[signal_name] = signal_value
-
     def get_signal(self, signal_name):
         try:
             return self.store[signal_name]
@@ -69,7 +60,30 @@ class VehicleBoard(CANDriver):
 
         self._bus = slash.g.vehicle_bus
         self.db = slash.g.vehicle_db
+        self.dtc_logger = slash.g.dtc_logger
         slash.g.vehicle_listener.register_callback(self.can_id, self.can_msg_rx)
+
+    def can_msg_rx(self, msg):
+        def is_dtc_msg(msg: Message) -> bool:
+            # Assuming 29 bit arbitration id
+            priority_mask = 0b11100000000000000000000000000
+            result = msg.arbitration_id & priority_mask
+            return result == 0
+        
+        decoded_data = self.db.decode_message(
+            msg.arbitration_id,
+            msg.data,
+            allow_truncated=True,
+            decode_choices=False,
+            decode_containers=False
+        )
+
+        if is_dtc_msg(msg):
+            self.dtc_logger.log_dtc(decoded_data)
+        else:
+            for signal_name, signal_value in decoded_data.items():  # type: ignore
+                self.store[signal_name] = signal_value
+
 
 
 class HILBoard(CANDriver):
@@ -79,6 +93,18 @@ class HILBoard(CANDriver):
         self._bus = slash.g.hil_bus
         self.db = slash.g.hil_db
         slash.g.hil_listener.register_callback(self.can_id, self.can_msg_rx)
+
+    def can_msg_rx(self, msg):
+        decoded_data = self.db.decode_message(
+            msg.arbitration_id,
+            msg.data,
+            allow_truncated=True,
+            decode_choices=False,
+            decode_containers=False
+        )
+
+        for signal_name, signal_value in decoded_data.items():  # type: ignore
+            self.store[signal_name] = signal_value
 
     def set_signal(self, message_name: str, signal_value_pair: dict) -> bool:
         try:
