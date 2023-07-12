@@ -1,11 +1,13 @@
 from typing import Dict, List
+from datetime import datetime
 
 class DTC:
-    def __init__(self, code: int, severity: int, data: int):
+    def __init__(self, code: int, severity: int, data: int, time: datetime):
         self.code = code
         self.data = data
         self.severity = severity
         self.was_read = False
+        self.time_logged = time
 
     def read(self):
         self.was_read = True
@@ -21,31 +23,33 @@ class DTCLogger:
         severity = decoded_dtc['DTC_Severity']
         data = decoded_dtc['DTC_Data']
 
-        received_dtc = DTC(code=code, severity=severity, data=data)
+        received_dtc = DTC(code=code, severity=severity, data=data, time=datetime.now())
 
-        # Todo: maybe add more details to the structure like time received
         if code not in self.dtc_log:
             self.dtcs[code] = []
 
         self.dtcs[code].append(received_dtc)
     
-    def has_unread_data(self, code: int) -> bool:
+    def get_dtc_structs(self, code: int) -> bool:
         assert self.has_dtc(code), f"DTC Code {code} not found in DTC Log"
 
-        # Given a DTC Code, checks if you have requested the data already
-        for dtc in self.dtc_log[code]:
+        # Given a DTC Code, return a list of unread DTC objects themselves
+        dtcs = []
+        for dtc in reversed(self.dtc_log[code]):
             if not dtc.was_read:
-                return True
-        return False
+                dtcs.append(dtc)
+                dtc.read()
+        return dtcs
     
     def get_dtc_data(self, code: int) -> List[int]:
         assert self.has_dtc(code), f"DTC Code {code} not found in DTC Log"
 
         # Given a DTC Code, return a list of DTC data received with that code
         dtcs_data = []
-        for dtc in self.dtc_log[code]:
+        for dtc in reversed(self.dtc_log[code]):
             if not dtc.was_read:
                 dtcs_data.append(dtc.read())
+        return dtcs_data
     
     def has_dtc(self, code: int) -> bool:
         # Check if a DTC code was logged
@@ -54,5 +58,8 @@ class DTCLogger:
     def list_dtcs(self) -> List[int]:
         # Return a list of all DTC codes logged
         return list(self.dtc_log.keys())
-                
+    
+    def reset_logger(self) -> None:
+        # Clear all DTCs from the log
+        self.dtc_log = {}
         

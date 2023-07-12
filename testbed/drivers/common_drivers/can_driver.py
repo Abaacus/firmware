@@ -43,6 +43,18 @@ class CANDriver(TestbedDriver):
 
         self.store = {}
 
+    def can_msg_rx(self, msg):
+        decoded_data = self.db.decode_message(
+            msg.arbitration_id,
+            msg.data,
+            allow_truncated=True,
+            decode_choices=False,
+            decode_containers=False
+        )
+
+        for signal_name, signal_value in decoded_data.items():  # type: ignore
+            self.store[signal_name] = signal_value
+
     def get_signal(self, signal_name):
         try:
             return self.store[signal_name]
@@ -60,16 +72,10 @@ class VehicleBoard(CANDriver):
 
         self._bus = slash.g.vehicle_bus
         self.db = slash.g.vehicle_db
-        self.dtc_logger = slash.g.dtc_logger
+        self.dtc_logger = slash.g.vehicle_dtc_logger
         slash.g.vehicle_listener.register_callback(self.can_id, self.can_msg_rx)
 
-    def can_msg_rx(self, msg):
-        def is_dtc_msg(msg: Message) -> bool:
-            # Assuming 29 bit arbitration id
-            priority_mask = 0b11100000000000000000000000000
-            result = msg.arbitration_id & priority_mask
-            return result == 0
-        
+    def can_msg_rx(self, msg): # Override inherited can_msg_rx
         decoded_data = self.db.decode_message(
             msg.arbitration_id,
             msg.data,
@@ -77,8 +83,9 @@ class VehicleBoard(CANDriver):
             decode_choices=False,
             decode_containers=False
         )
-
-        if is_dtc_msg(msg):
+        priority_mask = 0b111 << 26
+        is_dtc = (msg.arbitration_id & priority_mask) == 0
+        if is_dtc:
             self.dtc_logger.log_dtc(decoded_data)
         else:
             for signal_name, signal_value in decoded_data.items():  # type: ignore
@@ -93,18 +100,6 @@ class HILBoard(CANDriver):
         self._bus = slash.g.hil_bus
         self.db = slash.g.hil_db
         slash.g.hil_listener.register_callback(self.can_id, self.can_msg_rx)
-
-    def can_msg_rx(self, msg):
-        decoded_data = self.db.decode_message(
-            msg.arbitration_id,
-            msg.data,
-            allow_truncated=True,
-            decode_choices=False,
-            decode_containers=False
-        )
-
-        for signal_name, signal_value in decoded_data.items():  # type: ignore
-            self.store[signal_name] = signal_value
 
     def set_signal(self, message_name: str, signal_value_pair: dict) -> bool:
         try:

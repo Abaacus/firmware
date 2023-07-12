@@ -15,9 +15,9 @@ class HWManifestItem:
     @classObj: Class object of the board driver, ex: VCU
     '''
 
-    def __init__(self, name: str, can_id: int):
+    def __init__(self, name: str, can_id_enum):
         self.name: str = name
-        self.can_id: int = can_id
+        self.can_id: int = can_id_enum.value
 
     def __repr__(self) -> str:
         return f"HWManifestItem(name={self.name}, can_id={self.can_id})"

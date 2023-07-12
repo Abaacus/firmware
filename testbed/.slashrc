@@ -31,6 +31,6 @@ class ParamsPlugin(slash.plugins.PluginInterface):
         slash.g.vehicle_listener = CANListener()
         slash.g.hil_listener = CANListener()
         
-        slash.g.dtc_logger = DTCLogger()
+        slash.g.vehicle_dtc_logger = DTCLogger()
 
         slash.g.testbed = globals()[self.testbed_name]()
