@@ -16,4 +16,14 @@ def test_steeringAngle(teststand):
         assert vcu_hil.get_signal("Steering_status")
         steerAngle = vcu.get_signal("SteeringAngle")
         assert abs(steerAngle-angle) <= 3
-        
+
+### TEMPORARY
+# How to check for DTC example (where 10 = a DTC code, vcu = teststand.vehicle_boards["vcu"])
+# vcu.dtc_logger.has_dtc(10) 
+# --> returns a bool for if it has a dtc
+# vcu.dtc_logger.get_dtc_data(10) 
+# --> returns an array of DTC data where the length is the number of times the dtc was received
+#     (also marks the dtc as read, so the second time you call it you'll get an empty array
+#       unless you received another dtc of the same code)
+# vcu.dtc_logger.list_dtcs() 
+# --> returns a list of all the dtc codes that have been received
