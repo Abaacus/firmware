@@ -10,7 +10,7 @@ from can.interfaces.socketcan.socketcan import SocketcanBus
 
 
 class CANListener(can.Listener):
-    def __init__(self, dtc_logger=None):
+    def __init__(self):
         super().__init__()
         self.callbacks: Dict[int, Callable] = {}
     
