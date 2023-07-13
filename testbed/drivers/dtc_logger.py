@@ -18,7 +18,7 @@ class DTC:
 class DTCLogger:
     def __init__(self):
         # Future todo? Store depending on which board received it?
-        self.dtc_log: Dict[int, DTC] = {}  # {code : DTC structure}
+        self.dtc_log: Dict[int, List[DTC]] = {}  # {code : DTC structure}
 
     def log_dtc(self, decoded_dtc: Dict[str, int]):
         code = decoded_dtc['DTC_CODE']
