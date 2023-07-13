@@ -1,8 +1,6 @@
 import cantools
-from cantools import DecodeResultType
 from drivers.common_drivers.driver import TestbedDriver
 import can
-from can import Message
 from slash import logger
 import slash
 from typing import Dict, Callable

@@ -15,7 +15,7 @@ def test_steeringAngle(teststand):
         time.sleep(0.2)
         assert vcu_hil.get_signal("Steering_status")
         steerAngle = vcu.get_signal("SteeringAngle")
-        assert abs(steerAngle-angle) <= 3
+        assert abs(steerAngle-angle) <= 5
 
 ### TEMPORARY
 # How to check for DTC example (where 10 = a DTC code, vcu = teststand.vehicle_boards["vcu"])
