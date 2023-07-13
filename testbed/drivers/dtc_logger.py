@@ -1,6 +1,7 @@
 from typing import Dict, List
 from datetime import datetime
 
+
 class DTC:
     def __init__(self, code: int, severity: int, data: int, time: datetime):
         self.code = code
@@ -13,23 +14,25 @@ class DTC:
         self.was_read = True
         return self.data
 
+
 class DTCLogger:
     def __init__(self):
         # Future todo? Store depending on which board received it?
-        self.dtc_log: Dict[int, DTC] = {} # {code : DTC structure}
+        self.dtc_log: Dict[int, DTC] = {}  # {code : DTC structure}
 
     def log_dtc(self, decoded_dtc: Dict[str, int]):
         code = decoded_dtc['DTC_CODE']
         severity = decoded_dtc['DTC_Severity']
         data = decoded_dtc['DTC_Data']
 
-        received_dtc = DTC(code=code, severity=severity, data=data, time=datetime.now())
+        received_dtc = DTC(code=code, severity=severity,
+                           data=data, time=datetime.now())
 
         if code not in self.dtc_log:
-            self.dtcs[code] = []
+            self.dtc_log[code] = []
 
-        self.dtcs[code].append(received_dtc)
-    
+        self.dtc_log[code].append(received_dtc)
+
     def get_dtc_structs(self, code: int) -> bool:
         assert self.has_dtc(code), f"DTC Code {code} not found in DTC Log"
 
@@ -40,7 +43,7 @@ class DTCLogger:
                 dtcs.append(dtc)
                 dtc.read()
         return dtcs
-    
+
     def get_dtc_data(self, code: int) -> List[int]:
         assert self.has_dtc(code), f"DTC Code {code} not found in DTC Log"
 
@@ -50,16 +53,15 @@ class DTCLogger:
             if not dtc.was_read:
                 dtcs_data.append(dtc.read())
         return dtcs_data
-    
+
     def has_dtc(self, code: int) -> bool:
         # Check if a DTC code was logged
         return code in self.dtc_log
-    
+
     def list_dtcs(self) -> List[int]:
         # Return a list of all DTC codes logged
         return list(self.dtc_log.keys())
-    
+
     def reset_logger(self) -> None:
         # Clear all DTCs from the log
         self.dtc_log = {}
-        
