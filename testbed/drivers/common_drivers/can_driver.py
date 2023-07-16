@@ -71,6 +71,26 @@ class VehicleBoard(CANDriver):
         self.db = slash.g.vehicle_db
         slash.g.vehicle_listener.register_callback(self.can_id, self.can_msg_rx)
 
+class Vehicle(CANDriver):
+    def __init__(self, name, can_id):
+        super().__init__(name, can_id)
+
+        self._bus = slash.g.vehicle_bus
+        self.db = slash.g.vehicle_db
+        slash.g.hil_listener.register_callback(self.can_id, self.can_msg_rx)
+
+    def send_CAN_message(self, message_name: str, signal_value_pair: dict) -> bool:
+        try:
+            data = self.db.encode_message(
+                message_name, signal_value_pair)
+        except KeyError:
+            logger.warning(f"Message {message_name} not found in {self.db}")
+            return False
+        msg = self.db.get_message_by_name(message_name)
+
+        msg = can.Message(arbitration_id=msg.frame_id, data=data)
+        self._bus.send(msg)
+        return True
 
 class HILBoard(CANDriver):
     def __init__(self, name, can_id):
