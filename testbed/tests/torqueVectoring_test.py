@@ -55,4 +55,3 @@ def test_TV_100R(testValue, expR, expL):
     f"torqueDemandR <{torqueDemandR}> exceeds tolerance <{tolerance}>"
     assert abs(torqueDemandL - expL) <= tolerance,\
     f"torqueDemandL <{torqueDemandL}> exceeds tolerance <{tolerance}>"
-

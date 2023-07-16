@@ -34,8 +34,3 @@ class Car:
         except:
             print("set_endurance_enable message NOT sent")
             return False
-
-        
-
-        
-
