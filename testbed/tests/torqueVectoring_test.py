@@ -20,9 +20,9 @@ class Car:
 
     def set_EM_enable(self):
         try:
-            self.vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": 2071})
-            self.vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": 2864})
-
+            self.vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": 2315}) #calculated 1958
+            self.vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": 897}) #calculated 991
+            self.vcu_hil.set_signal("Brake_pres_raw", {"Brake_pres_raw": 1000})
             self.vcu_hil.set_signal("Brake_position", {"Brake_position": 3300})
             self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonEMEnabled": 1, "ButtonHVEnabled": 1, "ButtonTCEnabled": 0, "ButtonEnduranceLapEnabled": 0, "ButtonEnduranceToggleEnabled":0 } )
             self.vehicle.send_CAN_message("BMU_HV_Power_State", {"HV_Power_State": 1} )
