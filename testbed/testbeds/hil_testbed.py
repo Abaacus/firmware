@@ -5,7 +5,6 @@ from hil_constants import VehicleBoardId, HilBoardId
 class HILTestbed(Testbed):
     pass
 
-
 class VehicleHIL(HILTestbed):
     vehicle_manifest = [
         HWManifestItem("vcu", VehicleBoardId.VCU),
@@ -14,8 +13,6 @@ class VehicleHIL(HILTestbed):
         HWManifestItem("vcu_hil", HilBoardId.VCU_HIL),
     ]
     
-
-
 @slash.fixture
 def teststand():
     return slash.g.testbed
