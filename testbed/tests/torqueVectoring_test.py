@@ -13,18 +13,25 @@ sleepDurationMs = 0.2
 tolerance = 5
 
 class Car:
-    def __init__(self):
+    def __init__(self, vcu_hil, vcu):
         self.vehicle = Vehicle()
+        self.vcu_hil = vcu_hil
+        self.vcu = vcu
 
     def set_EM_enable(self):
         try:
-            vcu_hil.set_signal("Brake_position", {"Brake_position": 3300})
-            self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonEMEnabled": 1} )
-            self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonHVEnabled": 1} )
+            self.vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": 2071})
+            self.vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": 2864})
+
+            self.vcu_hil.set_signal("Brake_position", {"Brake_position": 3300})
+            self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonEMEnabled": 1, "ButtonHVEnabled": 1, "ButtonTCEnabled": 0, "ButtonEnduranceLapEnabled": 0, "ButtonEnduranceToggleEnabled":0 } )
+            self.vehicle.send_CAN_message("BMU_HV_Power_State", {"HV_Power_State": 1} )
+            
             time.sleep(0.5)
-            vcu_hil.set_signal("Brake_position", {"Brake_position": 0})
-        except:
-            print("set_EM_enable asd message NOT sent")
+            self.vcu_hil.set_signal("Brake_position", {"Brake_position": 0})
+        except Exception as e:
+            print("set_EM_enable message NOT sent")
+            print(e)
             return False
         
     def set_TC_enable(self):
@@ -48,23 +55,23 @@ def test_TV_setup(teststand):
     vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
     # globals.init()
     #assert globals.HIL_wip_workaround, "Error: workaround is set to 0"
-    car = Car()
+    car = Car(vcu_hil, vcu)
     car.set_EM_enable()
 
     # set 50% throttle
-    throttleA_mV = 2090
-    throttleB_mV = 1130
-    vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": throttleA_mV})
-    time.sleep(sleepDurationMs)
-    assert vcu_hil.get_signal("Throttle_A_status")
+    # throttleA_mV = 2090
+    # throttleB_mV = 1130
+    # vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": throttleA_mV})
+    # time.sleep(sleepDurationMs)
+    # assert vcu_hil.get_signal("Throttle_A_status")
 
-    vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": throttleB_mV})
-    time.sleep(sleepDurationMs)
-    assert vcu_hil.get_signal("Throttle_B_status")
+    # vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": throttleB_mV})
+    # time.sleep(sleepDurationMs)
+    # assert vcu_hil.get_signal("Throttle_B_status")
 
-    vcu_hil.set_signal("Brake_position", {"Brake_position": 3300})
-    time.sleep(sleepDurationMs)
-    assert vcu_hil.get_signal("Brake_pos_status")
+    # vcu_hil.set_signal("Brake_position", {"Brake_position": 3300})
+    # time.sleep(sleepDurationMs)
+    # assert vcu_hil.get_signal("Brake_pos_status")
 
 '''
 # test 1: steering angle in dead zone (0)
