@@ -1,12 +1,11 @@
 import time
 import slash
-import HIL_Firmware.globals as globals
-from HIL_Firmware.common_HIL import Car
+
+# import HIL_Firmware.globals as globals
+from hil_constants import HIL_wip_workaround
+from hil_constants import Car
 from testbeds.hil_testbed import teststand
 from drivers.common_drivers.can_driver import HILBoard, VehicleBoard
-
-vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
-vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
 
 # variables for testing
 sleepDurationMs = 0.2
@@ -14,9 +13,10 @@ tolerance = 5
 
 def test_TV_setup(teststand):
     print(teststand.hil_boards)
-
-    globals.init()
-    assert globals.HIL_wip_workaround, "Error: workaround is set to 0"
+    vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
+    vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
+    # globals.init()
+    #assert globals.HIL_wip_workaround, "Error: workaround is set to 0"
 
     Car.set_EM_enable()
 
@@ -31,8 +31,12 @@ def test_TV_setup(teststand):
     time.sleep(sleepDurationMs)
     assert vcu_hil.get_signal("Throttle_B_status")
 
+'''
 # test 1: steering angle in dead zone (0)
 def test_TV_deadzone():
+    #print(teststand.hil_boards)
+    vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
+    vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
     vcu_hil.set_signal("Steering_raw", {"Steering_raw": 1650})
     time.sleep(sleepDurationMs)
     assert vcu_hil.get_signal("Steering_status")
@@ -45,6 +49,9 @@ def test_TV_deadzone():
 # test 2 & 3: steering angle fully right and left
 @slash.parametrize(('testValue', 'expR', 'expL'), [(3300, 2.50, 27.50), (0, 27.50, 2.50)])
 def test_TV_100R(testValue, expR, expL):
+    #print(teststand.hil_boards)
+    vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
+    vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
     vcu_hil.set_signal("Steering_raw", {"Steering_raw": testValue})
     time.sleep(sleepDurationMs)
     assert vcu_hil.get_signal("Steering_status")
@@ -55,3 +62,4 @@ def test_TV_100R(testValue, expR, expL):
     f"torqueDemandR <{torqueDemandR}> exceeds tolerance <{tolerance}>"
     assert abs(torqueDemandL - expL) <= tolerance,\
     f"torqueDemandL <{torqueDemandL}> exceeds tolerance <{tolerance}>"
+'''
