@@ -20,14 +20,22 @@ class Car:
 
     def set_EM_enable(self):
         try:
-            self.vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": 2315}) #calculated 1958
-            self.vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": 897}) #calculated 991
+            self.vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": 2307}) #calculated 1958
+            self.vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": 936}) #calculated 991
             self.vcu_hil.set_signal("Brake_pres_raw", {"Brake_pres_raw": 1000})
             self.vcu_hil.set_signal("Brake_position", {"Brake_position": 3300})
-            self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonEMEnabled": 1, "ButtonHVEnabled": 1, "ButtonTCEnabled": 0, "ButtonEnduranceLapEnabled": 0, "ButtonEnduranceToggleEnabled":0 } )
             self.vehicle.send_CAN_message("BMU_HV_Power_State", {"HV_Power_State": 1} )
-            
-            time.sleep(0.5)
+            self.vehicle.send_CAN_message("TempInverterLeft", {"PRO_CAN_CRC": 0, "PRO_CAN_COUNT": 0, "PRO_CAN_RES": 0, "InverterAUTHSEEDLeft": 0,\
+                                                               "TempInverterLeft": 0, "TempInverterDeltaLeft": 0, "StateInverterLeft": 0x18})
+            self.vehicle.send_CAN_message("TempInverterRight", {"PRO_CAN_CRC": 0, "PRO_CAN_COUNT": 0, "PRO_CAN_RES": 0, "InverterAUTHSEEDRight": 0,\
+                                                               "TempInverterRight": 0, "TempInverterDeltaRight": 0, "StateInverterRight": 0x18})
+            time.sleep(0.05)
+            self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonEMEnabled": 1, "ButtonHVEnabled": 1, "ButtonTCEnabled": 0, "ButtonEnduranceLapEnabled": 0, "ButtonEnduranceToggleEnabled":0 } )
+            self.vehicle.send_CAN_message("PDU_ChannelStatus", {"StatusPowerVCU": 0, "StatusPowerMCRight": 2, "StatusPowerMCLeft": 2, \
+                                                                 "StatusPowerIMD": 0, "StatusPowerDCU": 0, "StatusPowerDAU": 0, "StatusPowerCoolingPumpRight" : 0,\
+                                                                 "StatusPowerCoolingPumpLeft": 0, "StatusPowerCoolingFanRight": 0, "StatusPowerCoolingFanLeft": 0,\
+                                                                 "StatusPowerCoolingFanBattery": 0, "StatusPowerBMU": 0})
+           
             self.vcu_hil.set_signal("Brake_position", {"Brake_position": 0})
         except Exception as e:
             print("set_EM_enable message NOT sent")
