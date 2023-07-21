@@ -55,6 +55,7 @@ images/
 staging
 
 beaglebone/os/Makefile
+beaglebone/app/wfe/dashboard/Makefile
 .br2-external*
 ..config.tmp
 .config*

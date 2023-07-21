@@ -1,6 +1,8 @@
 #include <QtWidgets>
 #include <QApplication>
 
+#define DIAL_VALUE_NUM_CHARACTERS 10
+
 class Dial {
 private:
     QWidget* parent;
@@ -10,10 +12,10 @@ private:
     int y;
     int radius;
     int thickness;
-    int val;
-    int minVal;
-    int maxVal;
-    int overVal;
+    float val;
+    float minVal;
+    float maxVal;
+    float overVal;
     int startAng;
     int spanAng;
     std::string text;
@@ -31,9 +33,9 @@ public:
         int y,
         int radius,
         int thickness,
-        int minVal,
-        int maxVal,
-        int overVal,
+        float minVal,
+        float maxVal,
+        float overVal,
         int startAng,
         int spanAng,
         std::string text,
@@ -74,13 +76,18 @@ public:
         qp.setPen(Qt::white);
         qp.setFont(QFont(QString("Arial"), valFontSize));
 
+        // Round the value
+        char roundedValue[DIAL_VALUE_NUM_CHARACTERS];
+        memset(roundedValue, '\0', DIAL_VALUE_NUM_CHARACTERS);
+        snprintf(roundedValue, DIAL_VALUE_NUM_CHARACTERS, "%.1f", val);
+
         // Display value
         qp.drawText(x + textXOffset,
                     (int)(y - radius * 0.075),
                     radius,
                     radius,
                     Qt::AlignCenter,
-                    QString::fromStdString(std::to_string(val)));
+                    QString(roundedValue));
         qp.setPen(isOver ? overColour : normColour);
         qp.setFont(QFont(QString("Arial"), textFontSize));
 
@@ -93,7 +100,7 @@ public:
                     QString::fromStdString(text));
     }
 
-    void setValue(int v) {
+    void setValue(float v) {
         val = v;
         isOver = val > overVal;
     }

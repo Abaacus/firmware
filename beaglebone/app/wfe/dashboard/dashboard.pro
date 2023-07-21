@@ -1,3 +1,6 @@
+# Run this to make the Makefile:
+# qmake -makefile -o Makefile dashboard.pro
+
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -8,13 +11,21 @@ CONFIG   -= app_bundle
 
 TEMPLATE += app
 
-HEADERS += dashboard.h
-SOURCES += dashboard.cpp \
-    displays/textdisplay.cpp \
-    displays/errordisplay.cpp \
-    displays/dial.cpp \
-    queuedata.cpp
-HEADERS += dashboardUI.h
-SOURCES += dashboardUI.cpp
-SOURCES += main.cpp
+SOURCES +=  displays/textdisplay.cpp \
+			displays/errordisplay.cpp \
+			displays/dial.cpp \
+			canBusReader.cpp \
+			canLogsWriter.cpp \
+			DashData.cpp \
+			dashboardUI.cpp \
+			main.cpp
+HEADERS +=  canBusReader.hpp \
+			canLogsWriter.hpp \
+			DashData.hpp \
+			dashboardUI.hpp
 
+DESTDIR  = ../../../../Bin/dashboard/
+OBJECTS_DIR  = ../../../../Bin/dashboard/Src
+
+mkdir.commands = $(CHK_DIR_EXISTS) $${OBJECTS_DIR} $(MKDIR) $${OBJECTS_DIR}
+QMAKE_EXTRA_TARGETS += mkdir

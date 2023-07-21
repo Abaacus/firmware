@@ -9,6 +9,9 @@ beaglebone:;
 	make -C beaglebone/os/
 
 dashboard:;
+	# Added this here as the dashboard uses qmake to generated its Makefile
+	mkdir -p Bin/dashboard/Src
+	qmake -makefile -o beaglebone/app/wfe/dashboard/Makefile beaglebone/app/wfe/dashboard/dashboard.pro
 	make -C beaglebone/app/wfe/dashboard/
 
 include bmu/board.mk
