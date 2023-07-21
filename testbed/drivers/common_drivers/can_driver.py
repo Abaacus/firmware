@@ -10,23 +10,24 @@ class CANListener(can.Listener):
     def __init__(self):
         super().__init__()
         self.callbacks = {}
+        self._enabled = False
 
     def register_callback(self, board_id, func_callback):
         assert board_id not in self.callbacks
         self.callbacks[board_id] = func_callback
 
     def on_message_received(self, msg):
-        # TODO: FIX THIS SO THAT HIL USES sender id for ack
-        #       should just be board_id = msg.arbitration_id & 0x07
-        if 7 in self.callbacks:
-            board_id = (msg.arbitration_id>>8) & 0x07
-        else:
-            board_id = msg.arbitration_id & 0x07
+        if not self._enabled:
+            return
+        board_id = msg.arbitration_id & 0xff
+        assert board_id in self.callbacks, f"{board_id} not in {self.callbacks}, can_id: {hex(msg.arbitration_id)}"
+        self.callbacks[board_id](msg)
 
-
-        if board_id in self.callbacks:
-        # assert board_id in self.callbacks, f"{board_id} not in {self.callbacks}, can_id: {hex(msg.arbitration_id)}"
-            self.callbacks[board_id](msg)
+    def enable(self):
+        self._enabled = True
+    
+    def disable(self):
+        self._enabled = False
 
 
 class CANDriver(TestbedDriver):
@@ -41,13 +42,18 @@ class CANDriver(TestbedDriver):
         self.store = {}
 
     def can_msg_rx(self, msg):
-        decoded_data = self.db.decode_message(
-            msg.arbitration_id,
-            msg.data,
-            allow_truncated=True,
-            decode_choices=False,
-            decode_containers=False
-        )
+        try:
+            decoded_data = self.db.decode_message(
+                msg.arbitration_id,
+                msg.data,
+                allow_truncated=True,
+                decode_choices=False,
+                decode_containers=False
+            )
+        except KeyError:
+            # logger.warning(f"Message {msg.arbitration_id} not found in {self.name}")
+            return
+            
 
         for signal_name, signal_value in decoded_data.items():  # type: ignore
             self.store[signal_name] = signal_value
@@ -56,7 +62,7 @@ class CANDriver(TestbedDriver):
         try:
             return self.store[signal_name]
         except KeyError:
-            logger.warning(f"Signal {signal_name} not found in {self.name}")
+            logger.warning(f"Signal {signal_name} not found in {self.name} {self.store.keys()}")
             return None
         
     def __repr__(self) -> str:

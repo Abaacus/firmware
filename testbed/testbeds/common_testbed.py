@@ -39,11 +39,13 @@ class Testbed:
             assert slash.g.vehicle_bus is not None, "Vehicle bus not initialized"
 
             slash.g.vehicle_listener = CANListener()
+            slash.g.vehicle_listener.disable()
             can.Notifier(slash.g.vehicle_bus, [slash.g.vehicle_listener])
 
             self.vehicle_boards = {}
             for board in self.vehicle_manifest:
                 self.vehicle_boards[board.name] = VehicleBoard(board.name, board.can_id)
+            slash.g.vehicle_listener.enable()
 
         # HIL Bus
         if setup_hil:
@@ -51,8 +53,10 @@ class Testbed:
             assert slash.g.hil_bus is not None, "HIL bus not initialized"
 
             slash.g.hil_listener = CANListener()
+            slash.g.hil_listener.disable()
             can.Notifier(slash.g.hil_bus, [slash.g.hil_listener])
 
             self.hil_boards = {}
             for board in self.hil_manifest:
                 self.hil_boards[board.name] = HILBoard(board.name, board.can_id)
+            slash.g.hil_listener.enable()
