@@ -22,6 +22,10 @@
 
 /// Number of AMS boards in system
 #define NUM_BOARDS                  5
+
+/// Number of AMS boards in system for testing
+#define NUM_BOARDS_TESTING          1
+
 /// Number of valid cells per board, starting from the most negative terminal
 #define CELLS_PER_BOARD             14
 /// Number of thermistors attached to each AMS, starting from A0
@@ -37,6 +41,7 @@
 
 #if LTC_CHIP == LTC_CHIP_6804
 #define NUM_LTC_CHIPS_PER_BOARD 2
+#define NUM_LTC_CHIPS_PER_BOARD_TESTING 1
 #elif LTC_CHIP == LTC_CHIP_6812
 #define NUM_LTC_CHIPS_PER_BOARD 1
 #else
