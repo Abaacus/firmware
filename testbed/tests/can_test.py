@@ -3,14 +3,14 @@ from testbeds.hil_testbed import teststand
 from drivers.common_drivers.can_driver import HILBoard, VehicleBoard
 import numpy as np
 import tqdm
-from hil_utilities.board_init import board_init
+from utilities.hil_init import board_init
 
 def test_steeringAngle(teststand):
     print(teststand.vehicle_boards)
     vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
     vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
     
-    assert board_init(vcu_hil)
+    assert board_init(hil_board=vcu_hil)
 
     for angle in range(-100, 101, 5):
         vcu_hil.set_signal("Steering_raw", {"Steering_raw": np.interp(angle, [-100, 100], [0, 3300])})
