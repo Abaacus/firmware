@@ -1,3 +1,15 @@
+from drivers.common_drivers.can_driver import HILBoard, VehicleBoard
+
+def board_init(hil_board: HILBoard):
+    '''Initialize signals to non-erroring values for a given board'''
+
+    if hil_board.name == 'vcu_hil':
+        hil_board.set_signal("Steering_raw", {"Steering_raw": 1.65})
+        hil_board.set_signal("Brake_pres_raw", {"Brake_pres_raw": 0})
+        hil_board.set_signal("Brake_position", {"Brake_position": 0})
+        hil_board.set_signal("Throttle_position_A", {"Throttle_position_A": 0})
+        hil_board.set_signal("Throttle_position_B", {"Throttle_position_B": 0})
+
 # def vcuInit() -> bool:
 
 #     if setVoltage('Throttle_position_A',volts_to_mV(2.19)) == False:

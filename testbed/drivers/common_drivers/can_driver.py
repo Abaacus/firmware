@@ -42,11 +42,11 @@ class CANListener(can.Listener):
 
 
 class CANDriver(TestbedDriver):
-    def __init__(self, name, can_id):
+    def __init__(self, name: str, can_id: int):
         super().__init__(name)
 
-        self.name = name
-        self.can_id = can_id
+        self.name: str = name
+        self.can_id: int = can_id
         self._bus: SocketcanBus = NotImplemented
         self.db: cantools.db.Database = NotImplemented
 
@@ -91,7 +91,7 @@ class VehicleBoard(CANDriver):
 
 
 class HILBoard(CANDriver):
-    def __init__(self, name, can_id):
+    def __init__(self, name: str, can_id: int):
         super().__init__(name, can_id)
 
         self._bus = slash.g.hil_bus
