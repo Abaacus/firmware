@@ -2,6 +2,7 @@ import cantools
 from drivers.common_drivers.driver import TestbedDriver
 from drivers.dtc_logger import DTCLogger
 import can
+import time
 from slash import logger
 import slash
 from typing import Dict, Callable
@@ -109,6 +110,7 @@ class HILBoard(CANDriver):
 
         msg = can.Message(arbitration_id=msg.frame_id, data=data)
         self._bus.send(msg)
+        time.sleep(0.001)
         return True
 
     def flush_tx(self):
