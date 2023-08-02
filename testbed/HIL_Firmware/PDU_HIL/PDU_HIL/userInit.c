@@ -10,10 +10,8 @@
 #include "processCAN.h"
 #include "digitalPot.h"
 #include "pduOutputs.h"
-
 #include "driver/ledc.h"
-#include "driver/timer.h"
-#include "driver/gptimer.h"
+#include "driver/gpio.h"
 
 spi_device_handle_t pot;
 
@@ -175,26 +173,24 @@ void pdu_input_init(void)
 #define LEDC_MODE               LEDC_LOW_SPEED_MODE
 #define LEDC_CHANNEL            LEDC_CHANNEL_0
 #define LEDC_DUTY_RES           LEDC_TIMER_13_BIT // Set duty resolution to 13 bits
-#define LEDC_CLK                RTC8M_CLK
-#define LEDC_INTR               LEDC_INTR_DISABLE
 
-void setPwmDutyCycle(int dutyCycle) {
+void setPwmDutyCycle(uint32_t dutyCycle) {
   ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, dutyCycle));
     // Update duty to apply the new value
-  ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, dutyCycle));
+  ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL));
 }
-void setPwmFreq(int freq) {
+void setPwmFreq(uint32_t freq) {
   ESP_ERROR_CHECK(ledc_set_freq(LEDC_MODE, LEDC_CHANNEL, freq));
 }
 
-void initPwmPin(int pinNumber, int frequency) {
+void initPwmPin(int pinNumber, uint32_t frequency) {
     // Prepare and then apply the LEDC PWM timer configuration
     ledc_timer_config_t ledc_timer = {
         .speed_mode       = LEDC_MODE,
         .timer_num        = LEDC_TIMER,
         .duty_resolution  = LEDC_DUTY_RES,
         .freq_hz          = frequency,  // Set output frequency at 5 kHz
-        .clk_cfg          = LEDC_CLK,
+        .clk_cfg          = LEDC_AUTO_CLK,
     };
     ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
     // Prepare and then apply the LEDC PWM channel configuration
@@ -202,14 +198,12 @@ void initPwmPin(int pinNumber, int frequency) {
         .speed_mode     = LEDC_MODE,
         .channel        = LEDC_CHANNEL,
         .timer_sel      = LEDC_TIMER,
-        .intr_type      = LEDC_INTR,
+        .intr_type      = LEDC_INTR_DISABLE,
         .gpio_num       = pinNumber,
         .duty           = 0, // Set duty to 0%
         .hpoint         = 0
     };
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
-    ESP_ERROR_CHECK(ledc_set_freq(LEDC_MODE, LEDC_CHANNEL, frequency));
-    ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, 60));
 }
 
 void app_main(void)
@@ -219,6 +213,10 @@ void app_main(void)
     pot_init();
     pdu_input_init();
     taskRegister();
-    
-    initPwmPin(3, 1000);
+    initPwmPin(3, 5000);
+
+    while(1)
+    {
+    setPwmDutyCycle(4000);
+    }
 }
