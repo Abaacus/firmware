@@ -172,7 +172,7 @@ void pdu_input_init(void)
 #define LEDC_TIMER              LEDC_TIMER_0
 #define LEDC_MODE               LEDC_LOW_SPEED_MODE
 #define LEDC_CHANNEL            LEDC_CHANNEL_0
-#define LEDC_DUTY_RES           LEDC_TIMER_13_BIT // Set duty resolution to 13 bits
+#define LEDC_DUTY_RES           LEDC_TIMER_7_BIT // Set duty resolution to 13 bits
 
 void setPwmDutyCycle(uint32_t dutyCycle) {
   ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, dutyCycle));
@@ -213,10 +213,10 @@ void app_main(void)
     pot_init();
     pdu_input_init();
     taskRegister();
-    initPwmPin(3, 5000);
+    initPwmPin(3, 500000);
 
     while(1)
     {
-    setPwmDutyCycle(4000);
+    setPwmDutyCycle(64);
     }
 }
