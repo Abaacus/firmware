@@ -13,19 +13,19 @@
 #define OUTPUT_REG 
 
 #define ADC_RES 16  // -32768 to 32767
-#define V_REF 3.3
+#define V_REF 3.3f
 #define ADC_TO_VOLTAGE(adc_data) ((V_REF / ((1 << ADC_BITS) - 1)) * (adc_data))
 
 // formula for wheatstone bridge 
 #define R 10000
 #define V_TO_R(voltage) (R((voltage/V_REF)+(V_REF/2*V_REF)))/(1-((voltage/V_REF)+(V_REF/2*V_REF)))
 
-/* steinhart-hart coefficients (TODO: may need to be adjusted)
- * Sample data: -30, 20, 70 celcius. May want to change it to expected range
+/* steinhart-hart coefficients
+ * Sample data: -30, 35, 70 celcius.
  */ 
-#define A 0.00112766
-#define B 0.000234372
-#define C 0.0000000866770
+#define A 0.001128174464
+#define B 0.0002342867544
+#define C 0.00000008696753691
 
 // Function prototypes
 void MCP3425_Configure(uint8_t config, I2C_HandleTypeDef *hi2c);
