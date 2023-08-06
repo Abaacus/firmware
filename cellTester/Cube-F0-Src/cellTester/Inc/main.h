@@ -57,6 +57,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define CELL_ADC_SCK_Pin GPIO_PIN_5
+#define CELL_ADC_SCK_GPIO_Port GPIOA
+#define CELL_ADC_MISO_Pin GPIO_PIN_6
+#define CELL_ADC_MISO_GPIO_Port GPIOA
+#define CELL_ADC_MOSI_Pin GPIO_PIN_7
+#define CELL_ADC_MOSI_GPIO_Port GPIOA
+#define CELL_ADC_CS_Pin GPIO_PIN_7
+#define CELL_ADC_CS_GPIO_Port GPIOC
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
