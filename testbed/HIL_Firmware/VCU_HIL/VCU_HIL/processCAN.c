@@ -4,6 +4,7 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 #include "driver/twai.h"
+#include "driver/i2c.h"
 #include "userInit.h"
 #include "dac.h"
 #include "canReceive.h"
@@ -19,62 +20,16 @@ static uint16_t dbyte1_mask = 0xFF00;
 void process_rx_task (void * pvParameters)
 {
     TickType_t xLastWakeTime = xTaskGetTickCount();
-
+    vTaskDelayUntil(&xLastWakeTime, 10000); // wait for adc start up ?
     while(1)
     {
-        xQueueReceive(vcu_hil_queue, &can_msg, portMAX_DELAY);
+        uint8_t write_buf[1] = {0b10011000}; //config byte
+        int ret = i2c_master_write_to_device(0, 0b1101000, write_buf, sizeof(write_buf), 1000 / portTICK_PERIOD_MS);
 
-        switch (can_msg.identifier)
-        {
-            case BRAKE_POS:     //Brake position
-                dbyte1 = can_msg.data[0];
-                dbyte2 = can_msg.data[1];
-                dbyte2 = dbyte2 << 8;
-                dbyte2 |= dbyte2_mask;
-                dbyte1 |= dbyte1_mask;
-                dbyte2 &= dbyte1;
-                set6551Voltage(dbyte2, brakePos_ID);
-                break;
-            case BRAKE_PRES_RAW:     //Brake pres raw
-                dbyte1 = can_msg.data[0];
-                dbyte2 = can_msg.data[1];
-                dbyte2 = dbyte2 << 8;
-                dbyte2 |= dbyte2_mask;
-                dbyte1 |= dbyte1_mask;
-                dbyte2 &= dbyte1;
-                setDacVoltage(dbyte2);
-                break;
-            case THROTTLE_A:     //Throttle A 
-                dbyte1 = can_msg.data[0];
-                dbyte2 = can_msg.data[1];
-                dbyte2 = dbyte2 << 8;
-                dbyte2 |= dbyte2_mask;
-                dbyte1 |= dbyte1_mask;
-                dbyte2 &= dbyte1;
-                set6551Voltage(dbyte2, throttleA_ID);
-                break;
-            case THROTTLE_B:     //Throttle B
-                dbyte1 = can_msg.data[0];
-                dbyte2 = can_msg.data[1];
-                dbyte2 = dbyte2 << 8;
-                dbyte2 |= dbyte2_mask;
-                dbyte1 |= dbyte1_mask;
-                dbyte2 &= dbyte1;
-                set6551Voltage(dbyte2, throttleB_ID);
-                break;
-            case STEER_RAW:     //Steer Raw
-                dbyte1 = can_msg.data[0];
-                dbyte2 = can_msg.data[1];
-                dbyte2 = dbyte2 << 8;
-                dbyte2 |= dbyte2_mask;
-                dbyte1 |=dbyte1_mask;
-                dbyte2 &= dbyte1;
-                set6551Voltage(dbyte2, steerRaw_ID);
-                break;
-            default:
-                break;
-        }
+        uint8_t read_buf[2];
+        i2c_master_read_from_device(0, 0b1101000, &read_buf, sizeof(read_buf), 1000 / portTICK_PERIOD_MS);
+        printf("read data bytes: %d, %d\n", read_buf[0], read_buf[1]);
 
-        vTaskDelayUntil(&xLastWakeTime, PROCESS_RX_TASK_INTERVAL);
+        vTaskDelayUntil(&xLastWakeTime, 10000);
     }
 }

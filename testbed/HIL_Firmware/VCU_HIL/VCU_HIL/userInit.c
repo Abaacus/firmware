@@ -6,6 +6,7 @@
 #include "esp_err.h"
 #include "driver/twai.h"
 #include "driver/spi_master.h"
+#include "driver/i2c.h"
 #include "userInit.h"
 #include "dac.h"
 #include "canReceive.h"
@@ -44,6 +45,21 @@ void taskRegister (void)
     {
         printf("Failed to register process_rx_task to RTOS");
     }
+}
+
+esp_err_t I2C_init (void) {
+    i2c_config_t i2c_config = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = 39,
+        .scl_io_num = 41,
+        .scl_pullup_en = false, // not sure if esp internal pullups should be on or off
+        .sda_pullup_en = false,
+        .clk_speed = 100000, //100khz
+
+    };
+    int port = 0;
+    i2c_param_config(port, &i2c_config);
+    return i2c_driver_install(port, i2c_config.mode, 0, 0, 0);
 }
 
 int CAN_init (void)
@@ -168,7 +184,8 @@ int spi_init(void)
 
 void app_main(void)
 {
-    spi_init();
+    i2c_init();
+    // spi_init();
     CAN_init();
     taskRegister();
 }
