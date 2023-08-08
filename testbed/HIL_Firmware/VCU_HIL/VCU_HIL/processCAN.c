@@ -10,13 +10,6 @@
 #include "canReceive.h"
 #include "processCAN.h"
 
-static uint16_t dbyte1;
-static uint16_t dbyte2;
-
-//reassemble data into a 16 bit uint to pass in desired voltage into set dac function
-static uint16_t dbyte2_mask = 0x00FF;
-static uint16_t dbyte1_mask = 0xFF00;
-
 void process_rx_task (void * pvParameters)
 {
     TickType_t xLastWakeTime = xTaskGetTickCount();
@@ -27,7 +20,7 @@ void process_rx_task (void * pvParameters)
         int ret = i2c_master_write_to_device(0, 0b1101000, write_buf, sizeof(write_buf), 1000 / portTICK_PERIOD_MS);
 
         uint8_t read_buf[2];
-        i2c_master_read_from_device(0, 0b1101000, &read_buf, sizeof(read_buf), 1000 / portTICK_PERIOD_MS);
+        i2c_master_read_from_device(0, 0b1101000, read_buf, sizeof(read_buf), 1000 / portTICK_PERIOD_MS);
         printf("read data bytes: %d, %d\n", read_buf[0], read_buf[1]);
 
         vTaskDelayUntil(&xLastWakeTime, 10000);

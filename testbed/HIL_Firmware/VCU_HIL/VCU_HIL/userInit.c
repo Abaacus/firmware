@@ -54,7 +54,7 @@ esp_err_t I2C_init (void) {
         .scl_io_num = 41,
         .scl_pullup_en = false, // not sure if esp internal pullups should be on or off
         .sda_pullup_en = false,
-        .clk_speed = 100000, //100khz
+        .master.clk_speed = 100000, //100khz
 
     };
     int port = 0;
@@ -184,7 +184,7 @@ int spi_init(void)
 
 void app_main(void)
 {
-    i2c_init();
+    I2C_init();
     // spi_init();
     CAN_init();
     taskRegister();
