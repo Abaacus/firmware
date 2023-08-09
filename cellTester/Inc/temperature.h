@@ -26,8 +26,8 @@ float temp_steinhart_hart(float resistance);
 float temp_beta(float resistance);
 float ntc_V_to_R(float voltage);
 float adc_to_volts(int16_t adc_ticks);
-HAL_StatusTypeDef thermistor_adc_init(I2C_HandleTypeDef *i2c_hdr);
-float read_thermistor(I2C_HandleTypeDef *i2c_hdr, float *temp_output_val);
+HAL_StatusTypeDef init_temp_measurements(void);
+HAL_StatusTypeDef read_thermistor(I2C_HandleTypeDef *i2c_hdr, float *output_temperature);
 
 extern I2C_HandleTypeDef *cell_i2c_hdr;
 extern I2C_HandleTypeDef *fuse_i2c_hdr;

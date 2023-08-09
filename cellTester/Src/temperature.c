@@ -25,10 +25,7 @@ float temp_beta(float resistance) {
     return temp_C;
 }
 
-// Potential third (and more performant) method of deriving temperature from resistance
-// float temp_lookuptable(float resistance) {}
-
-// Voltage to Resistance (Wheastone Bridge equation)
+// Voltage to Resistance (Wheatstone Bridge equation)
 // https://www.ametherm.com/thermistor/ntc-thermistors-temperature-measurement-with-wheatstone-bridge
 float ntc_V_to_R(float voltage) {
     // R1 == R2 == R3
@@ -43,38 +40,36 @@ float adc_to_volts(int16_t adc_ticks) {
     return voltage;
 }
 
-HAL_StatusTypeDef thermistor_adc_init(I2C_HandleTypeDef *i2c_hdr) {
-    HAL_StatusTypeDef config_status = mcp3425_adc_configure(i2c_hdr);
+HAL_StatusTypeDef init_temp_measurements(void) {
+    HAL_StatusTypeDef cell_config_status = mcp3425_adc_configure(cell_i2c_hdr);
+    HAL_StatusTypeDef fuse_config_status = mcp3425_adc_configure(fuse_i2c_hdr);
 
-    if (config_status != HAL_OK) {
-        DEBUG_PRINT("config failed\r\n");
+    if (cell_config_status != HAL_OK) {
+        DEBUG_PRINT("Cell temp adc config failed\r\n");
         return HAL_ERROR;
-    }
-    else
-    {
-        DEBUG_PRINT("config pass\r\n");
-    }
+    } 
+    else if (fuse_config_status != HAL_OK) {
+         DEBUG_PRINT("Fuse temp adc config failed\r\n");
+        return HAL_ERROR;       
+    } 
     return HAL_OK;
 }
 
-float read_thermistor(I2C_HandleTypeDef *i2c_hdr, float *output_temperature) {
+HAL_StatusTypeDef read_thermistor(I2C_HandleTypeDef *i2c_hdr, float *output_temperature) {
     if (mcp3425_adc_read(i2c_hdr) != HAL_OK) {
         ERROR_PRINT("Failed to read from adc\n");
         return HAL_ERROR;
     }
 
-    // DEBUG_PRINT("last adc output is: %d\r\n", save_adc_output_val);
-    int save_adc_output_val = 0;
-    if (i2c_hdr == cell_i2c_hdr)
-    {
-        save_adc_output_val = adc_1_output_val;
+    int16_t adc_output = 0;
+    if (i2c_hdr == cell_i2c_hdr) {
+        adc_output = cell_temp_output_val;
     }
-    else if (i2c_hdr == fuse_i2c_hdr)
-    {
-        save_adc_output_val = adc_2_output_val;
+    else if (i2c_hdr == fuse_i2c_hdr) {
+        adc_output = fuse_temp_output_val;
     }
 
-    float voltage = adc_to_volts(save_adc_output_val);
+    float voltage = adc_to_volts(adc_output);
     float resistance = ntc_V_to_R(voltage);
     float temperature_celsius = temp_steinhart_hart(resistance);
     (*output_temperature) = temperature_celsius;
@@ -93,14 +88,7 @@ void temperatureTask(void *pvParameters) {
     // Wait for boot
     vTaskDelay(pdMS_TO_TICKS(100));
 
-    // Configure ADCs    
-    thermistor_adc_init(cell_i2c_hdr);
-    thermistor_adc_init(fuse_i2c_hdr);
-
-    vTaskDelay(100);
-
     while (1) {
-
         if (read_thermistor(cell_i2c_hdr, &cell_temp_result) != HAL_OK) {
             DEBUG_PRINT("failed to read cell temp\n");
         }

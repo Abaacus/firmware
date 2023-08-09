@@ -8,6 +8,8 @@
 #define MCP3425_DEVICE_CODE 0b1101
 #define MCP3425_ADDR_CODE 0b000
 #define MCP3425_ADDR_BYTE ((MCP3425_DEVICE_CODE << 3) | 0b000)
+#define MCP3425_ADDR_BYTE_SHIFTED ((MCP3425_ADDR_BYTE) << 1)
+
 #define I2C_INIT_TRIALS 5
 #define I2C_INIT_TIMEOUT 1000
 
@@ -24,9 +26,10 @@
 
 #define MCP3425_RX_BUFFER_SIZE 3
 
-HAL_StatusTypeDef mcp3425_device_ready(I2C_HandleTypeDef *i2c_hdr);
 HAL_StatusTypeDef mcp3425_adc_configure(I2C_HandleTypeDef *i2c_hdr);
-HAL_StatusTypeDef mcp3425_adc_read(I2C_HandleTypeDef *i2c_hdr);
-extern int16_t adc_1_output_val;
-extern int16_t adc_2_output_val;
+HAL_StatusTypeDef mcp3425_adc_read(I2C_HandleTypeDef *i2c_hdc);
+
+extern int16_t cell_temp_output_val;
+extern int16_t fuse_temp_output_val;
+
 #endif

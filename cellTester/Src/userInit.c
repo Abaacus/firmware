@@ -14,6 +14,7 @@
 
 #include "bsp.h"
 #include "debug.h"
+#include "temperature.h"
 
 void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                     signed char *pcTaskName )
@@ -33,6 +34,10 @@ void userInit()
     
     if (uartStartReceiving(&DEBUG_UART_HANDLE) != HAL_OK)
     {
+        Error_Handler();
+    }
+
+    if (init_temp_measurements() != HAL_OK) {
         Error_Handler();
     }
 }
