@@ -10,7 +10,7 @@ int16_t cell_temp_output_val = 0;
 int16_t fuse_temp_output_val = 0;
 
 // Match I2C handler to the correct read buffer
-static uint8_t* select_buffer(I2C_HandleTypeDef *i2c_hdr) {
+static uint8_t* select_rbuffer(I2C_HandleTypeDef *i2c_hdr) {
     uint8_t* rbuffer = NULL;
     if (i2c_hdr == cell_i2c_hdr) {
         rbuffer = rbuffer_1;

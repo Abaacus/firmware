@@ -43,7 +43,7 @@ float adc_to_volts(int16_t adc_ticks) {
 HAL_StatusTypeDef init_temp_measurements(void) {
     HAL_StatusTypeDef cell_config_status = mcp3425_adc_configure(cell_i2c_hdr);
     HAL_StatusTypeDef fuse_config_status = mcp3425_adc_configure(fuse_i2c_hdr);
-
+    
     if (cell_config_status != HAL_OK) {
         DEBUG_PRINT("Cell temp adc config failed\r\n");
         return HAL_ERROR;
