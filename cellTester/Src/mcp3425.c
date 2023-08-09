@@ -18,9 +18,7 @@ static uint8_t* select_rbuffer(I2C_HandleTypeDef *i2c_hdr) {
     else if (i2c_hdr == fuse_i2c_hdr) {
         rbuffer = rbuffer_2;
     } 
-    else {
-        DEBUG_PRINT("i2c handler not recognized\r\n");
-    }
+
     return rbuffer;
 }
 
@@ -38,7 +36,7 @@ HAL_StatusTypeDef mcp3425_adc_configure(I2C_HandleTypeDef *i2c_hdr) {
 
 // Also write the adc reading to provided address
 HAL_StatusTypeDef mcp3425_adc_read(I2C_HandleTypeDef *i2c_hdr) {
-    uint8_t* rbuffer = select_buffer(i2c_hdr);
+    uint8_t* rbuffer = select_rbuffer(i2c_hdr);
  
     HAL_StatusTypeDef status = HAL_I2C_Master_Receive_DMA(i2c_hdr, MCP3425_ADDR_BYTE_SHIFTED, rbuffer, MCP3425_RX_BUFFER_SIZE);
 
@@ -62,7 +60,7 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    uint8_t* rbuffer = select_buffer(hi2c);
+    uint8_t* rbuffer = select_rbuffer(hi2c);
     int16_t adc_raw = (rbuffer[0] << 8) | rbuffer[1];
     // Check RDY bit
     // 0 = Output register has been updated with the latest conversion data.
