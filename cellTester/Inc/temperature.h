@@ -13,9 +13,9 @@
 #define TEMPERATURE_PERIOD_MS 100
 
 // Constants of Steinhart-Hart equation, calculated from samples from R-T table
-#define A 0.0011144534f
-#define B 0.0002364747f
-#define C 0.0000000787784f
+#define A 0.001127699f
+#define B 0.00023433f
+#define C 0.000000087f
 
 // Beta (K) 0-50 C (from the USP10982 datasheet)
 #define BETA 3892
