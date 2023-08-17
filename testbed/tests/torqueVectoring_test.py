@@ -1,72 +1,27 @@
 import time
 import slash
-
-# import HIL_Firmware.globals as globals
-from hil_constants import HIL_wip_workaround
-# from hil_common import Car
+# import sys
+# sys.path.append("C:\\Users\\Jacky\\vagrant\\shared\\firmware\\testbed")
+from HIL_Firmware.common_HIL import Car
 from testbeds.hil_testbed import teststand
-from drivers.common_drivers.can_driver import HILBoard, VehicleBoard, Vehicle
-
+from drivers.common_drivers.can_driver import HILBoard, VehicleBoard
+from utilities.hil_init import board_init
 
 # variables for testing
 sleepDurationMs = 0.2
 tolerance = 5
 
-class Car:
-    def __init__(self, vcu_hil, vcu):
-        self.vehicle = Vehicle()
-        self.vcu_hil = vcu_hil
-        self.vcu = vcu
-
-    def set_EM_enable(self):
-        try:
-            self.vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": 2307}) #calculated 1958
-            self.vcu_hil.set_signal("Throttle_position_B", {"Throttle_position_B": 936}) #calculated 991
-            self.vcu_hil.set_signal("Brake_pres_raw", {"Brake_pres_raw": 1000})
-            self.vcu_hil.set_signal("Brake_position", {"Brake_position": 3300})
-            self.vehicle.send_CAN_message("BMU_HV_Power_State", {"HV_Power_State": 1} )
-            self.vehicle.send_CAN_message("TempInverterLeft", {"PRO_CAN_CRC": 0, "PRO_CAN_COUNT": 0, "PRO_CAN_RES": 0, "InverterAUTHSEEDLeft": 0,\
-                                                               "TempInverterLeft": 0, "TempInverterDeltaLeft": 0, "StateInverterLeft": 0x18})
-            self.vehicle.send_CAN_message("TempInverterRight", {"PRO_CAN_CRC": 0, "PRO_CAN_COUNT": 0, "PRO_CAN_RES": 0, "InverterAUTHSEEDRight": 0,\
-                                                               "TempInverterRight": 0, "TempInverterDeltaRight": 0, "StateInverterRight": 0x18})
-            time.sleep(0.05)
-            self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonEMEnabled": 1, "ButtonHVEnabled": 1, "ButtonTCEnabled": 0, "ButtonEnduranceLapEnabled": 0, "ButtonEnduranceToggleEnabled":0 } )
-            self.vehicle.send_CAN_message("PDU_ChannelStatus", {"StatusPowerVCU": 0, "StatusPowerMCRight": 2, "StatusPowerMCLeft": 2, \
-                                                                 "StatusPowerIMD": 0, "StatusPowerDCU": 0, "StatusPowerDAU": 0, "StatusPowerCoolingPumpRight" : 0,\
-                                                                 "StatusPowerCoolingPumpLeft": 0, "StatusPowerCoolingFanRight": 0, "StatusPowerCoolingFanLeft": 0,\
-                                                                 "StatusPowerCoolingFanBattery": 0, "StatusPowerBMU": 0})
-           
-            self.vcu_hil.set_signal("Brake_position", {"Brake_position": 0})
-        except Exception as e:
-            print("set_EM_enable message NOT sent")
-            print(e)
-            return False
-        
-    def set_TC_enable(self):
-        try:
-            self.vehicle.send_CAN_message("ButtonTCEnabled", {"ButtonTCEnabled": 1})
-        except:
-            print("set_TC_enable message NOT sent")
-            return False
-
-    def set_endurance_enable(self):
-        try:
-            self.vehicle.send_CAN_message("ButtonEnduranceToggleEnabled", {"ButtonEnduranceToggleEnabled": 1})
-        except:
-            print("set_endurance_enable message NOT sent")
-            return False
-            
-
 def test_TV_setup(teststand):
-    print(teststand.hil_boards)
+    print(teststand.hil_boards) # try moving these three lines outside?  it is repeated in each 
     vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
     vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
-    # globals.init()
-    #assert globals.HIL_wip_workaround, "Error: workaround is set to 0"
-    car = Car(vcu_hil, vcu)
-    car.set_EM_enable()
 
-    # set 50% throttle
+    assert board_init(hil_board=vcu_hil)
+
+    #assert globals.HIL_wip_workaround, "Error: workaround is set to 0"
+    Car.set_EM_enable()
+
+    # # set 50% throttle
     # throttleA_mV = 2090
     # throttleB_mV = 1130
     # vcu_hil.set_signal("Throttle_position_A", {"Throttle_position_A": throttleA_mV})
