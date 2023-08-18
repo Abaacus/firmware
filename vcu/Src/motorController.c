@@ -253,7 +253,7 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
 
 	if(!motors_active)
 	{
-        
+        DEBUG_PRINT("HELLLLOOOOOOOOOOOOOOOOOOOO");
 		return HAL_OK;
 	}
 
@@ -296,47 +296,60 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
     // Sevcon didn't explain what these are for, but said to set to 0
     ActiveShortRight = 0;
     ActiveShortLeft = 0;
-
+    DEBUG_PRINT("HELLLLOOOOOOOOOOOOOOOOOOOO");
     if (sendCAN_TorqueLimitRight() != HAL_OK) {
         ERROR_PRINT("Failed to send torque limit right\n");
         return HAL_ERROR;
     }
+    vTaskDelay(3);
+
     if (sendCAN_TorqueLimitLeft() != HAL_OK) {
         ERROR_PRINT("Failed to send torque limit left\n");
         return HAL_ERROR;
     }
-
+vTaskDelay(3);
     if (sendCAN_SpeedLimitRight() != HAL_OK) {
         ERROR_PRINT("Failed to send speed limit right\n");
         return HAL_ERROR;
     }
+    vTaskDelay(3);
+
     if (sendCAN_SpeedLimitLeft() != HAL_OK) {
         ERROR_PRINT("Failed to send speed limit left\n");
         return HAL_ERROR;
     }
+vTaskDelay(3);
 
     if (sendCAN_CurrentLimitRight() != HAL_OK) {
         ERROR_PRINT("Failed to send current limit right\n");
         return HAL_ERROR;
     }
+    vTaskDelay(3);
+
     if (sendCAN_CurrentLimitLeft() != HAL_OK) {
         ERROR_PRINT("Failed to send current limit left\n");
         return HAL_ERROR;
     }
+vTaskDelay(3);
 
     if (sendCAN_VoltageLimitRight() != HAL_OK) {
         ERROR_PRINT("Failed to send voltage limit right\n");
         return HAL_ERROR;
     }
+    vTaskDelay(3);
+
     if (sendCAN_VoltageLimitLeft() != HAL_OK) {
         ERROR_PRINT("Failed to send voltage limit left\n");
         return HAL_ERROR;
     }
+vTaskDelay(3);
 
     if (sendCAN_AuxRight() != HAL_OK) {
         ERROR_PRINT("Failed to send aux right\n");
         return HAL_ERROR;
     }
+    vTaskDelay(3);
+
     if (sendCAN_AuxLeft() != HAL_OK) {
         ERROR_PRINT("Failed to send aux left\n");
         return HAL_ERROR;

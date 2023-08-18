@@ -3,14 +3,13 @@ from . import setVcuHilOutputs
 from drivers.common_drivers.can_driver import Vehicle
 
 class Car:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
         self.vehicle = Vehicle()
 
     def set_EM_enable(self):
         try:
-            setVcuHilOutputs.setThrottleA(2.307) #calculated 1958
-            setVcuHilOutputs.setThrottleB(0.936) #calculated 991
+            setVcuHilOutputs.setThrottleA(2.307) #calculated: 2307
+            setVcuHilOutputs.setThrottleB(0.920) #calculated: 0936
             setVcuHilOutputs.setBrakePres(1000)
             setVcuHilOutputs.setBrakePosition(3300)
             self.vehicle.send_CAN_message("BMU_HV_Power_State", {"HV_Power_State": 1} )

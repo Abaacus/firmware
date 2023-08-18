@@ -343,11 +343,11 @@ HAL_StatusTypeDef MotorStart()
     }
 
     vTaskDelay(pdMS_TO_TICKS(MC_STARTUP_TIME_MS));
-    rc = mcInit();
-    if (rc != HAL_OK) {
-        ERROR_PRINT("Failed to start motor controllers\n");
-        return rc;
-    }
+    // rc = mcInit();
+    // if (rc != HAL_OK) {
+    //     ERROR_PRINT("Failed to start motor controllers\n");
+    //     return rc;
+    // }
 
 
     // Change back timeout
