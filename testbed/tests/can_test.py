@@ -3,7 +3,7 @@ from testbeds.hil_testbed import teststand
 from drivers.common_drivers.can_driver import HILBoard, VehicleBoard
 import numpy as np
 from tqdm import tqdm
-from utilities.hil_init import board_init
+from .utilities.hil_init import board_init
 
 def test_steeringAngle(teststand):
     print(teststand.hil_boards)

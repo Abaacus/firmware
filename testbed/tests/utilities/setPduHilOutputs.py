@@ -8,7 +8,7 @@ MAX_POT_RESISTANCE_OHM = 199219
 MIN_POT_RESISTANCE_OHM = 60
 
 bus = can.Bus(bustype='vector', app_name='CANalyzer', channel=0, bitrate=500000)
-hil_dbc = cantools.database.load_file(r'testbed\HIL_Firmware\common\data\HIL.dbc')
+hil_dbc = cantools.database.load_file(r'HIL_Firmware\common\data\HIL.dbc')
 
 pdu_hil = cantools.tester.Tester('PDU_HIL', hil_dbc, bus)
 pdu_hil.start()

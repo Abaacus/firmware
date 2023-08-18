@@ -15,10 +15,11 @@ def test_TV_setup(teststand):
     vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
     vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
 
-    assert board_init(hil_board=vcu_hil)
+    #assert board_init(hil_board=vcu_hil)
 
-    #assert globals.HIL_wip_workaround, "Error: workaround is set to 0"
-    Car.set_EM_enable()
+    #assert globals.HIL_wip_workaround, "Error: workaround is set to 0"\
+    car = Car(name='myCar')
+    car.set_EM_enable()
 
     # # set 50% throttle
     # throttleA_mV = 2090

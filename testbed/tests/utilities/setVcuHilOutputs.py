@@ -7,7 +7,7 @@ import time
 MAX_VOLTAGE_V = 3.3
 
 bus = can.Bus(bustype='vector', app_name='CANalyzer', channel=0, bitrate=500000)
-hil_dbc = cantools.database.load_file(r'testbed\HIL_Firmware\common\data\HIL.dbc')
+hil_dbc = cantools.database.load_file(r'HIL_Firmware\common\data\HIL.dbc')
 vcu_hil = cantools.tester.Tester('VCU_HIL', hil_dbc, bus)
 vcu_hil.start()
 

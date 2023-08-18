@@ -10,7 +10,7 @@ class Car:
     def set_EM_enable(self):
         try:
             setVcuHilOutputs.setThrottleA(2.307) #calculated 1958
-            setVcuHilOutputs.setThrottleA(0.936) #calculated 991
+            setVcuHilOutputs.setThrottleB(0.936) #calculated 991
             setVcuHilOutputs.setBrakePres(1000)
             setVcuHilOutputs.setBrakePosition(3300)
             self.vehicle.send_CAN_message("BMU_HV_Power_State", {"HV_Power_State": 1} )
