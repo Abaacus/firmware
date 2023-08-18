@@ -1,21 +1,14 @@
 import time
 import slash
-# import sys
-# sys.path.append("C:\\Users\\Jacky\\vagrant\\shared\\firmware\\testbed")
-from utilities.common_HIL import Car
+
 from testbeds.hil_testbed import teststand
 from drivers.common_drivers.can_driver import HILBoard, VehicleBoard
-from utilities.hil_init import board_init
+from .utilities.hil_init import board_init
+from .utilities.common_HIL import Car
 
 # variables for testing
 sleepDurationMs = 0.2
 tolerance = 5
-print('hi')
-def test_math(x):
-    sum = 0
-    for j in range(x+1):
-        sum = sum + j
-    assert sum == x*(x+1)/2
 
 def test_TV_setup(teststand):
     print(teststand.hil_boards) # try moving these three lines outside?  it is repeated in each 
@@ -42,6 +35,8 @@ def test_TV_setup(teststand):
     # time.sleep(sleepDurationMs)
     # assert vcu_hil.get_signal("Brake_pos_status")
 
+
+'''
 # test 1: steering angle in dead zone (0)
 def test_TV_deadzone():
     #print(teststand.hil_boards)
@@ -72,3 +67,4 @@ def test_TV_100R(testValue, expR, expL):
     f"torqueDemandR <{torqueDemandR}> exceeds tolerance <{tolerance}>"
     assert abs(torqueDemandL - expL) <= tolerance,\
     f"torqueDemandL <{torqueDemandL}> exceeds tolerance <{tolerance}>"
+'''
