@@ -3,7 +3,7 @@
 - See slash docs for more information https://slash.readthedocs.io/en/master/slash_run.html
 
 # Run Interactive Session
-slash -i
+slash run -i
 
 # Run HIL Tests
 slash run tests/<path_to_test> --testbed <TestbedName>

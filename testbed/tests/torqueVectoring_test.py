@@ -2,7 +2,7 @@ import time
 import slash
 # import sys
 # sys.path.append("C:\\Users\\Jacky\\vagrant\\shared\\firmware\\testbed")
-from HIL_Firmware.common_HIL import Car
+from utilities.common_HIL import Car
 from testbeds.hil_testbed import teststand
 from drivers.common_drivers.can_driver import HILBoard, VehicleBoard
 from utilities.hil_init import board_init
@@ -36,7 +36,6 @@ def test_TV_setup(teststand):
     # time.sleep(sleepDurationMs)
     # assert vcu_hil.get_signal("Brake_pos_status")
 
-'''
 # test 1: steering angle in dead zone (0)
 def test_TV_deadzone():
     #print(teststand.hil_boards)
@@ -67,4 +66,3 @@ def test_TV_100R(testValue, expR, expL):
     f"torqueDemandR <{torqueDemandR}> exceeds tolerance <{tolerance}>"
     assert abs(torqueDemandL - expL) <= tolerance,\
     f"torqueDemandL <{torqueDemandL}> exceeds tolerance <{tolerance}>"
-'''
