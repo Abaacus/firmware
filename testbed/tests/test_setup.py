@@ -1,5 +1,5 @@
 import slash
-from testbeds.hil_testbed import hil_testbed
+
 def test_setup(hil_testbed):
     pass
 
