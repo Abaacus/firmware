@@ -21,17 +21,16 @@ class ParamsPlugin(slash.plugins.PluginInterface):
             self.testbed_name = "VehicleHIL"
 
     def session_start(self):
-        pass
         # TODO: Maybe move this to .slashrc as an arg
-        # slash.g.vehicle_db = cantools.db.load_file("../common/Data/2018CAR.dbc")
-        # slash.g.hil_db = cantools.db.load_file("HIL_Firmware/common/data/HIL.dbc")
+        slash.g.vehicle_db = cantools.db.load_file("../common/Data/2018CAR.dbc")
+        slash.g.hil_db = cantools.db.load_file("HIL_Firmware/common/data/HIL.dbc")
 
-        # slash.g.vehicle_bus: SocketcanBus = NotImplemented
-        # slash.g.hil_bus: SocketcanBus = NotImplemented
+        slash.g.vehicle_bus: SocketcanBus = NotImplemented
+        slash.g.hil_bus: SocketcanBus = NotImplemented
 
-        # slash.g.vehicle_listener = CANListener()
-        # slash.g.hil_listener = CANListener()
+        slash.g.vehicle_listener = CANListener()
+        slash.g.hil_listener = CANListener()
         
-        # slash.g.vehicle_dtc_logger = DTCLogger()
+        slash.g.vehicle_dtc_logger = DTCLogger()
 
-        # slash.g.testbed = globals()[self.testbed_name]()
+        slash.g.testbed = globals()[self.testbed_name]()
