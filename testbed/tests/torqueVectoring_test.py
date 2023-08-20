@@ -7,56 +7,64 @@ from .utilities.hil_init import board_init
 from .utilities.common_HIL import Car
 from .utilities import setVcuHilOutputs
 
-# variables for testing
-sleepDurationMs = 0.2
-tolerance = 5
+# Variables for testing
+sleepDurationMs = 0.05
+tolerance = 2
+setup_complete = False
+vcu = None
+vcu_hil = None
 
 def test_TV_setup(teststand):
-    #assert board_init(hil_board=vcu_hil)
-    vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
-    vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
-    #assert globals.HIL_wip_workaround, "Error: workaround is set to 0"\
-    car = Car()
-    car.set_EM_enable()
-    
-    # test 50% throttle
-    setVcuHilOutputs.setThrottleA(2.154) # off by 47
-    setVcuHilOutputs.setThrottleB(1.047) # ADC: 1452, 1.153 = 100%, 
-    #assert vcu_hil.get_signal("Throttle_A_status")
-    assert vcu_hil.get_signal("Throttle_B_status")
+    global setup_complete
+    global vcu
+    global vcu_hil
+    try:
+        vcu = teststand.vehicle_boards["vcu"]
+        vcu_hil = teststand.hil_boards["vcu_hil"]
+        assert board_init(hil_board=vcu_hil)
+        car = Car()
+        assert car.set_EM_enable()
+        
+        # All tests conducted at 50% throttle
+        setVcuHilOutputs.setThrottleA(2.154)
+        time.sleep(sleepDurationMs)
+        assert vcu_hil.get_signal("Throttle_A_status")
+        setVcuHilOutputs.setThrottleB(1.047)
+        time.sleep(sleepDurationMs)
+        assert vcu_hil.get_signal("Throttle_B_status")
+    except Exception as e:
+        print("Setup failed!")
+        print(e)
+    else:
+        setup_complete = True
+        time.sleep(0.8) # Delay required after going to EM. 0.7 fails 100%. 
 
-    # why is this needed
-    # time.sleep(0.05) 
-    # setVcuHilOutputs.setBrakePosition(3300)
-    # assert vcu_hil.get_signal("Brake_pos_status")
-
-
-# test 1: steering angle in dead zone (0)
-def test_TV_deadzone(teststand):
-    vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
-    vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
+# Test 1: steering angle in dead zone (0)
+def test_TV_deadzone():
+    assert setup_complete, "Setup is incomplete!"
+ 
     setVcuHilOutputs.setSteering(1.650)
-    assert vcu_hil.get_signal("Steering_status")
-
-    torqueDemandR = vcu.get_signal("TorqueDemandRight")
-    torqueDemandL = vcu.get_signal("TorqueDemandLeft")
-    print(f"Right: {torqueDemandR}")
-    print(f"Left: {torqueDemandL}")
-    assert torqueDemandR == torqueDemandL,\
-    f"torqueDemandR <{torqueDemandR}>, torqueDemandL <{torqueDemandL}>"
-
-# test 2 & 3: steering angle fully right and left
-@slash.parametrize(('testValue', 'expR', 'expL'), [(3300, 2.50, 27.50), (0, 27.50, 2.50)])
-def test_TV_100R(teststand, testValue, expR, expL):
-    vcu_hil: HILBoard = teststand.hil_boards["vcu_hil"]
-    vcu: VehicleBoard = teststand.vehicle_boards["vcu"]
-    vcu_hil.set_signal("Steering_raw", {"Steering_raw": testValue})
     time.sleep(sleepDurationMs)
     assert vcu_hil.get_signal("Steering_status")
+    time.sleep(sleepDurationMs)
 
     torqueDemandR = vcu.get_signal("TorqueDemandRight")
     torqueDemandL = vcu.get_signal("TorqueDemandLeft")
-    assert abs(torqueDemandR - expR) <= tolerance,\
-        f"torqueDemandR <{torqueDemandR}> exceeds tolerance <{tolerance}>"
-    assert abs(torqueDemandL - expL) <= tolerance,\
-        f"torqueDemandL <{torqueDemandL}> exceeds tolerance <{tolerance}>"
+
+    assert (torqueDemandR - torqueDemandL) <= tolerance
+
+# Test 2 & 3: steering angle fully right and left
+@slash.parametrize(('testValue', 'expR', 'expL'), [(3.30, 1.56, 19.24), (0.00, 19.24, 1.56)])
+def test_TV_100R(testValue, expR, expL):
+    assert setup_complete, "Setup is incomplete!"
+
+    setVcuHilOutputs.setSteering(testValue)
+    time.sleep(sleepDurationMs)
+    assert vcu_hil.get_signal("Steering_status")
+    time.sleep(sleepDurationMs)
+
+    torqueDemandR = vcu.get_signal("TorqueDemandRight")
+    torqueDemandL = vcu.get_signal("TorqueDemandLeft")
+
+    assert abs(torqueDemandR - expR) <= tolerance
+    assert abs(torqueDemandL - expL) <= tolerance

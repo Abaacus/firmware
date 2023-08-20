@@ -41,5 +41,6 @@ HAL_StatusTypeDef setMotorControllerProcanSettings(MotorControllerProcanSettings
 HAL_StatusTypeDef setDischargeCurrentLimit(float limit);
 HAL_StatusTypeDef setForwardSpeedLimit(float limit);
 HAL_StatusTypeDef setTorqueLimit(float limit);
+void delete_set_motor_true (void);
 
 #endif /* end of include guard: MOTORCONTROLLER_H */

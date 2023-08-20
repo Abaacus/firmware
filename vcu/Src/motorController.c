@@ -253,7 +253,7 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
 
 	if(!motors_active)
 	{
-        DEBUG_PRINT("HELLLLOOOOOOOOOOOOOOOOOOOO");
+
 		return HAL_OK;
 	}
 
@@ -296,7 +296,7 @@ HAL_StatusTypeDef sendThrottleValueToMCs(float throttle, int steeringAngle)
     // Sevcon didn't explain what these are for, but said to set to 0
     ActiveShortRight = 0;
     ActiveShortLeft = 0;
-    DEBUG_PRINT("HELLLLOOOOOOOOOOOOOOOOOOOO");
+
     if (sendCAN_TorqueLimitRight() != HAL_OK) {
         ERROR_PRINT("Failed to send torque limit right\n");
         return HAL_ERROR;
@@ -356,4 +356,9 @@ vTaskDelay(3);
     }
 
     return HAL_OK;
+}
+
+// 20-8-2023: we haven't emulate the motor controllers so we are spoofing it here
+void delete_set_motor_true (void){
+    motors_active = true;
 }

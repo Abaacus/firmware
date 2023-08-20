@@ -2,6 +2,8 @@ import time
 from . import setVcuHilOutputs
 from drivers.common_drivers.can_driver import Vehicle
 
+sleepDuration = 0.05
+
 class Car:
     def __init__(self):
         self.vehicle = Vehicle()
@@ -17,7 +19,7 @@ class Car:
                                                                "TempInverterLeft": 0, "TempInverterDeltaLeft": 0, "StateInverterLeft": 0x18})
             self.vehicle.send_CAN_message("TempInverterRight", {"PRO_CAN_CRC": 0, "PRO_CAN_COUNT": 0, "PRO_CAN_RES": 0, "InverterAUTHSEEDRight": 0,\
                                                                "TempInverterRight": 0, "TempInverterDeltaRight": 0, "StateInverterRight": 0x18})
-            time.sleep(0.05) # todo: check if this is necessary
+            time.sleep(sleepDuration)
             self.vehicle.send_CAN_message("DCU_buttonEvents", {"ButtonEMEnabled": 1, "ButtonHVEnabled": 1, "ButtonTCEnabled": 0, "ButtonEnduranceLapEnabled": 0, "ButtonEnduranceToggleEnabled":0 } )
             self.vehicle.send_CAN_message("PDU_ChannelStatus", {"StatusPowerVCU": 0, "StatusPowerMCRight": 2, "StatusPowerMCLeft": 2, \
                                                                  "StatusPowerIMD": 0, "StatusPowerDCU": 0, "StatusPowerDAU": 0, "StatusPowerCoolingPumpRight" : 0,\
@@ -25,6 +27,7 @@ class Car:
                                                                  "StatusPowerCoolingFanBattery": 0, "StatusPowerBMU": 0})
            
             setVcuHilOutputs.setBrakePosition(0)
+            return True
         except Exception as e:
             print("set_EM_enable message NOT sent")
             print(e)
@@ -33,6 +36,7 @@ class Car:
     def set_TC_enable():
         try:
             Vehicle.send_CAN_message("ButtonTCEnabled", {"ButtonTCEnabled": 1})
+            return True
         except:
             print("set_TC_enable message NOT sent")
             return False
@@ -40,6 +44,7 @@ class Car:
     def set_endurance_enable():
         try:
             Vehicle.send_CAN_message("ButtonEnduranceToggleEnabled", {"ButtonEnduranceToggleEnabled": 1})
+            return True
         except:
             print("set_endurance_enable message NOT sent")
             return False

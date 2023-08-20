@@ -348,7 +348,7 @@ HAL_StatusTypeDef MotorStart()
     //     ERROR_PRINT("Failed to start motor controllers\n");
     //     return rc;
     // }
-
+    delete_set_motor_true();
 
     // Change back timeout
     watchdogTaskChangeTimeout(DRIVE_BY_WIRE_TASK_ID,
