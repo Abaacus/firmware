@@ -8,8 +8,8 @@ from .utilities.common_HIL import Car
 from .utilities import setVcuHilOutputs
 
 # Variables for testing
-sleepDurationMs = 0.05
-tolerance = 2
+sleepDurationMs = 0.05 
+tolerance = 2  # Nm
 setup_complete = False
 vcu = None
 vcu_hil = None
@@ -29,6 +29,7 @@ def test_TV_setup(teststand):
         setVcuHilOutputs.setThrottleA(2.154)
         time.sleep(sleepDurationMs)
         assert vcu_hil.get_signal("Throttle_A_status")
+
         setVcuHilOutputs.setThrottleB(1.047)
         time.sleep(sleepDurationMs)
         assert vcu_hil.get_signal("Throttle_B_status")
@@ -41,7 +42,7 @@ def test_TV_setup(teststand):
 
 # Test 1: steering angle in dead zone (0)
 def test_TV_deadzone():
-    assert setup_complete, "Setup is incomplete!"
+    assert setup_complete
  
     setVcuHilOutputs.setSteering(1.650)
     time.sleep(sleepDurationMs)
@@ -56,7 +57,7 @@ def test_TV_deadzone():
 # Test 2 & 3: steering angle fully right and left
 @slash.parametrize(('testValue', 'expR', 'expL'), [(3.30, 1.56, 19.24), (0.00, 19.24, 1.56)])
 def test_TV_100R(testValue, expR, expL):
-    assert setup_complete, "Setup is incomplete!"
+    assert setup_complete
 
     setVcuHilOutputs.setSteering(testValue)
     time.sleep(sleepDurationMs)
