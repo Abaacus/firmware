@@ -33,8 +33,39 @@ NS_ :
 
 BS_:
 
-BU_: Computer PDU_HIL VCU_HIL
+BU_: DCU_HIL Computer PDU_HIL VCU_HIL
 
+
+BO_ 2281836295 DCU_HIL_output_status: 1 DCU_HIL
+ SG_ TV_button_status : 6|1@1+ (1,0) [0|1] ""  Computer
+ SG_ TC_button_status : 5|1@1+ (1,0) [0|1] ""  Computer
+ SG_ SEL_button_status : 4|1@1+ (1,0) [0|1] ""  Computer
+ SG_ NAV_R_button_status : 3|1@1+ (1,0) [0|1] ""  Computer
+ SG_ NAV_L_button_status : 2|1@1+ (1,0) [0|1] ""  Computer
+ SG_ HV_button_status : 1|1@1+ (1,0) [0|1] ""  Computer
+ SG_ EM_button_status : 0|1@1+ (1,0) [0|1] ""  Computer
+
+BO_ 2281770759 DCU_HIL_input: 2 DCU_HIL
+ SG_ TV_LED : 10|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ TC_LED : 9|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ MOT_RED_LED : 8|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ MOT_GR_LED : 7|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ MC_LED : 6|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ IMD_LED : 5|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ HV_LED : 4|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ EM_LED : 3|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ Buzzer : 2|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ AMS_RED_LED : 1|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ AMS_GR_LED : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+
+BO_ 2214594319 DCU_HIL_output: 1 Computer
+ SG_ TC_button : 6|1@1+ (1,0) [0|1] ""  DCU_HIL
+ SG_ SEL_button : 5|1@1+ (1,0) [0|1] ""  DCU_HIL
+ SG_ NAV_R_button : 4|1@1+ (1,0) [0|1] ""  DCU_HIL
+ SG_ NAV_L_button : 3|1@1+ (1,0) [0|1] ""  DCU_HIL
+ SG_ HV_button : 2|1@1+ (1,0) [0|1] ""  DCU_HIL
+ SG_ EM_button : 1|1@1+ (1,0) [0|1] ""  DCU_HIL
+ SG_ TV_button : 0|1@1+ (1,0) [0|1] ""  DCU_HIL
 
 BO_ 2281901827 Relay_PDU_outputs: 2 PDU_HIL
  SG_ Pow_right_fan : 11|1@1+ (1,0) [0|1] ""  Computer

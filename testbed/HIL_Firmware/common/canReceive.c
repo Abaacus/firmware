@@ -11,11 +11,13 @@ twai_message_t can_msg;
 
 QueueHandle_t vcu_hil_queue;
 QueueHandle_t pdu_hil_queue;
+QueueHandle_t dcu_hil_queue;
 
 void can_rx_task (void * pvParameters){
 
     vcu_hil_queue = xQueueCreate(MAX_QUEUE_LENGTH, sizeof(twai_message_t));
     pdu_hil_queue = xQueueCreate(MAX_QUEUE_LENGTH, sizeof(twai_message_t));
+    dcu_hil_queue = xQueueCreate(MAX_QUEUE_LENGTH, sizeof(twai_message_t));
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
@@ -41,6 +43,14 @@ void can_rx_task (void * pvParameters){
             if(error != pdPASS)
             {
                 printf("failed to send message to PDU HIL\n");
+            }
+        #endif
+
+        #ifdef DCU_HIL_ID
+            error = xQueueSend(dcu_hil_queue, &rx_msg, portMAX_DELAY);
+            if(error != pdPASS)
+            {
+                printf("failed to send message to DCU HIL\n");
             }
         #endif
 
