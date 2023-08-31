@@ -48,7 +48,7 @@ void process_rx_task(void *pvParameters)
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     while(1) {
-        xQueueReceive(vcu_hil_queue, &can_msg, portMAX_DELAY);
+        xQueueReceive(dcu_hil_queue, &can_msg, portMAX_DELAY);
         
         if (can_msg.extd) { // only parse messages in extended CAN frame
             switch (can_msg.identifier) {
@@ -84,11 +84,14 @@ twai_message_t CAN_output_status =
 
 /* A helper function for setting the GPIO pins */
 void set_output_pins(DCU_Output_t *buttons) {
+    uint8_t dByte0 = 0;
+
     for (int i = 0; i < OUTPUT_COUNT; i++) {
         if (gpio_set_level(OUTPUT_PIN_ARRAY[i], buttons->DCU_Output_TV_BTN + i) == ESP_OK) {
-            CAN_output_status.data[i] = PIN_SET;
+            dByte0 |= (PIN_SET << i);
         }
     }
 
+    CAN_output_status.data[0] = dByte0;
     twai_transmit(&CAN_output_status, portMAX_DELAY); // send CAN message
 }
