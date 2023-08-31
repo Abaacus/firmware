@@ -21,7 +21,7 @@ twai_message_t CAN_DCU_HIL_input =
 {
     .identifier = DCU_HIL_INPUT_ID,
     .extd = 1,
-    .data_length_code = 1,
+    .data_length_code = 2,
 };
 
 /* Poll the output of the DCU board @ 1 ms */
