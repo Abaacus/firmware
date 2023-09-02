@@ -87,11 +87,12 @@ void set_output_pins(DCU_Output_t *buttons) {
     uint8_t dByte0 = 0;
 
     for (int i = 0; i < OUTPUT_COUNT; i++) {
-        if (gpio_set_level(OUTPUT_PIN_ARRAY[i], buttons->DCU_Output_TV_BTN + i) == ESP_OK) {
+        uint8_t *level = (uint8_t *)buttons + i;
+        if (gpio_set_level(OUTPUT_PIN_ARRAY[i], *level) == ESP_OK) {
             dByte0 |= (PIN_SET << i);
         }
     }
-
+    
     CAN_output_status.data[0] = dByte0;
     twai_transmit(&CAN_output_status, portMAX_DELAY); // send CAN message
 }

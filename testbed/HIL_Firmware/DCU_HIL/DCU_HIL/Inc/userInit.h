@@ -7,17 +7,17 @@
 
 /* PINS */
 // CAN
-#define CAN_TX GPIO_NUM_12 //20
-#define CAN_RX GPIO_NUM_13 //21
+#define CAN_TX GPIO_NUM_12
+#define CAN_RX GPIO_NUM_13
 
 // Output pins
 #define EM_BTN_PIN      GPIO_NUM_4
 #define HV_BTN_PIN      GPIO_NUM_5
 #define TC_BTN_PIN      GPIO_NUM_6
 #define TV_BTN_PIN      GPIO_NUM_7
-#define NAV_R_BTN_PIN   GPIO_NUM_39 //32
-#define NAV_L_BTN_PIN   GPIO_NUM_40 //33
-#define SEL_BTN_PIN     GPIO_NUM_41 //34
+#define NAV_R_BTN_PIN   GPIO_NUM_39
+#define NAV_L_BTN_PIN   GPIO_NUM_40
+#define SEL_BTN_PIN     GPIO_NUM_41
 
 // Data is encoded in a byte where each bit correspond to a signal
 typedef enum {
@@ -32,17 +32,17 @@ typedef enum {
 } Output_Bit_t;
 
 // Input pins
-#define MC_LED_PIN      GPIO_NUM_15 //8
-#define IMD_LED_PIN     GPIO_NUM_16 //9
-#define MOT_RED_PIN     GPIO_NUM_17 //10
-#define MOT_GR_PIN      GPIO_NUM_18 //11
-#define AMS_RED_PIN     GPIO_NUM_8 //12
-#define AMS_GR_PIN      GPIO_NUM_3 //15
-#define BUZZER_PIN      GPIO_NUM_46 //16
-#define EM_LED_PIN      GPIO_NUM_35 //28
-#define TV_LED_PIN      GPIO_NUM_36 //29
-#define HV_LED_PIN      GPIO_NUM_37 //30
-#define TC_LED_PIN      GPIO_NUM_38 //31
+#define MC_LED_PIN      GPIO_NUM_15 // problem
+#define IMD_LED_PIN     GPIO_NUM_16 // problem
+#define MOT_RED_PIN     GPIO_NUM_17
+#define MOT_GR_PIN      GPIO_NUM_18
+#define AMS_RED_PIN     GPIO_NUM_8
+#define AMS_GR_PIN      GPIO_NUM_3
+#define BUZZER_PIN      GPIO_NUM_46 // problem
+#define EM_LED_PIN      GPIO_NUM_35
+#define TV_LED_PIN      GPIO_NUM_36
+#define HV_LED_PIN      GPIO_NUM_37
+#define TC_LED_PIN      GPIO_NUM_38
 
 // Data is encoded in a byte where each bit correspond to a signal
 typedef enum {

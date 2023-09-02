@@ -127,6 +127,11 @@ void GPIO_init(void)
 
     // Output pins
     for (int i = 0; i < OUTPUT_COUNT; i++) {
+        /* reset is needed because IO39, 40, and 41 are JTAG 
+         * by default. To use them as normal GPIOs, do reset.
+         * Most pins by default are GPIO.
+         */
+        gpio_reset_pin(OUTPUT_PIN_ARRAY[i]);
         gpio_set_direction(OUTPUT_PIN_ARRAY[i], GPIO_MODE_OUTPUT);
     }
 }

@@ -32,6 +32,7 @@ void poll_DCU_output_task(void *pvParameters)
 	uint16_t byte_mask = 0xFF;
 
     while (1) {
+		DCU_GPIO_data = 0;
 		DCU_GPIO_data |= gpio_get_level(INPUT_PIN_ARRAY[0]) << AMS_GR_BIT;
 		DCU_GPIO_data |= gpio_get_level(INPUT_PIN_ARRAY[1]) << AMS_RED_BIT;
 		DCU_GPIO_data |= gpio_get_level(INPUT_PIN_ARRAY[2]) << BUZZER_BIT;
