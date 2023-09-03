@@ -32,16 +32,16 @@
 #define MC_LED_MASK     (1 << (MC_LED_BIT - BITS_IN_BYTE))
 
 typedef struct {
-    uint8_t DCU_Output_TV_BTN;
-    uint8_t DCU_Output_EM_BTN;
-    uint8_t DCU_Output_HV_BTN;
-    uint8_t DCU_Output_NAV_L_BTN;
-    uint8_t DCU_Output_NAV_R_BTN;
-    uint8_t DCU_Output_SEL_BTN;
-    uint8_t DCU_Output_TC_BTN;
-    uint8_t DCU_Output_IMD_LED;
-    uint8_t DCU_Output_BUZZER;
-    uint8_t DCU_Output_MC_LED;
+    bool DCU_Output_TV_BTN;
+    bool DCU_Output_EM_BTN;
+    bool DCU_Output_HV_BTN;
+    bool DCU_Output_NAV_L_BTN;
+    bool DCU_Output_NAV_R_BTN;
+    bool DCU_Output_SEL_BTN;
+    bool DCU_Output_TC_BTN;
+    bool DCU_Output_IMD_LED;
+    bool DCU_Output_BUZZER;
+    bool DCU_Output_MC_LED;
 } DCU_Output_t;
 
 static uint8_t dByte0 = 0;
@@ -70,9 +70,9 @@ void process_rx_task(void *pvParameters)
                     output.DCU_Output_NAV_R_BTN = (dByte0 & NAV_R_BTN_MASK);
                     output.DCU_Output_SEL_BTN = (dByte0 & SEL_BTN_MASK);
                     output.DCU_Output_TC_BTN = (dByte0 & TC_BTN_MASK);
-                    output.DCU_Output_IMD_LED = (dByte0 & IMD_LED_MASK);
-                    output.DCU_Output_BUZZER = (dByte1 & BUZZER_MASK);
-                    output.DCU_Output_MC_LED = (dByte1 & MC_LED_MASK);
+                    output.DCU_Output_IMD_LED = ((dByte0 & IMD_LED_MASK) ? 0 : 1); // invert signal
+                    output.DCU_Output_BUZZER = ((dByte1 & BUZZER_MASK) ? 0 : 1); // invert signal
+                    output.DCU_Output_MC_LED = ((dByte1 & MC_LED_MASK) ? 0 : 1); // invert signal
 
                     set_output_pins(&output);
                 default:
@@ -100,7 +100,7 @@ void set_output_pins(DCU_Output_t *output) {
     uint8_t dByte1 = 0;
 
     for (int i = 0; i < OUTPUT_COUNT; i++) {
-        uint8_t *level = (uint8_t *)output + i; // iterate over elements
+        bool *level = (bool *)output + i; // iterate over elements
 
         if (gpio_set_level(OUTPUT_PIN_ARRAY[i], *level) == ESP_OK) {
             if (i < BITS_IN_BYTE) { // 1st byte
