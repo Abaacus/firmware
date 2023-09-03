@@ -24,12 +24,12 @@
 void create_task(void)
 {
     BaseType_t xReturned;
-    TaskHandle_t CAN_rx_task_handler; // found in common
+    TaskHandle_t CAN_rx_task_handler;
     TaskHandle_t CAN_process_task_handler;
     TaskHandle_t poll_DCU_output_task_handler;
 
     xReturned = xTaskCreate(
-        can_rx_task,
+        can_rx_task, // found in common
         "CAN_RECEIVE_TASK",
         4096,
         NULL,
@@ -86,7 +86,7 @@ esp_err_t CAN_init(void)
     twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
 
-    //Install TWAI driver
+    // Install TWAI driver
     if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
         printf("Driver installed\n");
     } else {
@@ -94,7 +94,7 @@ esp_err_t CAN_init(void)
         return ESP_FAIL;
     }
 
-    //Start TWAI driver
+    // Start TWAI driver
     if (twai_start() == ESP_OK) {
         printf("Driver started\n");
         return ESP_OK;
@@ -105,17 +105,15 @@ esp_err_t CAN_init(void)
 }
 
 /* Pin arrays */
-// Output array
 const int OUTPUT_PIN_ARRAY[] = {
     TV_BTN_PIN, EM_BTN_PIN, HV_BTN_PIN, NAV_L_BTN_PIN,
-    NAV_R_BTN_PIN, SEL_BTN_PIN, TC_BTN_PIN
+    NAV_R_BTN_PIN, SEL_BTN_PIN, TC_BTN_PIN, IMD_LED_PIN,
+    BUZZER_PIN, MC_LED_PIN
 };
 
-// Input array
 const int INPUT_PIN_ARRAY[] = {
-    AMS_GR_PIN, AMS_RED_PIN, BUZZER_PIN, EM_LED_PIN, HV_LED_PIN, 
-    IMD_LED_PIN, MC_LED_PIN, MOT_GR_PIN, MOT_RED_PIN, TC_LED_PIN,
-    TV_LED_PIN
+    AMS_GR_PIN, AMS_RED_PIN, EM_LED_PIN, HV_LED_PIN,
+    MOT_GR_PIN, MOT_RED_PIN, TC_LED_PIN, TV_LED_PIN
 };
 
 void GPIO_init(void)
@@ -127,9 +125,9 @@ void GPIO_init(void)
 
     // Output pins
     for (int i = 0; i < OUTPUT_COUNT; i++) {
-        /* reset is needed because IO39, 40, and 41 are JTAG 
+        /* Reset is needed because IO39, 40, and 41 are for JTAG 
          * by default. To use them as normal GPIOs, do reset.
-         * Most pins by default are GPIO.
+         * The functionality of most pins is GPIO by default.
          */
         gpio_reset_pin(OUTPUT_PIN_ARRAY[i]);
         gpio_set_direction(OUTPUT_PIN_ARRAY[i], GPIO_MODE_OUTPUT);

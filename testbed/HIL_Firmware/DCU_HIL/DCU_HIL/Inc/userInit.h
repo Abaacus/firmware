@@ -18,8 +18,12 @@
 #define NAV_R_BTN_PIN   GPIO_NUM_39
 #define NAV_L_BTN_PIN   GPIO_NUM_40
 #define SEL_BTN_PIN     GPIO_NUM_41
+#define MC_LED_PIN      GPIO_NUM_15
+#define IMD_LED_PIN     GPIO_NUM_16
+#define BUZZER_PIN      GPIO_NUM_46
 
-// Data is encoded in a byte where each bit correspond to a signal
+
+// Data is encoded in two bytes where each bit correspond to a signal
 typedef enum {
     TV_BTN_BIT,
     EM_BTN_BIT,
@@ -28,17 +32,17 @@ typedef enum {
     NAV_R_BTN_BIT,
     SEL_BTN_BIT,
     TC_BTN_BIT,
+    IMD_LED_BIT,
+    BUZZER_BIT,
+    MC_LED_BIT,
     OUTPUT_COUNT,
 } Output_Bit_t;
 
 // Input pins
-#define MC_LED_PIN      GPIO_NUM_15 // problem
-#define IMD_LED_PIN     GPIO_NUM_16 // problem
 #define MOT_RED_PIN     GPIO_NUM_17
 #define MOT_GR_PIN      GPIO_NUM_18
 #define AMS_RED_PIN     GPIO_NUM_8
 #define AMS_GR_PIN      GPIO_NUM_3
-#define BUZZER_PIN      GPIO_NUM_46 // problem
 #define EM_LED_PIN      GPIO_NUM_35
 #define TV_LED_PIN      GPIO_NUM_36
 #define HV_LED_PIN      GPIO_NUM_37
@@ -48,11 +52,8 @@ typedef enum {
 typedef enum {
     AMS_GR_BIT,
     AMS_RED_BIT,
-    BUZZER_BIT,
     EM_LED_BIT,
     HV_LED_BIT,
-    IMD_LED_BIT,
-    MC_LED_BIT,
     MOT_GR_BIT,
     MOT_RED_BIT,
     TC_LED_BIT,

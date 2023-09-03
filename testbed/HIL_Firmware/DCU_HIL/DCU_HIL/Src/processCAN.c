@@ -20,13 +20,16 @@
 #include <stdio.h>
 
 /* process_rx_task defines and variables */
-#define TV_BTN_mask     (1 << TV_BTN_BIT)  
-#define EM_BTN_mask     (1 << EM_BTN_BIT)
-#define HV_BTN_mask     (1 << HV_BTN_BIT)
-#define NAV_L_BTN_mask  (1 << NAV_L_BTN_BIT)
-#define NAV_R_BTN_mask  (1 << NAV_R_BTN_BIT)
-#define SEL_BTN_mask    (1 << SEL_BTN_BIT)
-#define TC_BTN_mask     (1 << TC_BTN_BIT)
+#define TV_BTN_MASK     (1 << TV_BTN_BIT)  
+#define EM_BTN_MASK     (1 << EM_BTN_BIT)
+#define HV_BTN_MASK     (1 << HV_BTN_BIT)
+#define NAV_L_BTN_MASK  (1 << NAV_L_BTN_BIT)
+#define NAV_R_BTN_MASK  (1 << NAV_R_BTN_BIT)
+#define SEL_BTN_MASK    (1 << SEL_BTN_BIT)
+#define TC_BTN_MASK     (1 << TC_BTN_BIT)
+#define IMD_LED_MASK    (1 << IMD_LED_BIT) // end of first byte
+#define BUZZER_MASK     (1 << (BUZZER_BIT - BITS_IN_BYTE))
+#define MC_LED_MASK     (1 << (MC_LED_BIT - BITS_IN_BYTE))
 
 typedef struct {
     uint8_t DCU_Output_TV_BTN;
@@ -36,12 +39,16 @@ typedef struct {
     uint8_t DCU_Output_NAV_R_BTN;
     uint8_t DCU_Output_SEL_BTN;
     uint8_t DCU_Output_TC_BTN;
+    uint8_t DCU_Output_IMD_LED;
+    uint8_t DCU_Output_BUZZER;
+    uint8_t DCU_Output_MC_LED;
 } DCU_Output_t;
 
 static uint8_t dByte0 = 0;
-static DCU_Output_t buttons;
+static uint8_t dByte1 = 0;
+static DCU_Output_t output;
 
-void set_output_pins(DCU_Output_t *buttons);
+void set_output_pins(DCU_Output_t *output);
 
 void process_rx_task(void *pvParameters)
 {
@@ -54,15 +61,20 @@ void process_rx_task(void *pvParameters)
             switch (can_msg.identifier) {
                 case DCU_HIL_OUTPUT_ID:  
                     dByte0 = can_msg.data[0];
-                    buttons.DCU_Output_TV_BTN = (dByte0 & TV_BTN_mask);
-                    buttons.DCU_Output_EM_BTN = (dByte0 & EM_BTN_mask);
-                    buttons.DCU_Output_HV_BTN = (dByte0 & HV_BTN_mask);
-                    buttons.DCU_Output_NAV_L_BTN = (dByte0 & NAV_L_BTN_mask);
-                    buttons.DCU_Output_NAV_R_BTN = (dByte0 & NAV_R_BTN_mask);
-                    buttons.DCU_Output_SEL_BTN = (dByte0 & SEL_BTN_mask);
-                    buttons.DCU_Output_TC_BTN = (dByte0 & TC_BTN_mask);
+                    dByte1 = can_msg.data[1];
 
-                    set_output_pins(&buttons);
+                    output.DCU_Output_TV_BTN = (dByte0 & TV_BTN_MASK);
+                    output.DCU_Output_EM_BTN = (dByte0 & EM_BTN_MASK);
+                    output.DCU_Output_HV_BTN = (dByte0 & HV_BTN_MASK);
+                    output.DCU_Output_NAV_L_BTN = (dByte0 & NAV_L_BTN_MASK);
+                    output.DCU_Output_NAV_R_BTN = (dByte0 & NAV_R_BTN_MASK);
+                    output.DCU_Output_SEL_BTN = (dByte0 & SEL_BTN_MASK);
+                    output.DCU_Output_TC_BTN = (dByte0 & TC_BTN_MASK);
+                    output.DCU_Output_IMD_LED = (dByte0 & IMD_LED_MASK);
+                    output.DCU_Output_BUZZER = (dByte1 & BUZZER_MASK);
+                    output.DCU_Output_MC_LED = (dByte1 & MC_LED_MASK);
+
+                    set_output_pins(&output);
                 default:
                     break;
             }
@@ -79,20 +91,27 @@ twai_message_t CAN_output_status =
 {
     .identifier = DCU_HIL_OUTPUT_STATUS_ID,
     .extd = 1,
-    .data_length_code = 1,
+    .data_length_code = 2,
 };
 
 /* A helper function for setting the GPIO pins */
-void set_output_pins(DCU_Output_t *buttons) {
+void set_output_pins(DCU_Output_t *output) {
     uint8_t dByte0 = 0;
+    uint8_t dByte1 = 0;
 
     for (int i = 0; i < OUTPUT_COUNT; i++) {
-        uint8_t *level = (uint8_t *)buttons + i;
+        uint8_t *level = (uint8_t *)output + i; // iterate over elements
+
         if (gpio_set_level(OUTPUT_PIN_ARRAY[i], *level) == ESP_OK) {
-            dByte0 |= (PIN_SET << i);
+            if (i < BITS_IN_BYTE) { // 1st byte
+                dByte0 |= (PIN_SET << i);
+            } else {
+                dByte1 |= (PIN_SET << (i - BITS_IN_BYTE)); // 2nd byte
+            }
         }
     }
-    
+
     CAN_output_status.data[0] = dByte0;
+    CAN_output_status.data[1] = dByte1;
     twai_transmit(&CAN_output_status, portMAX_DELAY); // send CAN message
 }
