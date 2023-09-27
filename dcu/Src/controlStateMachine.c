@@ -21,6 +21,10 @@ TimerHandle_t buzzerSoundTimer;
 void buzzerTimerCallback(TimerHandle_t timer);
 bool buzzerTimerStarted = false;
 
+
+
+
+
 #define DEBOUNCE_WAIT_MS 50
 
 TimerHandle_t debounceTimer;
