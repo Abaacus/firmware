@@ -21,3 +21,4 @@ class VehicleBoardId(Enum):
 
 class HilBoardId(Enum):
     VCU_HIL = 2
+    BMU_HIL = 1

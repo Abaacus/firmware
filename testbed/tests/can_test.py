@@ -18,6 +18,21 @@ def test_steeringAngle(teststand):
         steerAngle = vcu.get_signal("SteeringAngle")
         assert abs(steerAngle-angle) <= 5
 
+#  BMU Brake Pressure Test
+def test_rearbrakePressure(teststand):
+    print(teststand.vehicle_boards)
+    bmu_hil: HILBoard = teststand.hil_boards["bmu_hil"]
+    bmu: VehicleBoard = teststand.vehicle_boards["bmu"]
+    for brake_pres in range (0, 4095, 1000):
+        bmu_hil.set_signal("Brake_Sense_Analog",
+         {"Brake_Sense_Analog": np.interp(brake_pres, [0, 4095], [0, 3.3])})
+        test_val = np.interp(brake_pres, [0, 4095], [0, 3.3])
+        time.sleep(0.001)
+        assert bmu_hil.get_signal("Brake_Sense_Status")
+        time.sleep(0.75)
+        msg_brake_pres = bmu.get_signal("BrakePressureBMU")
+        assert msg_brake_pres == test_val
+
 
 ### TEMPORARY
 # How to check for DTC example (where 10 = a DTC code, vcu = teststand.vehicle_boards["vcu"])
