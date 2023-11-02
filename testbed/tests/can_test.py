@@ -23,14 +23,22 @@ def test_rearbrakePressure(teststand):
     print(teststand.vehicle_boards)
     bmu_hil: HILBoard = teststand.hil_boards["bmu_hil"]
     bmu: VehicleBoard = teststand.vehicle_boards["bmu"]
+
     for brake_pres in range (0, 4095, 1000):
+        # Set signal via the HIL board (Signal yet to be confirmed)
         bmu_hil.set_signal("Brake_Sense_Analog",
          {"Brake_Sense_Analog": np.interp(brake_pres, [0, 4095], [0, 3.3])})
         test_val = np.interp(brake_pres, [0, 4095], [0, 3.3])
         time.sleep(0.001)
-        assert bmu_hil.get_signal("Brake_Sense_Status")
+        
+        # Check status of the set signal
+        assert _hil.get_signal("Brake_Sense_Status")
         time.sleep(0.75)
+        
+        # Get signal value from the vehicle CANBus
         msg_brake_pres = bmu.get_signal("BrakePressureBMU")
+
+        # Validate if sent value is same as received
         assert msg_brake_pres == test_val
 
 
