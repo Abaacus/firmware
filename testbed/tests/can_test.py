@@ -19,7 +19,7 @@ def test_steeringAngle(teststand):
         assert abs(steerAngle-angle) <= 5
 
 #  BMU Brake Pressure Test
-def test_rearbrakePressure(teststand):
+def test_BMU_BrakePressure(teststand):
     print(teststand.vehicle_boards)
     bmu_hil: HILBoard = teststand.hil_boards["bmu_hil"]
     bmu: VehicleBoard = teststand.vehicle_boards["bmu"]
@@ -39,7 +39,7 @@ def test_rearbrakePressure(teststand):
         msg_brake_pres = bmu.get_signal("BrakePressureBMU")
 
         # Validate if sent value is same as received
-        assert msg_brake_pres == test_val
+        assert msg_brake_pres == brake_pres
 
 
 ### TEMPORARY
