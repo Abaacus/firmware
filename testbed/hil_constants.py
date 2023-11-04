@@ -1,5 +1,6 @@
 from enum import Enum
 
+# For board IDs, follow the CAN bus wiki page: http://208.68.36.87/projects/firmware/wiki/can-bus
 class VehicleBoardId(Enum):
     BMU = 1
     VCU = 2
@@ -17,7 +18,6 @@ class VehicleBoardId(Enum):
     CHARGER = 14
     DEBUG = 15
 
-
-
 class HilBoardId(Enum):
     VCU_HIL = 2
+    PDU_HIL = 3
